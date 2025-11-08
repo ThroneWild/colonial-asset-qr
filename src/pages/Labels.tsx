@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
+import logoColonial from '@/assets/logo-colonial.png';
 
 const Labels = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -80,15 +81,16 @@ const Labels = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-primary text-primary-foreground py-6 px-4 shadow-md print:hidden">
+      <header className="bg-primary text-primary-foreground py-4 px-4 shadow-md print:hidden">
         <div className="container mx-auto">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-primary-foreground hover:bg-primary-foreground/10">
               <ArrowLeft className="h-5 w-5" />
             </Button>
+            <img src={logoColonial} alt="Hotel Colonial Iguaçu" className="h-10 w-auto" />
             <div>
-              <h1 className="text-3xl font-bold">Geração de Etiquetas</h1>
-              <p className="text-primary-foreground/90 mt-1">
+              <h1 className="text-xl font-bold">Geração de Etiquetas</h1>
+              <p className="text-xs text-primary-foreground/90">
                 Selecione os ativos para imprimir etiquetas
               </p>
             </div>
@@ -145,33 +147,34 @@ const Labels = () => {
         </div>
 
         <div className="hidden print:block">
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-4 gap-2">
             {selectedAssetsList.map((asset) => (
               <div
                 key={asset.id}
-                className="border border-black page-break-inside-avoid"
-                style={{ width: '180px', height: '130px', padding: '4px' }}
+                className="border-2 border-black page-break-inside-avoid"
+                style={{ width: '195px', height: '155px', padding: '6px' }}
               >
                 <div className="flex flex-col h-full">
-                  <div className="text-center border-b border-black pb-1 mb-1">
-                    <h3 className="text-[8px] font-bold leading-tight">Hotel Colonial Iguaçu</h3>
+                  <div className="flex items-center justify-center border-b-2 border-black pb-1 mb-2">
+                    <img src={logoColonial} alt="Hotel Colonial Iguaçu" className="h-8 w-auto" />
                   </div>
 
-                  <div className="flex-1 flex gap-1">
-                    <div className="flex-1 min-w-0">
-                      <div className="mb-1">
-                        <p className="text-[9px] font-bold leading-tight">HCI-{String(asset.item_number).padStart(6, '0')}</p>
-                      </div>
+                  <div className="flex-1 flex gap-2">
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div>
-                        <p className="text-[7px] font-medium leading-tight line-clamp-3">{asset.description}</p>
+                        <p className="text-[10px] font-bold leading-tight mb-1">HCI-{String(asset.item_number).padStart(6, '0')}</p>
+                        <p className="text-[8px] font-medium leading-tight line-clamp-4">{asset.description}</p>
+                      </div>
+                      <div className="text-[7px] text-gray-600 mt-1">
+                        <p className="truncate">{asset.sector}</p>
                       </div>
                     </div>
 
-                    <div className="flex-shrink-0">
-                      <div className="bg-white border border-gray-300">
+                    <div className="flex-shrink-0 flex items-center">
+                      <div className="bg-white p-1 border border-gray-400">
                         <QRCodeSVG
                           value={asset.qr_code_url || `${window.location.origin}/asset/${asset.id}`}
-                          size={60}
+                          size={70}
                           level="H"
                         />
                       </div>
@@ -188,7 +191,7 @@ const Labels = () => {
         @media print {
           @page {
             size: A4;
-            margin: 0.5cm;
+            margin: 0.4cm;
           }
           body {
             print-color-adjust: exact;
@@ -198,9 +201,9 @@ const Labels = () => {
             page-break-inside: avoid;
             break-inside: avoid;
           }
-          .line-clamp-3 {
+          .line-clamp-4 {
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;
             overflow: hidden;
           }

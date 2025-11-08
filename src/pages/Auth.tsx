@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { LogIn, UserPlus } from 'lucide-react';
 import { z } from 'zod';
+import logoColonial from '@/assets/logo-colonial.png';
 
 const signUpSchema = z.object({
   full_name: z.string().trim().min(3, 'Nome deve ter no mínimo 3 caracteres').max(100, 'Nome muito longo'),
@@ -148,8 +149,11 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-8 shadow-elegant border-0 animate-scale-in">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Hotel Colonial Iguaçu</h1>
-          <p className="text-muted-foreground">Sistema de Gestão Patrimonial</p>
+          <div className="flex justify-center mb-4">
+            <img src={logoColonial} alt="Hotel Colonial Iguaçu" className="h-20 w-auto" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-1">Hotel Colonial Iguaçu</h1>
+          <p className="text-sm text-muted-foreground">Sistema de Gestão Patrimonial</p>
         </div>
 
         <div className="flex gap-2 mb-6">

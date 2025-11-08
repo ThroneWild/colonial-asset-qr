@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Plus, Package, FileSpreadsheet, Tag, LogOut, User } from 'lucide-react';
+import { Plus, Package, FileSpreadsheet, Tag, LogOut, User, DollarSign, MapPin } from 'lucide-react';
 import { AssetList } from '@/components/AssetList';
 import { AssetForm } from '@/components/AssetForm';
 import { AssetDetails } from '@/components/AssetDetails';
@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import logoColonial from '@/assets/logo-colonial.png';
 
 const Index = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -164,14 +165,17 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <header className="gradient-primary text-primary-foreground shadow-elegant sticky top-0 z-50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Hotel Colonial Iguaçu</h1>
-              <p className="text-sm opacity-90 mt-1">Sistema de Gestão Patrimonial</p>
-            </div>
             <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center gap-2 text-sm">
+              <img src={logoColonial} alt="Hotel Colonial Iguaçu" className="h-12 w-auto" />
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight">Hotel Colonial Iguaçu</h1>
+                <p className="text-xs opacity-90">Sistema de Gestão Patrimonial</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="hidden md:flex items-center gap-2 text-sm bg-primary-foreground/10 px-3 py-2 rounded-lg">
                 <User className="h-4 w-4" />
                 <span className="opacity-90">{userName}</span>
               </div>
@@ -181,8 +185,8 @@ const Index = () => {
                 size="sm"
                 className="bg-primary-foreground/10 border-primary-foreground/20 hover:bg-primary-foreground/20 text-primary-foreground"
               >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
+                <LogOut className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Sair</span>
               </Button>
             </div>
           </div>
@@ -190,39 +194,39 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
-          <Card className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card">
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
+          <Card className="p-5 shadow-card hover:shadow-hover transition-smooth border-0 bg-card/80 backdrop-blur-sm">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-xl bg-primary/10">
-                <Package className="h-6 w-6 text-primary" />
+                <Package className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Total de Ativos</h3>
-                <p className="text-3xl font-bold text-foreground mt-1">{assets.length}</p>
+                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Total de Ativos</h3>
+                <p className="text-2xl font-bold text-foreground mt-1">{assets.length}</p>
               </div>
             </div>
           </Card>
-          <Card className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card">
+          <Card className="p-5 shadow-card hover:shadow-hover transition-smooth border-0 bg-card/80 backdrop-blur-sm">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-xl bg-primary/10">
-                <Package className="h-6 w-6 text-primary" />
+                <DollarSign className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Valor Total</h3>
-                <p className="text-3xl font-bold text-foreground mt-1">
+                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Valor Total</h3>
+                <p className="text-2xl font-bold text-foreground mt-1">
                   R$ {assets.reduce((acc, asset) => acc + (asset.evaluation_value || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
           </Card>
-          <Card className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card">
+          <Card className="p-5 shadow-card hover:shadow-hover transition-smooth border-0 bg-card/80 backdrop-blur-sm">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-xl bg-primary/10">
-                <Package className="h-6 w-6 text-primary" />
+                <MapPin className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Setores Ativos</h3>
-                <p className="text-3xl font-bold text-foreground mt-1">
+                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Setores Ativos</h3>
+                <p className="text-2xl font-bold text-foreground mt-1">
                   {new Set(assets.map(a => a.sector)).size}
                 </p>
               </div>
@@ -230,30 +234,43 @@ const Index = () => {
           </Card>
         </div>
 
-        <div className="mb-8 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-          <div>
-            <h2 className="text-3xl font-bold text-foreground">Ativos Cadastrados</h2>
-            <p className="text-muted-foreground mt-1">Gerencie todos os bens do hotel</p>
+        <Card className="mb-6 p-6 shadow-card border-0 bg-card/80 backdrop-blur-sm">
+          <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">Gestão de Ativos</h2>
+              <p className="text-sm text-muted-foreground mt-1">Gerencie todos os bens do hotel</p>
+            </div>
+            <div className="flex flex-wrap gap-2 w-full md:w-auto">
+              <Button 
+                onClick={() => setIsFormOpen(true)} 
+                className="gap-2 shadow-card hover:shadow-elegant transition-smooth flex-1 md:flex-initial"
+              >
+                <Plus className="h-4 w-4" />
+                Novo Ativo
+              </Button>
+              <Button 
+                onClick={handleExportExcel} 
+                variant="outline" 
+                className="gap-2 shadow-card hover:shadow-elegant transition-smooth flex-1 md:flex-initial"
+              >
+                <FileSpreadsheet className="h-4 w-4" />
+                Exportar
+              </Button>
+              <Button 
+                onClick={() => navigate('/labels')} 
+                variant="outline" 
+                className="gap-2 shadow-card hover:shadow-elegant transition-smooth flex-1 md:flex-initial"
+              >
+                <Tag className="h-4 w-4" />
+                Etiquetas
+              </Button>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={() => setIsFormOpen(true)} className="gap-2 shadow-card hover:shadow-elegant transition-smooth">
-              <Plus className="h-4 w-4" />
-              Novo Ativo
-            </Button>
-            <Button onClick={handleExportExcel} variant="outline" className="gap-2 shadow-card hover:shadow-elegant transition-smooth">
-              <FileSpreadsheet className="h-4 w-4" />
-              Exportar Planilha
-            </Button>
-            <Button onClick={() => navigate('/labels')} variant="outline" className="gap-2 shadow-card hover:shadow-elegant transition-smooth">
-              <Tag className="h-4 w-4" />
-              Gerar Etiquetas
-            </Button>
-          </div>
-        </div>
+        </Card>
 
         {isFormOpen && (
-          <Card className="p-6 mb-8 shadow-card border-0 bg-card animate-scale-in">
-            <h3 className="text-2xl font-semibold mb-6 text-foreground">Cadastrar Novo Ativo</h3>
+          <Card className="p-6 mb-6 shadow-card border-0 bg-card/80 backdrop-blur-sm animate-scale-in">
+            <h3 className="text-xl font-semibold mb-6 text-foreground">Cadastrar Novo Ativo</h3>
             <AssetForm
               onSubmit={handleSubmit}
               onCancel={() => setIsFormOpen(false)}
