@@ -1,18 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Asset } from '@/types/asset';
+import { Asset, SECTORS } from '@/types/asset';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useAuth } from '@/hooks/useAuth';
 
 const AssetView = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [asset, setAsset] = useState<Asset | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newSector, setNewSector] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -44,6 +64,30 @@ const AssetView = () => {
       navigate('/');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleChangeSector = async () => {
+    if (!newSector || !asset || !user) return;
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('assets')
+        .update({ sector: newSector })
+        .eq('id', asset.id);
+
+      if (error) throw error;
+
+      setAsset({ ...asset, sector: newSector });
+      toast.success('Local alterado com sucesso!');
+      setIsDialogOpen(false);
+      setNewSector('');
+    } catch (error) {
+      console.error('Erro ao alterar setor:', error);
+      toast.error('Erro ao alterar local. Faça login para continuar.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -108,8 +152,18 @@ const AssetView = () => {
         <Card className="p-8 max-w-3xl mx-auto">
           <div className="space-y-6">
             <div className="text-center pb-6 border-b">
-              <p className="text-sm font-semibold text-primary mb-2">Item #{asset.item_number}</p>
+              <p className="text-sm font-semibold text-primary mb-2">HCI-{String(asset.item_number).padStart(6, '0')}</p>
               <h2 className="text-3xl font-bold text-foreground">{asset.description}</h2>
+              {user && (
+                <Button
+                  onClick={() => setIsDialogOpen(true)}
+                  variant="outline"
+                  className="mt-4"
+                >
+                  <MapPin className="mr-2 h-4 w-4" />
+                  Alterar Local
+                </Button>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -190,6 +244,39 @@ const AssetView = () => {
           </div>
         </Card>
       </main>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Alterar Local do Item</DialogTitle>
+            <DialogDescription>
+              Selecione o novo setor onde o item está localizado.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Select value={newSector} onValueChange={setNewSector}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o novo setor" />
+              </SelectTrigger>
+              <SelectContent>
+                {SECTORS.map((sector) => (
+                  <SelectItem key={sector} value={sector}>
+                    {sector}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSaving}>
+              Cancelar
+            </Button>
+            <Button onClick={handleChangeSector} disabled={!newSector || isSaving}>
+              {isSaving ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
