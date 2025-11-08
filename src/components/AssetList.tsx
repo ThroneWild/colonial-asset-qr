@@ -1,38 +1,16 @@
-import { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Asset } from '@/types/asset';
-import { Eye, Search } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { SECTORS, ASSET_GROUPS } from '@/types/asset';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Eye, Edit } from 'lucide-react';
 
 interface AssetListProps {
   assets: Asset[];
   onViewAsset: (asset: Asset) => void;
+  onEditAsset?: (asset: Asset) => void;
 }
 
-export const AssetList = ({ assets, onViewAsset }: AssetListProps) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sectorFilter, setSectorFilter] = useState<string>('all');
-  const [groupFilter, setGroupFilter] = useState<string>('all');
-
-  const filteredAssets = assets.filter((asset) => {
-    const matchesSearch =
-      asset.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.item_number.toString().includes(searchTerm);
-    const matchesSector = sectorFilter === 'all' || asset.sector === sectorFilter;
-    const matchesGroup = groupFilter === 'all' || asset.asset_group === groupFilter;
-    return matchesSearch && matchesSector && matchesGroup;
-  });
-
+export const AssetList = ({ assets, onViewAsset, onEditAsset }: AssetListProps) => {
   const getConservationColor = (state: string) => {
     switch (state) {
       case 'Novo':
@@ -50,46 +28,8 @@ export const AssetList = ({ assets, onViewAsset }: AssetListProps) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Buscar por descrição ou número..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <Select value={sectorFilter} onValueChange={setSectorFilter}>
-          <SelectTrigger className="w-full md:w-[200px]">
-            <SelectValue placeholder="Filtrar por setor" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os setores</SelectItem>
-            {SECTORS.map((sector) => (
-              <SelectItem key={sector} value={sector}>
-                {sector}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={groupFilter} onValueChange={setGroupFilter}>
-          <SelectTrigger className="w-full md:w-[200px]">
-            <SelectValue placeholder="Filtrar por grupo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os grupos</SelectItem>
-            {ASSET_GROUPS.map((group) => (
-              <SelectItem key={group} value={group}>
-                {group}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredAssets.map((asset) => (
+        {assets.map((asset) => (
           <Card key={asset.id} className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card group">
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
@@ -100,14 +40,6 @@ export const AssetList = ({ assets, onViewAsset }: AssetListProps) => {
                   {asset.description}
                 </h3>
               </div>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => onViewAsset(asset)}
-                className="h-9 w-9 hover:bg-primary/10 hover:text-primary transition-smooth"
-              >
-                <Eye className="h-5 w-5" />
-              </Button>
             </div>
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
@@ -130,11 +62,23 @@ export const AssetList = ({ assets, onViewAsset }: AssetListProps) => {
                 </p>
               )}
             </div>
+            <div className="flex gap-2 mt-4">
+              <Button onClick={() => onViewAsset(asset)} size="sm" className="flex-1">
+                <Eye className="h-4 w-4 mr-2" />
+                Visualizar
+              </Button>
+              {onEditAsset && (
+                <Button onClick={() => onEditAsset(asset)} size="sm" variant="outline" className="flex-1">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Editar
+                </Button>
+              )}
+            </div>
           </Card>
         ))}
       </div>
 
-      {filteredAssets.length === 0 && (
+      {assets.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">Nenhum ativo encontrado</p>
         </div>

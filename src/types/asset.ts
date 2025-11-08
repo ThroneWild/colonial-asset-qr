@@ -47,3 +47,41 @@ export const ASSET_GROUPS = [
 ] as const;
 
 export const CONSERVATION_STATES = ['Novo', 'Bom', 'Regular', 'Ruim'] as const;
+
+export interface AssetHistoryEntry {
+  id: string;
+  asset_id: string;
+  user_id: string;
+  action: 'created' | 'updated' | 'deleted' | 'sector_changed';
+  old_values: Partial<Asset> | null;
+  new_values: Partial<Asset>;
+  changed_fields: string[];
+  created_at: string;
+  user_profile?: {
+    full_name: string;
+    email: string;
+  };
+}
+
+export interface AssetFilters {
+  searchTerm?: string;
+  sectors?: string[];
+  groups?: string[];
+  conservationStates?: string[];
+  valueMin?: number;
+  valueMax?: number;
+  dateFrom?: Date;
+  dateTo?: Date;
+  sortBy?: 'date_desc' | 'date_asc' | 'value_desc' | 'value_asc' | 'alpha';
+}
+
+export interface AssetStatistics {
+  totalAssets: number;
+  totalValue: number;
+  averageValue: number;
+  assetsBySector: Record<string, number>;
+  assetsByGroup: Record<string, number>;
+  assetsByConservation: Record<string, number>;
+  maintenanceRate: number;
+  monthlyGrowth: number;
+}

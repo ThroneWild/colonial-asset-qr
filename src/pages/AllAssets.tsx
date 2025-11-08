@@ -1,18 +1,35 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Asset } from '@/types/asset';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { ArrowLeft, FileSpreadsheet, Tag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { Asset, AssetFilters } from '@/types/asset';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { ArrowLeft, FileSpreadsheet, Tags, Edit } from 'lucide-react';
 import { AssetList } from '@/components/AssetList';
 import { AssetDetails } from '@/components/AssetDetails';
+import { AssetEditForm } from '@/components/AssetEditForm';
+import { AdvancedFilters } from '@/components/AdvancedFilters';
+import { useAssetFilters } from '@/hooks/useAssetFilters';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
 const AllAssets = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
+  const [isEditLoading, setIsEditLoading] = useState(false);
+  const [filters, setFilters] = useState<AssetFilters>({
+    searchTerm: '',
+    sectors: [],
+    groups: [],
+    conservationStates: [],
+    sortBy: 'date_desc',
+  });
+  
+  const filteredAssets = useAssetFilters(assets, filters);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
 
@@ -44,36 +61,52 @@ const AllAssets = () => {
   };
 
   const handleExportExcel = () => {
-    const exportData = assets.map((asset) => ({
-      Item: asset.item_number,
-      Descrição: asset.description,
-      Setor: asset.sector,
-      Grupo: asset.asset_group,
-      'Estado de Conservação': asset.conservation_state,
-      'Marca/Modelo': asset.brand_model || '',
-      'Valor de Avaliação': asset.evaluation_value
-        ? `R$ ${asset.evaluation_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-        : '',
+    const excelData = filteredAssets.map(asset => ({
+      'Item Nº': asset.item_number,
+      'Descrição': asset.description,
+      'Setor': asset.sector,
+      'Grupo': asset.asset_group,
+      'Estado': asset.conservation_state,
+      'Marca/Modelo': asset.brand_model || '-',
+      'Valor (R$)': asset.evaluation_value || 0,
+      'Cadastrado em': new Date(asset.created_at).toLocaleDateString('pt-BR'),
     }));
 
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Ativos');
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Ativos');
+    
+    const fileName = `colonial-patrimonio-${new Date().toLocaleDateString('pt-BR')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    
+    toast.success('Arquivo Excel exportado com sucesso!');
+  };
 
-    const columnWidths = [
-      { wch: 8 },
-      { wch: 40 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 30 },
-      { wch: 18 },
-    ];
-    worksheet['!cols'] = columnWidths;
+  const handleEditAsset = async (id: string, data: Partial<Asset>) => {
+    setIsEditLoading(true);
+    try {
+      const { error } = await supabase
+        .from('assets')
+        .update(data)
+        .eq('id', id);
 
-    const fileName = `hotel-colonial-ativos-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
-    toast.success('Planilha exportada com sucesso!');
+      if (error) throw error;
+
+      toast.success('Ativo atualizado com sucesso!');
+      setEditingAsset(null);
+      await fetchAssets();
+      
+      // Update selected asset if it's the one being edited
+      if (selectedAsset?.id === id) {
+        const updated = assets.find(a => a.id === id);
+        if (updated) setSelectedAsset({ ...updated, ...data } as Asset);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar ativo:', error);
+      toast.error('Erro ao atualizar ativo');
+    } finally {
+      setIsEditLoading(false);
+    }
   };
 
   if (loading) {
@@ -113,36 +146,66 @@ const AllAssets = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex justify-between items-center mb-6">
-          <p className="text-muted-foreground">
-            Total: <strong className="text-foreground">{assets.length}</strong> itens cadastrados
-          </p>
-          <div className="flex gap-2">
-            <Button 
-              onClick={handleExportExcel} 
-              variant="outline" 
-              size="sm"
-              className="gap-2"
-            >
-              <FileSpreadsheet className="h-4 w-4" />
-              Exportar
-            </Button>
-            <Button 
-              onClick={() => navigate('/labels')} 
-              variant="outline" 
-              size="sm"
-              className="gap-2"
-            >
-              <Tag className="h-4 w-4" />
-              Gerar Etiquetas
-            </Button>
+        <div className="mb-8 space-y-4">
+          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Todos os Ativos</h2>
+              <p className="text-muted-foreground">
+                Total: <span className="font-semibold text-primary">{filteredAssets.length}</span> de {assets.length} ativos
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <AdvancedFilters filters={filters} onFiltersChange={setFilters} />
+              <Button onClick={handleExportExcel} variant="outline">
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Exportar Excel
+              </Button>
+              <Button onClick={() => navigate('/labels')}>
+                <Tags className="h-4 w-4 mr-2" />
+                Gerar Etiquetas
+              </Button>
+            </div>
           </div>
+          
+          <Input
+            placeholder="Buscar por descrição, setor, grupo, item nº ou marca..."
+            value={filters.searchTerm}
+            onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
+            className="max-w-md"
+          />
         </div>
 
-        <AssetList assets={assets} onViewAsset={setSelectedAsset} />
+        <AssetList 
+          assets={filteredAssets} 
+          onViewAsset={setSelectedAsset}
+          onEditAsset={setEditingAsset}
+        />
 
         {selectedAsset && (
-          <AssetDetails asset={selectedAsset} onClose={() => setSelectedAsset(null)} />
+          <AssetDetails
+            asset={selectedAsset}
+            onClose={() => setSelectedAsset(null)}
+            onEdit={() => {
+              setEditingAsset(selectedAsset);
+              setSelectedAsset(null);
+            }}
+          />
+        )}
+
+        {editingAsset && (
+          <Dialog open={!!editingAsset} onOpenChange={(open) => !open && setEditingAsset(null)}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Editar Ativo #{editingAsset.item_number}</DialogTitle>
+              </DialogHeader>
+              <AssetEditForm
+                asset={editingAsset}
+                onSubmit={handleEditAsset}
+                onCancel={() => setEditingAsset(null)}
+                isLoading={isEditLoading}
+              />
+            </DialogContent>
+          </Dialog>
         )}
       </main>
     </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Plus, LogOut, QrCode, List } from 'lucide-react';
+import { Plus, LogOut, QrCode, List, BarChart3 } from 'lucide-react';
 import { AssetForm } from '@/components/AssetForm';
 import { QRScanner } from '@/components/QRScanner';
 import { SingleLabel } from '@/components/SingleLabel';
@@ -177,7 +177,22 @@ const Index = () => {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-scale-in">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 animate-scale-in">
+          <Card 
+            className="p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group"
+            onClick={() => navigate('/dashboard')}
+          >
+            <div className="flex flex-col items-center gap-4">
+              <div className="p-4 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                <BarChart3 className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-foreground mb-2">Dashboard</h3>
+                <p className="text-sm text-muted-foreground">Visualize estatísticas e gráficos</p>
+              </div>
+            </div>
+          </Card>
+
           <Card 
             className="p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group"
             onClick={() => setIsFormOpen(true)}
