@@ -132,7 +132,7 @@ const Labels = () => {
                     onCheckedChange={() => toggleAsset(asset.id)}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-primary">Item #{asset.item_number}</p>
+                    <p className="text-sm font-semibold text-primary">HCI-{String(asset.item_number).padStart(6, '0')}</p>
                     <p className="text-sm text-foreground truncate">{asset.description}</p>
                     {asset.brand_model && (
                       <p className="text-xs text-muted-foreground truncate">{asset.brand_model}</p>
@@ -145,56 +145,36 @@ const Labels = () => {
         </div>
 
         <div className="hidden print:block">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-4 gap-1">
             {selectedAssetsList.map((asset) => (
               <div
                 key={asset.id}
-                className="border-2 border-black p-4 page-break-inside-avoid"
-                style={{ minHeight: '280px' }}
+                className="border border-black page-break-inside-avoid"
+                style={{ width: '180px', height: '130px', padding: '4px' }}
               >
                 <div className="flex flex-col h-full">
-                  <div className="text-center border-b-2 border-black pb-3 mb-3">
-                    <h3 className="text-xl font-bold">Hotel Colonial Iguaçu</h3>
-                    <p className="text-sm text-gray-600 mt-1">Patrimônio</p>
+                  <div className="text-center border-b border-black pb-1 mb-1">
+                    <h3 className="text-[8px] font-bold leading-tight">Hotel Colonial Iguaçu</h3>
                   </div>
 
-                  <div className="flex-1 flex items-center justify-between gap-4">
-                    <div className="flex-1 space-y-2">
-                      <div>
-                        <p className="text-xs font-semibold text-gray-600">ITEM</p>
-                        <p className="text-2xl font-bold">#{asset.item_number}</p>
+                  <div className="flex-1 flex gap-1">
+                    <div className="flex-1 min-w-0">
+                      <div className="mb-1">
+                        <p className="text-[9px] font-bold leading-tight">HCI-{String(asset.item_number).padStart(6, '0')}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-gray-600">DESCRIÇÃO</p>
-                        <p className="text-sm font-medium leading-tight">{asset.description}</p>
-                      </div>
-                      {asset.brand_model && (
-                        <div>
-                          <p className="text-xs font-semibold text-gray-600">MARCA/MODELO</p>
-                          <p className="text-sm">{asset.brand_model}</p>
-                        </div>
-                      )}
-                      <div className="grid grid-cols-2 gap-2 pt-2">
-                        <div>
-                          <p className="text-xs font-semibold text-gray-600">SETOR</p>
-                          <p className="text-xs">{asset.sector}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold text-gray-600">GRUPO</p>
-                          <p className="text-xs">{asset.asset_group}</p>
-                        </div>
+                        <p className="text-[7px] font-medium leading-tight line-clamp-3">{asset.description}</p>
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-center">
-                      <div className="bg-white p-2 border border-gray-300">
+                    <div className="flex-shrink-0">
+                      <div className="bg-white border border-gray-300">
                         <QRCodeSVG
                           value={asset.qr_code_url || `${window.location.origin}/asset/${asset.id}`}
-                          size={120}
+                          size={60}
                           level="H"
                         />
                       </div>
-                      <p className="text-xs text-center mt-2 text-gray-600">Escaneie para detalhes</p>
                     </div>
                   </div>
                 </div>
@@ -208,7 +188,7 @@ const Labels = () => {
         @media print {
           @page {
             size: A4;
-            margin: 1cm;
+            margin: 0.5cm;
           }
           body {
             print-color-adjust: exact;
@@ -217,6 +197,12 @@ const Labels = () => {
           .page-break-inside-avoid {
             page-break-inside: avoid;
             break-inside: avoid;
+          }
+          .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
           }
         }
       `}</style>
