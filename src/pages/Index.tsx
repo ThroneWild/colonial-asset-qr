@@ -1,27 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Plus, Package, FileSpreadsheet, Tag, LogOut, User, DollarSign, MapPin, QrCode, List, Wrench } from 'lucide-react';
-import { AssetList } from '@/components/AssetList';
+import { Plus, LogOut, QrCode, List } from 'lucide-react';
 import { AssetForm } from '@/components/AssetForm';
-import { AssetDetails } from '@/components/AssetDetails';
 import { QRScanner } from '@/components/QRScanner';
 import { SingleLabel } from '@/components/SingleLabel';
 import { Asset, AssetFormData } from '@/types/asset';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import * as XLSX from 'xlsx';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import logoColonial from '@/assets/logo-colonial.png';
 
 const Index = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [userName, setUserName] = useState<string>('');
-  const [showAllAssets, setShowAllAssets] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [newAssetLabel, setNewAssetLabel] = useState<Asset | null>(null);
   const navigate = useNavigate();
@@ -36,25 +29,8 @@ const Index = () => {
   useEffect(() => {
     if (user) {
       fetchAssets();
-      fetchUserProfile();
     }
   }, [user]);
-
-  const fetchUserProfile = async () => {
-    if (!user) return;
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-      setUserName(data?.full_name || 'Usuário');
-    } catch (error) {
-      console.error('Erro ao carregar perfil:', error);
-    }
-  };
 
   const fetchAssets = async () => {
     try {
@@ -117,40 +93,6 @@ const Index = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleExportExcel = () => {
-    const exportData = assets.map((asset) => ({
-      Item: asset.item_number,
-      Descrição: asset.description,
-      Setor: asset.sector,
-      Grupo: asset.asset_group,
-      'Estado de Conservação': asset.conservation_state,
-      'Marca/Modelo': asset.brand_model || '',
-      'Valor de Avaliação': asset.evaluation_value
-        ? `R$ ${asset.evaluation_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-        : '',
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Ativos');
-
-    // Ajustar largura das colunas
-    const columnWidths = [
-      { wch: 8 },  // Item
-      { wch: 40 }, // Descrição
-      { wch: 20 }, // Setor
-      { wch: 20 }, // Grupo
-      { wch: 20 }, // Estado de Conservação
-      { wch: 30 }, // Marca/Modelo
-      { wch: 18 }, // Valor de Avaliação
-    ];
-    worksheet['!cols'] = columnWidths;
-
-    const fileName = `hotel-colonial-ativos-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
-    toast.success('Planilha exportada com sucesso!');
   };
 
   const handleLogout = async () => {
@@ -268,7 +210,7 @@ const Index = () => {
 
           <Card 
             className="p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group"
-            onClick={() => setShowAllAssets(!showAllAssets)}
+            onClick={() => navigate('/assets')}
           >
             <div className="flex flex-col items-center gap-4">
               <div className="p-4 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-smooth">
@@ -291,39 +233,6 @@ const Index = () => {
               isLoading={isLoading}
             />
           </Card>
-        )}
-
-        {showAllAssets && (
-          <div id="asset-list" className="mt-12 animate-fade-in">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-foreground">Lista de Ativos</h2>
-              <div className="flex gap-2">
-                <Button 
-                  onClick={handleExportExcel} 
-                  variant="outline" 
-                  size="sm"
-                  className="gap-2"
-                >
-                  <FileSpreadsheet className="h-4 w-4" />
-                  Exportar
-                </Button>
-                <Button 
-                  onClick={() => navigate('/labels')} 
-                  variant="outline" 
-                  size="sm"
-                  className="gap-2"
-                >
-                  <Tag className="h-4 w-4" />
-                  Gerar Etiquetas
-                </Button>
-              </div>
-            </div>
-            <AssetList assets={assets} onViewAsset={setSelectedAsset} />
-          </div>
-        )}
-
-        {selectedAsset && (
-          <AssetDetails asset={selectedAsset} onClose={() => setSelectedAsset(null)} />
         )}
 
         {showScanner && (
