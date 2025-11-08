@@ -6,7 +6,10 @@ import { Asset, AssetFilters } from '@/types/asset';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, FileSpreadsheet, Tags, Edit } from 'lucide-react';
+import { ArrowLeft, FileText, Tags, Edit } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import logoColonial from '@/assets/logo-colonial.png';
 import { AssetList } from '@/components/AssetList';
 import { AssetDetails } from '@/components/AssetDetails';
 import { AssetEditForm } from '@/components/AssetEditForm';
@@ -60,26 +63,116 @@ const AllAssets = () => {
     }
   };
 
-  const handleExportExcel = () => {
-    const excelData = filteredAssets.map(asset => ({
-      'Item Nº': asset.item_number,
-      'Descrição': asset.description,
-      'Setor': asset.sector,
-      'Grupo': asset.asset_group,
-      'Estado': asset.conservation_state,
-      'Marca/Modelo': asset.brand_model || '-',
-      'Valor (R$)': asset.evaluation_value || 0,
-      'Cadastrado em': new Date(asset.created_at).toLocaleDateString('pt-BR'),
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(excelData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Ativos');
+  const handleExportPDF = () => {
+    const doc = new jsPDF('landscape');
     
-    const fileName = `colonial-patrimonio-${new Date().toLocaleDateString('pt-BR')}.xlsx`;
-    XLSX.writeFile(wb, fileName);
+    // Adicionar logo
+    const imgWidth = 30;
+    const imgHeight = 15;
+    doc.addImage(logoColonial, 'PNG', 14, 10, imgWidth, imgHeight);
     
-    toast.success('Arquivo Excel exportado com sucesso!');
+    // Cabeçalho - Título
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Relatório de Patrimônio', 148, 15, { align: 'center' });
+    
+    // Informações do cabeçalho
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('pt-BR', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    // Data e usuário no canto direito
+    doc.text(`Data: ${dateStr}`, 280, 15, { align: 'right' });
+    doc.text(`Usuário: ${user?.email || 'Sistema'}`, 280, 20, { align: 'right' });
+    
+    // Linha separadora
+    doc.setDrawColor(200, 200, 200);
+    doc.line(14, 28, 282, 28);
+    
+    // Resumo
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Total de Ativos: ${filteredAssets.length}`, 14, 35);
+    
+    const totalValue = filteredAssets.reduce((sum, asset) => sum + (asset.evaluation_value || 0), 0);
+    doc.text(`Valor Total: R$ ${totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 100, 35);
+    
+    // Preparar dados da tabela
+    const tableData = filteredAssets.map(asset => [
+      asset.item_number,
+      asset.description,
+      asset.sector,
+      asset.asset_group,
+      asset.conservation_state,
+      asset.brand_model || '-',
+      `R$ ${(asset.evaluation_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      new Date(asset.created_at).toLocaleDateString('pt-BR')
+    ]);
+    
+    // Criar tabela
+    autoTable(doc, {
+      startY: 42,
+      head: [['Item Nº', 'Descrição', 'Setor', 'Grupo', 'Estado', 'Marca/Modelo', 'Valor', 'Cadastro']],
+      body: tableData,
+      theme: 'striped',
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: 255,
+        fontSize: 9,
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      bodyStyles: {
+        fontSize: 8,
+        cellPadding: 3
+      },
+      columnStyles: {
+        0: { halign: 'center', cellWidth: 20 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 30 },
+        4: { halign: 'center', cellWidth: 25 },
+        5: { cellWidth: 35 },
+        6: { halign: 'right', cellWidth: 25 },
+        7: { halign: 'center', cellWidth: 25 }
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      },
+      margin: { top: 42, left: 14, right: 14 }
+    });
+    
+    // Rodapé
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(128);
+      doc.text(
+        `Página ${i} de ${pageCount}`,
+        148,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+      doc.text(
+        'Colonial Patrimônio - Sistema de Gestão Patrimonial',
+        148,
+        doc.internal.pageSize.height - 6,
+        { align: 'center' }
+      );
+    }
+    
+    const fileName = `patrimonio-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`;
+    doc.save(fileName);
+    
+    toast.success('Relatório PDF gerado com sucesso!');
   };
 
   const handleEditAsset = async (id: string, data: Partial<Asset>) => {
@@ -156,9 +249,9 @@ const AllAssets = () => {
             </div>
             <div className="flex flex-wrap gap-2">
               <AdvancedFilters filters={filters} onFiltersChange={setFilters} />
-              <Button onClick={handleExportExcel} variant="outline">
-                <FileSpreadsheet className="h-4 w-4 mr-2" />
-                Exportar Excel
+              <Button onClick={handleExportPDF} variant="outline">
+                <FileText className="h-4 w-4 mr-2" />
+                Exportar PDF
               </Button>
               <Button onClick={() => navigate('/labels')}>
                 <Tags className="h-4 w-4 mr-2" />
