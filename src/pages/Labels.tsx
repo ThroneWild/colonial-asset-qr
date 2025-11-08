@@ -8,15 +8,25 @@ import { ArrowLeft, Printer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/hooks/useAuth';
 
 const Labels = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedAssets, setSelectedAssets] = useState<string[]>([]);
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    fetchAssets();
-  }, []);
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  useEffect(() => {
+    if (user) {
+      fetchAssets();
+    }
+  }, [user]);
 
   const fetchAssets = async () => {
     try {
@@ -52,6 +62,21 @@ const Labels = () => {
   };
 
   const selectedAssetsList = assets.filter((asset) => selectedAssets.includes(asset.id));
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">

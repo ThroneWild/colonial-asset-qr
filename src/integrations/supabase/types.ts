@@ -24,9 +24,11 @@ export type Database = {
           evaluation_value: number | null
           id: string
           item_number: number
+          modified_by: string | null
           qr_code_url: string | null
           sector: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           asset_group: string
@@ -37,9 +39,11 @@ export type Database = {
           evaluation_value?: number | null
           id?: string
           item_number?: number
+          modified_by?: string | null
           qr_code_url?: string | null
           sector: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           asset_group?: string
@@ -50,8 +54,34 @@ export type Database = {
           evaluation_value?: number | null
           id?: string
           item_number?: number
+          modified_by?: string | null
           qr_code_url?: string | null
           sector?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
           updated_at?: string
         }
         Relationships: []

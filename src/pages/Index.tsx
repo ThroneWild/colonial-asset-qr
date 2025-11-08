@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Plus, Download, Tag, Package, FileSpreadsheet } from 'lucide-react';
+import { Plus, Package, FileSpreadsheet, Tag, LogOut, User } from 'lucide-react';
 import { AssetList } from '@/components/AssetList';
 import { AssetForm } from '@/components/AssetForm';
 import { AssetDetails } from '@/components/AssetDetails';
@@ -10,17 +10,45 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [userName, setUserName] = useState<string>('');
   const navigate = useNavigate();
+  const { user, loading, signOut } = useAuth();
 
   useEffect(() => {
-    fetchAssets();
-  }, []);
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  useEffect(() => {
+    if (user) {
+      fetchAssets();
+      fetchUserProfile();
+    }
+  }, [user]);
+
+  const fetchUserProfile = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+      setUserName(data?.full_name || 'Usuário');
+    } catch (error) {
+      console.error('Erro ao carregar perfil:', error);
+    }
+  };
 
   const fetchAssets = async () => {
     try {
@@ -38,11 +66,22 @@ const Index = () => {
   };
 
   const handleSubmit = async (formData: AssetFormData) => {
+    if (!user) {
+      toast.error('Você precisa estar autenticado');
+      return;
+    }
+
     setIsLoading(true);
     try {
+      const dataWithUser = {
+        ...formData,
+        user_id: user.id,
+        modified_by: user.id,
+      };
+
       const { data, error } = await supabase
         .from('assets')
-        .insert([formData])
+        .insert([dataWithUser])
         .select()
         .single();
 
@@ -101,12 +140,52 @@ const Index = () => {
     toast.success('Planilha exportada com sucesso!');
   };
 
+  const handleLogout = async () => {
+    await signOut();
+    toast.success('Logout realizado com sucesso');
+    navigate('/auth');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <header className="gradient-primary text-primary-foreground shadow-elegant sticky top-0 z-50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold tracking-tight">Hotel Colonial Iguaçu</h1>
-          <p className="text-sm opacity-90 mt-1">Sistema de Gestão Patrimonial</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Hotel Colonial Iguaçu</h1>
+              <p className="text-sm opacity-90 mt-1">Sistema de Gestão Patrimonial</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-2 text-sm">
+                <User className="h-4 w-4" />
+                <span className="opacity-90">{userName}</span>
+              </div>
+              <Button 
+                onClick={handleLogout} 
+                variant="outline" 
+                size="sm"
+                className="bg-primary-foreground/10 border-primary-foreground/20 hover:bg-primary-foreground/20 text-primary-foreground"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sair
+              </Button>
+            </div>
+          </div>
         </div>
       </header>
 

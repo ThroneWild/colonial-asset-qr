@@ -26,13 +26,20 @@ const AssetView = () => {
         .from('assets')
         .select('*')
         .eq('id', assetId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      
+      if (!data) {
+        toast.error('Ativo não encontrado');
+        navigate('/');
+        return;
+      }
+      
       setAsset(data);
     } catch (error) {
       console.error('Erro ao carregar ativo:', error);
-      toast.error('Ativo não encontrado');
+      toast.error('Erro ao carregar ativo');
       navigate('/');
     } finally {
       setIsLoading(false);

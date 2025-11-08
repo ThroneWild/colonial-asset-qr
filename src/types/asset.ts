@@ -8,6 +8,8 @@ export interface Asset {
   brand_model: string | null;
   evaluation_value: number | null;
   qr_code_url: string | null;
+  user_id: string | null;
+  modified_by: string | null;
   created_at: string;
   updated_at: string;
 }
