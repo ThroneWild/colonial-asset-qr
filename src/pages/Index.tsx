@@ -5,6 +5,8 @@ import { Plus, Package, FileSpreadsheet, Tag, LogOut, User, DollarSign, MapPin, 
 import { AssetList } from '@/components/AssetList';
 import { AssetForm } from '@/components/AssetForm';
 import { AssetDetails } from '@/components/AssetDetails';
+import { QRScanner } from '@/components/QRScanner';
+import { SingleLabel } from '@/components/SingleLabel';
 import { Asset, AssetFormData } from '@/types/asset';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -19,6 +21,9 @@ const Index = () => {
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [userName, setUserName] = useState<string>('');
+  const [showAllAssets, setShowAllAssets] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [newAssetLabel, setNewAssetLabel] = useState<Asset | null>(null);
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
 
@@ -91,14 +96,21 @@ const Index = () => {
       // Gerar URL do QR Code
       const qrCodeUrl = `${window.location.origin}/asset/${data.id}`;
       
-      await supabase
+      const { data: updatedAsset } = await supabase
         .from('assets')
         .update({ qr_code_url: qrCodeUrl })
-        .eq('id', data.id);
+        .eq('id', data.id)
+        .select()
+        .single();
 
       toast.success('Ativo cadastrado com sucesso!');
       setIsFormOpen(false);
       fetchAssets();
+      
+      // Mostrar etiqueta para impressão
+      if (updatedAsset) {
+        setNewAssetLabel(updatedAsset);
+      }
     } catch (error) {
       console.error('Erro ao cadastrar ativo:', error);
       toast.error('Erro ao cadastrar ativo');
@@ -145,6 +157,17 @@ const Index = () => {
     await signOut();
     toast.success('Logout realizado com sucesso');
     navigate('/auth');
+  };
+
+  const handleScanQR = (data: string) => {
+    setShowScanner(false);
+    // Se for uma URL do nosso sistema, navegar para ela
+    if (data.includes('/asset/')) {
+      const assetId = data.split('/asset/')[1];
+      navigate(`/asset/${assetId}`);
+    } else {
+      toast.error('QR Code inválido');
+    }
   };
 
   if (loading) {
@@ -230,7 +253,7 @@ const Index = () => {
 
           <Card 
             className="p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group"
-            onClick={() => navigate('/labels')}
+            onClick={() => setShowScanner(true)}
           >
             <div className="flex flex-col items-center gap-4">
               <div className="p-4 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-smooth">
@@ -245,10 +268,7 @@ const Index = () => {
 
           <Card 
             className="p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group"
-            onClick={() => {
-              const element = document.getElementById('asset-list');
-              element?.scrollIntoView({ behavior: 'smooth' });
-            }}
+            onClick={() => setShowAllAssets(!showAllAssets)}
           >
             <div className="flex flex-col items-center gap-4">
               <div className="p-4 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-smooth">
@@ -273,26 +293,45 @@ const Index = () => {
           </Card>
         )}
 
-        <div id="asset-list" className="mt-12">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-foreground">Lista de Ativos</h2>
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleExportExcel} 
-                variant="outline" 
-                size="sm"
-                className="gap-2"
-              >
-                <FileSpreadsheet className="h-4 w-4" />
-                Exportar
-              </Button>
+        {showAllAssets && (
+          <div id="asset-list" className="mt-12 animate-fade-in">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-foreground">Lista de Ativos</h2>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleExportExcel} 
+                  variant="outline" 
+                  size="sm"
+                  className="gap-2"
+                >
+                  <FileSpreadsheet className="h-4 w-4" />
+                  Exportar
+                </Button>
+                <Button 
+                  onClick={() => navigate('/labels')} 
+                  variant="outline" 
+                  size="sm"
+                  className="gap-2"
+                >
+                  <Tag className="h-4 w-4" />
+                  Gerar Etiquetas
+                </Button>
+              </div>
             </div>
+            <AssetList assets={assets} onViewAsset={setSelectedAsset} />
           </div>
-          <AssetList assets={assets} onViewAsset={setSelectedAsset} />
-        </div>
+        )}
 
         {selectedAsset && (
           <AssetDetails asset={selectedAsset} onClose={() => setSelectedAsset(null)} />
+        )}
+
+        {showScanner && (
+          <QRScanner onScan={handleScanQR} onClose={() => setShowScanner(false)} />
+        )}
+
+        {newAssetLabel && (
+          <SingleLabel asset={newAssetLabel} onClose={() => setNewAssetLabel(null)} />
         )}
       </main>
     </div>
