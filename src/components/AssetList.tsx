@@ -88,15 +88,15 @@ export const AssetList = ({ assets, onViewAsset }: AssetListProps) => {
         </Select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredAssets.map((asset) => (
-          <Card key={asset.id} className="p-4 hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <span className="text-sm font-semibold text-primary">
+          <Card key={asset.id} className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card group">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex-1">
+                <span className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full inline-block mb-2">
                   Item #{asset.item_number}
                 </span>
-                <h3 className="font-semibold text-lg text-foreground mt-1">
+                <h3 className="font-semibold text-xl text-foreground mt-2 group-hover:text-primary transition-smooth">
                   {asset.description}
                 </h3>
               </div>
@@ -104,28 +104,28 @@ export const AssetList = ({ assets, onViewAsset }: AssetListProps) => {
                 size="icon"
                 variant="ghost"
                 onClick={() => onViewAsset(asset)}
-                className="h-8 w-8"
+                className="h-9 w-9 hover:bg-primary/10 hover:text-primary transition-smooth"
               >
-                <Eye className="h-4 w-4" />
+                <Eye className="h-5 w-5" />
               </Button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs font-medium border-primary/20 bg-primary/5">
                   {asset.sector}
                 </Badge>
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs font-medium border-primary/20 bg-primary/5">
                   {asset.asset_group}
                 </Badge>
               </div>
-              <Badge className={`text-xs ${getConservationColor(asset.conservation_state)}`}>
+              <Badge className={`text-xs font-medium ${getConservationColor(asset.conservation_state)}`}>
                 {asset.conservation_state}
               </Badge>
               {asset.brand_model && (
-                <p className="text-sm text-muted-foreground">{asset.brand_model}</p>
+                <p className="text-sm text-muted-foreground font-medium pt-2 border-t border-border">{asset.brand_model}</p>
               )}
               {asset.evaluation_value && (
-                <p className="text-sm font-semibold text-foreground">
+                <p className="text-lg font-bold text-primary mt-2">
                   R$ {asset.evaluation_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               )}

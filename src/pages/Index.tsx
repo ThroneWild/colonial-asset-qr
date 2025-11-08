@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Plus, Download, Tag } from 'lucide-react';
+import { Plus, Download, Tag, Package, FileSpreadsheet } from 'lucide-react';
 import { AssetList } from '@/components/AssetList';
 import { AssetForm } from '@/components/AssetForm';
 import { AssetDetails } from '@/components/AssetDetails';
@@ -102,41 +102,79 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-primary text-primary-foreground py-6 px-4 shadow-md">
-        <div className="container mx-auto">
-          <h1 className="text-3xl font-bold">Hotel Colonial Iguaçu</h1>
-          <p className="text-primary-foreground/90 mt-1">Sistema de Gestão Patrimonial</p>
+    <div className="min-h-screen bg-gradient-subtle">
+      <header className="gradient-primary text-primary-foreground shadow-elegant sticky top-0 z-50 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-6">
+          <h1 className="text-3xl font-bold tracking-tight">Hotel Colonial Iguaçu</h1>
+          <p className="text-sm opacity-90 mt-1">Sistema de Gestão Patrimonial</p>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
+          <Card className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10">
+                <Package className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground">Total de Ativos</h3>
+                <p className="text-3xl font-bold text-foreground mt-1">{assets.length}</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10">
+                <Package className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground">Valor Total</h3>
+                <p className="text-3xl font-bold text-foreground mt-1">
+                  R$ {assets.reduce((acc, asset) => acc + (asset.evaluation_value || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10">
+                <Package className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground">Setores Ativos</h3>
+                <p className="text-3xl font-bold text-foreground mt-1">
+                  {new Set(assets.map(a => a.sector)).size}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <div className="mb-8 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Ativos Patrimoniais</h2>
-            <p className="text-muted-foreground mt-1">
-              Total de {assets.length} {assets.length === 1 ? 'ativo' : 'ativos'} cadastrados
-            </p>
+            <h2 className="text-3xl font-bold text-foreground">Ativos Cadastrados</h2>
+            <p className="text-muted-foreground mt-1">Gerencie todos os bens do hotel</p>
           </div>
-          <div className="flex gap-3 w-full md:w-auto">
-            <Button onClick={() => navigate('/labels')} variant="outline" className="flex-1 md:flex-initial">
-              <Tag className="mr-2 h-4 w-4" />
-              Etiquetas
-            </Button>
-            <Button onClick={handleExportExcel} variant="outline" className="flex-1 md:flex-initial">
-              <Download className="mr-2 h-4 w-4" />
-              Exportar
-            </Button>
-            <Button onClick={() => setIsFormOpen(true)} className="flex-1 md:flex-initial">
-              <Plus className="mr-2 h-4 w-4" />
+          <div className="flex flex-wrap gap-3">
+            <Button onClick={() => setIsFormOpen(true)} className="gap-2 shadow-card hover:shadow-elegant transition-smooth">
+              <Plus className="h-4 w-4" />
               Novo Ativo
+            </Button>
+            <Button onClick={handleExportExcel} variant="outline" className="gap-2 shadow-card hover:shadow-elegant transition-smooth">
+              <FileSpreadsheet className="h-4 w-4" />
+              Exportar Planilha
+            </Button>
+            <Button onClick={() => navigate('/labels')} variant="outline" className="gap-2 shadow-card hover:shadow-elegant transition-smooth">
+              <Tag className="h-4 w-4" />
+              Gerar Etiquetas
             </Button>
           </div>
         </div>
 
         {isFormOpen && (
-          <Card className="p-6 mb-8">
-            <h3 className="text-xl font-semibold mb-4 text-foreground">Cadastrar Novo Ativo</h3>
+          <Card className="p-6 mb-8 shadow-card border-0 bg-card animate-scale-in">
+            <h3 className="text-2xl font-semibold mb-6 text-foreground">Cadastrar Novo Ativo</h3>
             <AssetForm
               onSubmit={handleSubmit}
               onCancel={() => setIsFormOpen(false)}
