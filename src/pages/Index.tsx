@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Plus, Package, FileSpreadsheet, Tag, LogOut, User, DollarSign, MapPin } from 'lucide-react';
+import { Plus, Package, FileSpreadsheet, Tag, LogOut, User, DollarSign, MapPin, QrCode, List, Wrench } from 'lucide-react';
 import { AssetList } from '@/components/AssetList';
 import { AssetForm } from '@/components/AssetForm';
 import { AssetDetails } from '@/components/AssetDetails';
@@ -162,114 +162,108 @@ const Index = () => {
     return null;
   }
 
+  const maintenanceCount = assets.filter(a => a.conservation_state === 'Precisa de Manutenção').length;
+
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <header className="gradient-primary text-primary-foreground shadow-elegant sticky top-0 z-50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen bg-background">
+      <header className="bg-primary text-primary-foreground shadow-md">
+        <div className="container mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <img src={logoColonial} alt="Hotel Colonial Iguaçu" className="h-12 w-auto" />
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight">Hotel Colonial Iguaçu</h1>
-                <p className="text-xs opacity-90">Sistema de Gestão Patrimonial</p>
-              </div>
+            <div className="text-center flex-1">
+              <h1 className="text-3xl font-bold tracking-tight">Colonial Patrimônio</h1>
+              <p className="text-sm opacity-90 mt-1">Sistema de Controle Patrimonial</p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="hidden md:flex items-center gap-2 text-sm bg-primary-foreground/10 px-3 py-2 rounded-lg">
-                <User className="h-4 w-4" />
-                <span className="opacity-90">{userName}</span>
-              </div>
-              <Button 
-                onClick={handleLogout} 
-                variant="outline" 
-                size="sm"
-                className="bg-primary-foreground/10 border-primary-foreground/20 hover:bg-primary-foreground/20 text-primary-foreground"
-              >
-                <LogOut className="h-4 w-4 md:mr-2" />
-                <span className="hidden md:inline">Sair</span>
-              </Button>
-            </div>
+            <Button 
+              onClick={handleLogout} 
+              variant="ghost" 
+              size="sm"
+              className="text-primary-foreground hover:bg-primary-foreground/10"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
-          <Card className="p-5 shadow-card hover:shadow-hover transition-smooth border-0 bg-card/80 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-primary/10">
-                <Package className="h-5 w-5 text-primary" />
+      <main className="container mx-auto px-4 py-12 max-w-5xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 animate-fade-in">
+          <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Total de Itens</h3>
+            <p className="text-4xl font-bold text-primary mb-2">{assets.length}</p>
+            <p className="text-sm text-muted-foreground">Itens cadastrados</p>
+          </Card>
+          
+          <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Itens Ativos</h3>
+            <p className="text-4xl font-bold text-primary mb-2">{assets.filter(a => a.conservation_state !== 'Precisa de Manutenção').length}</p>
+            <p className="text-sm text-muted-foreground">Em uso regular</p>
+          </Card>
+          
+          <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Em Manutenção</h3>
+            <p className="text-4xl font-bold text-primary mb-2">{maintenanceCount}</p>
+            <p className="text-sm text-muted-foreground">Necessitam atenção</p>
+          </Card>
+          
+          <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Localizações</h3>
+            <p className="text-4xl font-bold text-primary mb-2">{new Set(assets.map(a => a.sector)).size}</p>
+            <p className="text-sm text-muted-foreground">Setores diferentes</p>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-scale-in">
+          <Card 
+            className="p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group"
+            onClick={() => setIsFormOpen(true)}
+          >
+            <div className="flex flex-col items-center gap-4">
+              <div className="p-4 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                <Plus className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Total de Ativos</h3>
-                <p className="text-2xl font-bold text-foreground mt-1">{assets.length}</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">Cadastrar Item</h3>
+                <p className="text-sm text-muted-foreground">Adicione um novo item ao patrimônio</p>
               </div>
             </div>
           </Card>
-          <Card className="p-5 shadow-card hover:shadow-hover transition-smooth border-0 bg-card/80 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-primary/10">
-                <DollarSign className="h-5 w-5 text-primary" />
+
+          <Card 
+            className="p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group"
+            onClick={() => navigate('/labels')}
+          >
+            <div className="flex flex-col items-center gap-4">
+              <div className="p-4 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                <QrCode className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Valor Total</h3>
-                <p className="text-2xl font-bold text-foreground mt-1">
-                  R$ {assets.reduce((acc, asset) => acc + (asset.evaluation_value || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </p>
+                <h3 className="text-xl font-bold text-foreground mb-2">Ler QR Code</h3>
+                <p className="text-sm text-muted-foreground">Escaneie o código para ver detalhes</p>
               </div>
             </div>
           </Card>
-          <Card className="p-5 shadow-card hover:shadow-hover transition-smooth border-0 bg-card/80 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-primary/10">
-                <MapPin className="h-5 w-5 text-primary" />
+
+          <Card 
+            className="p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group"
+            onClick={() => {
+              const element = document.getElementById('asset-list');
+              element?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            <div className="flex flex-col items-center gap-4">
+              <div className="p-4 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                <List className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Setores Ativos</h3>
-                <p className="text-2xl font-bold text-foreground mt-1">
-                  {new Set(assets.map(a => a.sector)).size}
-                </p>
+                <h3 className="text-xl font-bold text-foreground mb-2">Ver Todos os Itens</h3>
+                <p className="text-sm text-muted-foreground">Liste e gerencie o patrimônio</p>
               </div>
             </div>
           </Card>
         </div>
 
-        <Card className="mb-6 p-6 shadow-card border-0 bg-card/80 backdrop-blur-sm">
-          <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-foreground">Gestão de Ativos</h2>
-              <p className="text-sm text-muted-foreground mt-1">Gerencie todos os bens do hotel</p>
-            </div>
-            <div className="flex flex-wrap gap-2 w-full md:w-auto">
-              <Button 
-                onClick={() => setIsFormOpen(true)} 
-                className="gap-2 shadow-card hover:shadow-elegant transition-smooth flex-1 md:flex-initial"
-              >
-                <Plus className="h-4 w-4" />
-                Novo Ativo
-              </Button>
-              <Button 
-                onClick={handleExportExcel} 
-                variant="outline" 
-                className="gap-2 shadow-card hover:shadow-elegant transition-smooth flex-1 md:flex-initial"
-              >
-                <FileSpreadsheet className="h-4 w-4" />
-                Exportar
-              </Button>
-              <Button 
-                onClick={() => navigate('/labels')} 
-                variant="outline" 
-                className="gap-2 shadow-card hover:shadow-elegant transition-smooth flex-1 md:flex-initial"
-              >
-                <Tag className="h-4 w-4" />
-                Etiquetas
-              </Button>
-            </div>
-          </div>
-        </Card>
-
         {isFormOpen && (
-          <Card className="p-6 mb-6 shadow-card border-0 bg-card/80 backdrop-blur-sm animate-scale-in">
+          <Card className="p-6 mb-6 shadow-card animate-scale-in">
             <h3 className="text-xl font-semibold mb-6 text-foreground">Cadastrar Novo Ativo</h3>
             <AssetForm
               onSubmit={handleSubmit}
@@ -279,7 +273,23 @@ const Index = () => {
           </Card>
         )}
 
-        <AssetList assets={assets} onViewAsset={setSelectedAsset} />
+        <div id="asset-list" className="mt-12">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-foreground">Lista de Ativos</h2>
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleExportExcel} 
+                variant="outline" 
+                size="sm"
+                className="gap-2"
+              >
+                <FileSpreadsheet className="h-4 w-4" />
+                Exportar
+              </Button>
+            </div>
+          </div>
+          <AssetList assets={assets} onViewAsset={setSelectedAsset} />
+        </div>
 
         {selectedAsset && (
           <AssetDetails asset={selectedAsset} onClose={() => setSelectedAsset(null)} />
