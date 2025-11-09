@@ -180,7 +180,7 @@ const AuditLogs = () => {
         .from('asset_history')
         .select(`
           *,
-          user_profile:profiles!asset_history_user_id_fkey(full_name, email)
+          user_profile:profiles(full_name, email)
         `)
         .order('created_at', { ascending: false });
 

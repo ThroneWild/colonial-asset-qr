@@ -63,6 +63,13 @@ export type Database = {
             referencedRelation: "assets_public"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "asset_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       assets: {
