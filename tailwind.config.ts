@@ -53,6 +53,26 @@ export default {
           gold: "hsl(var(--prize-gold))",
           charcoal: "hsl(var(--prize-charcoal))",
         },
+        emerald: {
+          300: "hsl(156 73% 74%)",
+          500: "hsl(160 84% 39%)",
+          700: "hsl(161 94% 30%)",
+        },
+        blue: {
+          300: "hsl(205 97% 75%)",
+          500: "hsl(211 100% 50%)",
+          700: "hsl(212 100% 48%)",
+        },
+        amber: {
+          300: "hsl(41 100% 71%)",
+          500: "hsl(38 92% 50%)",
+          700: "hsl(32 95% 44%)",
+        },
+        red: {
+          300: "hsl(0 91% 71%)",
+          500: "hsl(0 84% 60%)",
+          700: "hsl(0 74% 42%)",
+        },
       },
       fontFamily: {
         sans: ['IBM Plex Sans', 'system-ui', 'sans-serif'],

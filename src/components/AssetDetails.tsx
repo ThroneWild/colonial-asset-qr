@@ -76,18 +76,18 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
   };
 
-  const getConservationColor = (state: string) => {
+  const getConservationBadge = (state: string) => {
     switch (state) {
       case 'Novo':
-        return 'bg-primary text-primary-foreground';
+        return 'glass-excellent';
       case 'Bom':
-        return 'bg-secondary text-secondary-foreground';
+        return 'glass-good';
       case 'Regular':
-        return 'bg-accent text-accent-foreground';
+        return 'glass-fair';
       case 'Ruim':
-        return 'bg-destructive text-destructive-foreground';
+        return 'glass-poor';
       default:
-        return 'bg-muted text-muted-foreground';
+        return 'outline';
     }
   };
 
@@ -135,7 +135,7 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
                 <div>
                   <dt className="text-sm font-medium text-muted-foreground mb-1">Estado de Conservação</dt>
                   <dd>
-                    <Badge variant="outline" className={getConservationColor(asset.conservation_state)}>
+                    <Badge variant={getConservationBadge(asset.conservation_state)} className="text-sm font-semibold">
                       {asset.conservation_state}
                     </Badge>
                   </dd>
@@ -161,8 +161,10 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
                 {asset.evaluation_value && (
                   <div>
                     <dt className="text-sm font-medium text-muted-foreground mb-1">Valor de Avaliação</dt>
-                    <dd className="text-lg font-semibold text-primary">
-                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(asset.evaluation_value)}
+                    <dd>
+                      <Badge variant="glass-gold" className="text-base font-bold">
+                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(asset.evaluation_value)}
+                      </Badge>
                     </dd>
                   </div>
                 )}

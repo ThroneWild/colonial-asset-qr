@@ -11,18 +11,18 @@ interface AssetListProps {
 }
 
 export const AssetList = ({ assets, onViewAsset, onEditAsset }: AssetListProps) => {
-  const getConservationColor = (state: string) => {
+  const getConservationBadge = (state: string) => {
     switch (state) {
       case 'Novo':
-        return 'bg-primary text-primary-foreground';
+        return 'glass-excellent';
       case 'Bom':
-        return 'bg-secondary text-secondary-foreground';
+        return 'glass-good';
       case 'Regular':
-        return 'bg-accent text-accent-foreground';
+        return 'glass-fair';
       case 'Ruim':
-        return 'bg-destructive text-destructive-foreground';
+        return 'glass-poor';
       default:
-        return 'bg-muted text-muted-foreground';
+        return 'outline';
     }
   };
 
@@ -33,33 +33,37 @@ export const AssetList = ({ assets, onViewAsset, onEditAsset }: AssetListProps) 
           <Card key={asset.id} className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card group">
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
-                <span className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full inline-block mb-2">
+                <Badge variant="glass-primary" className="mb-3">
                   Item #{asset.item_number}
-                </span>
-                <h3 className="font-semibold text-xl text-foreground mt-2 group-hover:text-primary transition-smooth">
+                </Badge>
+                <h3 className="font-semibold text-xl text-foreground group-hover:text-primary transition-smooth">
                   {asset.description}
                 </h3>
               </div>
             </div>
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="text-xs font-medium border-primary/20 bg-primary/5">
+                <Badge variant="glass-primary" className="text-xs font-medium">
                   {asset.sector}
                 </Badge>
-                <Badge variant="outline" className="text-xs font-medium border-primary/20 bg-primary/5">
+                <Badge variant="glass-primary" className="text-xs font-medium">
                   {asset.asset_group}
                 </Badge>
               </div>
-              <Badge className={`text-xs font-medium ${getConservationColor(asset.conservation_state)}`}>
-                {asset.conservation_state}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant={getConservationBadge(asset.conservation_state)} className="text-xs font-semibold">
+                  {asset.conservation_state}
+                </Badge>
+              </div>
               {asset.brand_model && (
                 <p className="text-sm text-muted-foreground font-medium pt-2 border-t border-border">{asset.brand_model}</p>
               )}
               {asset.evaluation_value && (
-                <p className="text-lg font-bold text-primary mt-2">
-                  R$ {asset.evaluation_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </p>
+                <div className="mt-3 pt-3 border-t border-border">
+                  <Badge variant="glass-gold" className="text-sm font-bold">
+                    R$ {asset.evaluation_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </Badge>
+                </div>
               )}
             </div>
             <div className="flex gap-2 mt-4">
