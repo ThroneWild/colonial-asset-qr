@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { LogIn, UserPlus } from 'lucide-react';
 import { z } from 'zod';
 import logoPrize from '@/assets/logo-prize.png';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const signUpSchema = z.object({
   full_name: z.string().trim().min(3, 'Nome deve ter no mínimo 3 caracteres').max(100, 'Nome muito longo'),
@@ -146,15 +147,21 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8 shadow-elegant border-0 animate-scale-in">
+    <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+      
+      <Card className="w-full max-w-md p-8 shadow-elegant border-0 animate-scale-in bg-card/80 backdrop-blur">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <img src={logoPrize} alt="Prize Patrimônios" className="h-20 w-auto" />
+            <img src={logoPrize} alt="Prize Patrimônios" className="h-20 w-auto drop-shadow-lg" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground mb-1">Prize Patrimônios</h1>
-          <p className="text-sm text-muted-foreground">Sistema de Gestão Patrimonial</p>
-          <p className="text-xs text-muted-foreground/70 mt-1">By prize hoteis</p>
+          <h1 className="text-3xl font-display font-bold text-foreground mb-1">
+            <span className="text-gold">Prize</span> Patrimônios
+          </h1>
+          <p className="text-sm text-muted-foreground font-sans">Sistema de Gestão Patrimonial</p>
+          <p className="text-xs text-muted-foreground/70 mt-1 font-sans italic">By prize hoteis</p>
         </div>
 
         <div className="flex gap-2 mb-6">

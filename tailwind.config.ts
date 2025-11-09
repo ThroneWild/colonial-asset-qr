@@ -47,11 +47,16 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        colonial: {
-          green: "hsl(var(--colonial-green))",
-          "green-light": "hsl(var(--colonial-green-light))",
-          "green-dark": "hsl(var(--colonial-green-dark))",
+        prize: {
+          petrol: "hsl(var(--prize-petrol))",
+          beige: "hsl(var(--prize-beige))",
+          gold: "hsl(var(--prize-gold))",
+          charcoal: "hsl(var(--prize-charcoal))",
         },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Playfair Display', 'serif'],
       },
       borderRadius: {
         lg: "var(--radius)",

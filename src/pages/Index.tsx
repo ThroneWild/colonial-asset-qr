@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Index = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -131,22 +132,27 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-primary text-primary-foreground shadow-md">
+      <header className="gradient-primary text-primary-foreground shadow-elegant">
         <div className="container mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
             <div className="text-center flex-1">
-              <h1 className="text-3xl font-bold tracking-tight">Prize Patrimônios</h1>
-              <p className="text-sm opacity-90 mt-1">Sistema de Controle Patrimonial</p>
-              <p className="text-xs opacity-70 mt-0.5">By prize hoteis</p>
+              <h1 className="text-4xl font-display font-bold tracking-tight">
+                <span className="text-gold">Prize</span> Patrimônios
+              </h1>
+              <p className="text-sm opacity-90 mt-1.5 font-sans">Sistema de Controle Patrimonial</p>
+              <p className="text-xs opacity-70 mt-0.5 font-sans italic">By prize hoteis</p>
             </div>
-            <Button 
-              onClick={handleLogout} 
-              variant="ghost" 
-              size="sm"
-              className="text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Button 
+                onClick={handleLogout} 
+                variant="ghost" 
+                size="sm"
+                className="text-primary-foreground hover:bg-primary-foreground/10 transition-smooth"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>

@@ -8,86 +8,98 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 157 20% 97%;
-    --foreground: 157 60% 15%;
+    /* Tema Luxo Moderno - Modo Claro */
+    --background: 46 36% 96%;
+    --foreground: 0 0% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 157 60% 15%;
+    --card-foreground: 0 0% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 157 60% 15%;
+    --popover-foreground: 0 0% 11%;
 
-    --primary: 157 60% 30%;
+    --primary: 200 75% 22%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 157 40% 92%;
-    --secondary-foreground: 157 60% 20%;
+    --secondary: 46 36% 87%;
+    --secondary-foreground: 0 0% 11%;
 
-    --muted: 157 15% 95%;
-    --muted-foreground: 157 10% 45%;
+    --muted: 46 30% 92%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 157 45% 88%;
-    --accent-foreground: 157 60% 20%;
+    --accent: 42 54% 54%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 157 20% 90%;
-    --input: 157 20% 90%;
-    --ring: 157 60% 30%;
+    --border: 46 25% 85%;
+    --input: 46 25% 85%;
+    --ring: 200 75% 22%;
 
     --radius: 0.75rem;
 
-    --colonial-green: 157 60% 30%;
-    --colonial-green-light: 157 50% 85%;
-    --colonial-green-dark: 157 60% 20%;
+    /* Cores Prize */
+    --prize-petrol: 200 75% 22%;
+    --prize-beige: 46 36% 87%;
+    --prize-gold: 42 54% 54%;
+    --prize-charcoal: 0 0% 11%;
     
-    --gradient-primary: linear-gradient(135deg, hsl(157 60% 35%), hsl(157 60% 25%));
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(157 20% 98%));
-    --shadow-elegant: 0 4px 20px -4px hsl(157 60% 30% / 0.15);
-    --shadow-card: 0 2px 8px -2px hsl(157 30% 20% / 0.08);
-    --shadow-hover: 0 8px 30px -6px hsl(157 60% 30% / 0.25);
+    /* Gradientes e sombras premium */
+    --gradient-primary: linear-gradient(135deg, hsl(200 75% 22%), hsl(200 75% 18%));
+    --gradient-gold: linear-gradient(135deg, hsl(42 54% 54%), hsl(42 54% 48%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(46 36% 96%));
+    --shadow-elegant: 0 4px 20px -4px hsl(200 75% 22% / 0.15);
+    --shadow-card: 0 2px 12px -2px hsl(200 40% 30% / 0.08);
+    --shadow-hover: 0 8px 30px -6px hsl(200 75% 22% / 0.25);
+    --shadow-gold: 0 4px 16px -4px hsl(42 54% 54% / 0.3);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    --background: 157 40% 6%;
-    --foreground: 0 0% 95%;
+    /* Tema Luxo Moderno - Modo Escuro */
+    --background: 200 40% 8%;
+    --foreground: 46 36% 95%;
 
-    --card: 157 35% 9%;
-    --card-foreground: 0 0% 95%;
+    --card: 200 35% 12%;
+    --card-foreground: 46 36% 95%;
 
-    --popover: 157 35% 9%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 200 35% 12%;
+    --popover-foreground: 46 36% 95%;
 
-    --primary: 157 55% 45%;
+    --primary: 200 75% 35%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 157 40% 15%;
-    --secondary-foreground: 0 0% 95%;
+    --secondary: 200 30% 18%;
+    --secondary-foreground: 46 36% 95%;
 
-    --muted: 157 35% 12%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 200 25% 15%;
+    --muted-foreground: 46 20% 70%;
 
-    --accent: 157 40% 20%;
-    --accent-foreground: 0 0% 95%;
+    --accent: 42 54% 54%;
+    --accent-foreground: 0 0% 11%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 157 35% 18%;
-    --input: 157 35% 18%;
-    --ring: 157 55% 45%;
+    --border: 200 25% 20%;
+    --input: 200 25% 20%;
+    --ring: 200 75% 35%;
 
-    --colonial-green: 157 55% 45%;
-    --colonial-green-light: 157 40% 30%;
-    --colonial-green-dark: 157 60% 55%;
+    /* Cores Prize (ajustadas para escuro) */
+    --prize-petrol: 200 75% 35%;
+    --prize-beige: 46 25% 25%;
+    --prize-gold: 42 54% 54%;
+    --prize-charcoal: 0 0% 95%;
     
-    --gradient-primary: linear-gradient(135deg, hsl(157 55% 45%), hsl(157 60% 35%));
-    --gradient-subtle: linear-gradient(180deg, hsl(157 35% 9%), hsl(157 40% 7%));
-    --shadow-elegant: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
-    --shadow-card: 0 2px 8px -2px hsl(0 0% 0% / 0.2);
-    --shadow-hover: 0 8px 30px -6px hsl(157 55% 45% / 0.4);
+    /* Gradientes e sombras premium (modo escuro) */
+    --gradient-primary: linear-gradient(135deg, hsl(200 75% 35%), hsl(200 75% 28%));
+    --gradient-gold: linear-gradient(135deg, hsl(42 54% 54%), hsl(42 54% 48%));
+    --gradient-subtle: linear-gradient(180deg, hsl(200 35% 12%), hsl(200 40% 8%));
+    --shadow-elegant: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
+    --shadow-card: 0 2px 12px -2px hsl(0 0% 0% / 0.3);
+    --shadow-hover: 0 8px 30px -6px hsl(200 75% 35% / 0.5);
+    --shadow-gold: 0 4px 16px -4px hsl(42 54% 54% / 0.4);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
@@ -98,11 +110,11 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased font-sans;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
+    @apply font-display font-semibold tracking-tight;
   }
 }
 
@@ -123,11 +135,31 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-hover);
   }
   
+  .shadow-gold {
+    box-shadow: var(--shadow-gold);
+  }
+  
   .gradient-primary {
     background: var(--gradient-primary);
   }
   
+  .gradient-gold {
+    background: var(--gradient-gold);
+  }
+  
   .gradient-subtle {
     background: var(--gradient-subtle);
+  }
+  
+  .text-gold {
+    color: hsl(var(--prize-gold));
+  }
+  
+  .bg-gold {
+    background-color: hsl(var(--prize-gold));
+  }
+  
+  .border-gold {
+    border-color: hsl(var(--prize-gold));
   }
 }
