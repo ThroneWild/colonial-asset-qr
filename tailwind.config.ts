@@ -63,6 +63,11 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      backdropBlur: {
+        glass: "var(--blur-glass)",
+        heavy: "var(--blur-heavy)",
+        light: "var(--blur-light)",
+      },
       keyframes: {
         "accordion-down": {
           from: {

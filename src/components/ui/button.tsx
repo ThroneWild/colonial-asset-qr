@@ -5,23 +5,23 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl text-sm font-semibold ring-offset-background transition-spring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-95",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-card hover:shadow-elegant transition-smooth",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-card hover:shadow-elegant transition-smooth",
-        outline: "border-2 border-primary/20 bg-background hover:bg-primary/5 hover:border-primary/40 text-foreground transition-smooth",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-card transition-smooth",
-        ghost: "hover:bg-accent hover:text-accent-foreground transition-smooth",
+        default: "gradient-primary text-primary-foreground shadow-glass hover:shadow-hover hover-lift backdrop-blur-xl",
+        destructive: "bg-destructive/90 text-destructive-foreground hover:bg-destructive shadow-glass hover:shadow-hover hover-lift backdrop-blur-xl",
+        outline: "glass border-2 text-foreground hover:bg-primary/10 hover-lift",
+        secondary: "glass-light text-secondary-foreground hover:shadow-card hover-lift",
+        ghost: "hover:glass-light hover-lift",
         link: "text-primary underline-offset-4 hover:underline",
-        gold: "gradient-gold text-white hover:shadow-gold shadow-card transition-smooth font-display",
+        gold: "gradient-gold text-white shadow-gold hover:shadow-hover hover-lift backdrop-blur-xl font-display",
       },
       size: {
-        default: "h-11 px-5 py-2",
-        sm: "h-9 rounded-lg px-3",
-        lg: "h-12 rounded-lg px-8 text-base",
-        icon: "h-10 w-10",
+        default: "h-11 px-6 py-2.5",
+        sm: "h-9 rounded-xl px-4",
+        lg: "h-12 rounded-2xl px-8 text-base",
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: {
