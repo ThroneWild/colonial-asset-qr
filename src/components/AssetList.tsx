@@ -29,8 +29,12 @@ export const AssetList = ({ assets, onViewAsset, onEditAsset }: AssetListProps) 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {assets.map((asset) => (
-          <Card key={asset.id} className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card group">
+        {assets.map((asset, index) => (
+          <Card 
+            key={asset.id} 
+            className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card group animate-scale-in"
+            style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
+          >
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
                 <Badge variant="glass-primary" className="mb-3">
