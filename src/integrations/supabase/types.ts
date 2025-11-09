@@ -71,6 +71,7 @@ export type Database = {
           description: string
           evaluation_value: number | null
           id: string
+          invoice_url: string | null
           item_number: number
           modified_by: string | null
           qr_code_url: string | null
@@ -86,6 +87,7 @@ export type Database = {
           description: string
           evaluation_value?: number | null
           id?: string
+          invoice_url?: string | null
           item_number?: number
           modified_by?: string | null
           qr_code_url?: string | null
@@ -101,6 +103,7 @@ export type Database = {
           description?: string
           evaluation_value?: number | null
           id?: string
+          invoice_url?: string | null
           item_number?: number
           modified_by?: string | null
           qr_code_url?: string | null

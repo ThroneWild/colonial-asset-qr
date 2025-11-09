@@ -3,22 +3,69 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { X, Printer, Download, Info, History, Edit } from 'lucide-react';
+import { X, Printer, Download, Info, History, Edit, FileText, Trash2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AssetHistory } from './AssetHistory';
 import { useAssetHistory } from '@/hooks/useAssetHistory';
+import { supabase } from '@/integrations/supabase/client';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface AssetDetailsProps {
   asset: Asset;
   onClose: () => void;
   onEdit?: () => void;
+  onDelete?: () => void;
 }
 
-export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
+export const AssetDetails = ({ asset, onClose, onEdit, onDelete }: AssetDetailsProps) => {
   const { history, loading: historyLoading } = useAssetHistory(asset?.id);
   const assetUrl = `${window.location.origin}/asset/${asset.id}`;
+  const navigate = useNavigate();
+
+  const handleDelete = async () => {
+    try {
+      // Delete invoice file if exists
+      if (asset.invoice_url) {
+        await supabase.storage.from('invoices').remove([asset.invoice_url]);
+      }
+
+      // Delete asset
+      const { error } = await supabase
+        .from('assets')
+        .delete()
+        .eq('id', asset.id);
+
+      if (error) throw error;
+
+      toast.success('Ativo excluído com sucesso!');
+      onDelete?.();
+      onClose();
+    } catch (error) {
+      console.error('Erro ao excluir ativo:', error);
+      toast.error('Erro ao excluir ativo. Verifique suas permissões.');
+    }
+  };
+
+  const handleViewInvoice = async () => {
+    if (!asset.invoice_url) return;
+    
+    try {
+      const { data, error } = await supabase.storage
+        .from('invoices')
+        .createSignedUrl(asset.invoice_url, 60);
+
+      if (error) throw error;
+      
+      window.open(data.signedUrl, '_blank');
+    } catch (error) {
+      console.error('Erro ao abrir nota fiscal:', error);
+      toast.error('Erro ao abrir nota fiscal');
+    }
+  };
 
   const handlePrintLabel = () => {
     window.print();
@@ -85,6 +132,29 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
                 Editar
               </Button>
             )}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" variant="destructive">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Excluir
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tem certeza que deseja excluir o ativo <strong>#{asset.item_number}</strong>?
+                    Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    Excluir
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button onClick={onClose} size="sm" variant="ghost">
               <X className="h-4 w-4" />
             </Button>
@@ -144,6 +214,17 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
                     <dt className="text-sm font-medium text-muted-foreground mb-1">Valor de Avaliação</dt>
                     <dd className="text-lg font-semibold text-primary">
                       {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(asset.evaluation_value)}
+                    </dd>
+                  </div>
+                )}
+                {asset.invoice_url && (
+                  <div className="md:col-span-2">
+                    <dt className="text-sm font-medium text-muted-foreground mb-1">Nota Fiscal</dt>
+                    <dd>
+                      <Button onClick={handleViewInvoice} variant="outline" size="sm">
+                        <FileText className="h-4 w-4 mr-2" />
+                        Ver Nota Fiscal
+                      </Button>
                     </dd>
                   </div>
                 )}

@@ -11,7 +11,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Asset, SECTORS, ASSET_GROUPS, CONSERVATION_STATES } from '@/types/asset';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, X, FileText } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface AssetEditFormProps {
   asset: Asset;
@@ -28,7 +30,61 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, isLoading }: AssetEdi
     conservation_state: asset.conservation_state,
     brand_model: asset.brand_model || '',
     evaluation_value: asset.evaluation_value || undefined,
+    invoice_url: asset.invoice_url || null,
   });
+  const [uploading, setUploading] = useState(false);
+  const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setInvoiceFile(file);
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${asset.id}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('invoices')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('invoices')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, invoice_url: filePath });
+      toast.success('Nota fiscal anexada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error);
+      toast.error('Erro ao anexar nota fiscal');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveInvoice = async () => {
+    if (formData.invoice_url) {
+      try {
+        const { error } = await supabase.storage
+          .from('invoices')
+          .remove([formData.invoice_url]);
+
+        if (error) throw error;
+        
+        setFormData({ ...formData, invoice_url: null });
+        setInvoiceFile(null);
+        toast.success('Nota fiscal removida');
+      } catch (error) {
+        console.error('Erro ao remover arquivo:', error);
+        toast.error('Erro ao remover nota fiscal');
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,6 +193,44 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, isLoading }: AssetEdi
             })
           }
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="invoice">Nota Fiscal</Label>
+        {formData.invoice_url ? (
+          <div className="flex items-center gap-2 p-3 border border-border rounded-lg bg-muted/30">
+            <FileText className="h-5 w-5 text-primary" />
+            <span className="text-sm flex-1 text-foreground">Nota fiscal anexada</span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleRemoveInvoice}
+              disabled={uploading}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="relative">
+            <Input
+              id="invoice"
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={handleFileUpload}
+              disabled={uploading}
+              className="cursor-pointer"
+            />
+            {uploading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                <Loader2 className="h-4 w-4 animate-spin" />
+              </div>
+            )}
+          </div>
+        )}
+        <p className="text-xs text-muted-foreground">
+          Formatos aceitos: PDF, JPG, PNG (máx. 10MB)
+        </p>
       </div>
 
       <div className="flex gap-3 pt-4">

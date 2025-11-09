@@ -282,6 +282,7 @@ const AllAssets = () => {
               setEditingAsset(selectedAsset);
               setSelectedAsset(null);
             }}
+            onDelete={fetchAssets}
           />
         )}
 
