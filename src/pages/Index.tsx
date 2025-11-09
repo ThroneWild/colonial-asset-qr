@@ -10,9 +10,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { SkeletonStatsGrid } from '@/components/ui/skeleton-stats';
 
 const Index = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [isLoadingAssets, setIsLoadingAssets] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
@@ -34,6 +36,7 @@ const Index = () => {
 
   const fetchAssets = async () => {
     try {
+      setIsLoadingAssets(true);
       const { data, error } = await supabase
         .from('assets')
         .select('*')
@@ -46,6 +49,8 @@ const Index = () => {
         console.error('Erro ao carregar ativos:', error);
       }
       toast.error('Erro ao carregar ativos');
+    } finally {
+      setIsLoadingAssets(false);
     }
   };
 
@@ -143,29 +148,35 @@ const Index = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 animate-fade-in">
-        <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
-          <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Total de Itens</h3>
-          <p className="text-5xl font-bold text-primary mb-2">{assets.length}</p>
-          <p className="text-xs text-muted-foreground">Itens cadastrados</p>
-        </Card>
-        
-        <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
-          <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Itens Ativos</h3>
-          <p className="text-5xl font-bold text-primary mb-2">{assets.filter(a => a.conservation_state !== 'Precisa de Manutenção').length}</p>
-          <p className="text-xs text-muted-foreground">Em uso regular</p>
-        </Card>
-        
-        <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
-          <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Em Manutenção</h3>
-          <p className="text-5xl font-bold text-destructive mb-2">{maintenanceCount}</p>
-          <p className="text-xs text-muted-foreground">Necessitam atenção</p>
-        </Card>
-        
-        <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
-          <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Localizações</h3>
-          <p className="text-5xl font-bold text-primary mb-2">{new Set(assets.map(a => a.sector)).size}</p>
-          <p className="text-xs text-muted-foreground">Setores diferentes</p>
-        </Card>
+        {isLoadingAssets ? (
+          <SkeletonStatsGrid count={4} />
+        ) : (
+          <>
+            <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Total de Itens</h3>
+              <p className="text-5xl font-bold text-primary mb-2">{assets.length}</p>
+              <p className="text-xs text-muted-foreground">Itens cadastrados</p>
+            </Card>
+            
+            <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Itens Ativos</h3>
+              <p className="text-5xl font-bold text-primary mb-2">{assets.filter(a => a.conservation_state !== 'Precisa de Manutenção').length}</p>
+              <p className="text-xs text-muted-foreground">Em uso regular</p>
+            </Card>
+            
+            <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Em Manutenção</h3>
+              <p className="text-5xl font-bold text-destructive mb-2">{maintenanceCount}</p>
+              <p className="text-xs text-muted-foreground">Necessitam atenção</p>
+            </Card>
+            
+            <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Localizações</h3>
+              <p className="text-5xl font-bold text-primary mb-2">{new Set(assets.map(a => a.sector)).size}</p>
+              <p className="text-xs text-muted-foreground">Setores diferentes</p>
+            </Card>
+          </>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 animate-scale-in">

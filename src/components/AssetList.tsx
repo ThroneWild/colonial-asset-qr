@@ -2,15 +2,19 @@ import { Asset } from '@/types/asset';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, Edit } from 'lucide-react';
 
 interface AssetListProps {
   assets: Asset[];
+  selectedAssets?: Asset[];
   onViewAsset: (asset: Asset) => void;
   onEditAsset?: (asset: Asset) => void;
+  onToggleSelection?: (asset: Asset) => void;
 }
 
-export const AssetList = ({ assets, onViewAsset, onEditAsset }: AssetListProps) => {
+export const AssetList = ({ assets, selectedAssets = [], onViewAsset, onEditAsset, onToggleSelection }: AssetListProps) => {
+  const isSelected = (asset: Asset) => selectedAssets.some(a => a.id === asset.id);
   const getConservationBadge = (state: string) => {
     switch (state) {
       case 'Novo':
@@ -32,17 +36,28 @@ export const AssetList = ({ assets, onViewAsset, onEditAsset }: AssetListProps) 
         {assets.map((asset, index) => (
           <Card 
             key={asset.id} 
-            className="p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card group animate-scale-in"
+            className={`p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card group animate-scale-in ${
+              isSelected(asset) ? 'ring-2 ring-primary' : ''
+            }`}
             style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
           >
             <div className="flex justify-between items-start mb-4">
-              <div className="flex-1">
-                <Badge variant="glass-primary" className="mb-3">
-                  Item #{asset.item_number}
-                </Badge>
-                <h3 className="font-semibold text-xl text-foreground group-hover:text-primary transition-smooth">
-                  {asset.description}
-                </h3>
+              <div className="flex-1 flex gap-3">
+                {onToggleSelection && (
+                  <Checkbox
+                    checked={isSelected(asset)}
+                    onCheckedChange={() => onToggleSelection(asset)}
+                    className="mt-1"
+                  />
+                )}
+                <div className="flex-1">
+                  <Badge variant="glass-primary" className="mb-3">
+                    Item #{asset.item_number}
+                  </Badge>
+                  <h3 className="font-semibold text-xl text-foreground group-hover:text-primary transition-smooth">
+                    {asset.description}
+                  </h3>
+                </div>
               </div>
             </div>
             <div className="space-y-3">

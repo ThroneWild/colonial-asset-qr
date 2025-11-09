@@ -4,20 +4,59 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Asset, AssetStatistics } from '@/types/asset';
 import { Card } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { BarChart3, TrendingUp, DollarSign, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { AssetsBySectorChart } from '@/components/charts/AssetsBySectorChart';
 import { AssetsByConservationChart } from '@/components/charts/AssetsByConservationChart';
 import { AssetsTimelineChart } from '@/components/charts/AssetsTimelineChart';
+import { ValueDistributionChart } from '@/components/charts/ValueDistributionChart';
+import { RegistrationTimelineChart } from '@/components/charts/RegistrationTimelineChart';
+import { ConservationHeatmapChart } from '@/components/charts/ConservationHeatmapChart';
 import { TopAssetsTable } from '@/components/charts/TopAssetsTable';
+import { SkeletonStats, SkeletonStatsGrid } from '@/components/ui/skeleton-stats';
+import { SkeletonChart } from '@/components/ui/skeleton-chart';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const Dashboard = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [statistics, setStatistics] = useState<AssetStatistics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [periodFilter, setPeriodFilter] = useState<string>('all');
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+
+  const filteredAssets = assets.filter(asset => {
+    const createdAt = new Date(asset.created_at);
+    const now = new Date();
+    
+    switch (periodFilter) {
+      case '7':
+        return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 7;
+      case '30':
+        return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 30;
+      case '90':
+        return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 90;
+      case '365':
+        return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 365;
+      default:
+        return true;
+    }
+  });
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -80,25 +119,28 @@ const Dashboard = () => {
       assetsByGroup,
       assetsByConservation,
       maintenanceRate,
-      monthlyGrowth: 0, // Simplified for now
+      monthlyGrowth: 0,
     });
   };
 
+  // Recalculate stats when period filter changes
+  useEffect(() => {
+    if (filteredAssets.length > 0) {
+      calculateStatistics(filteredAssets);
+    }
+  }, [periodFilter, assets]);
+
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="bg-primary text-primary-foreground shadow-md">
-          <div className="container mx-auto px-4 py-6">
-            <Skeleton className="h-8 w-64 mx-auto" />
-          </div>
-        </header>
-        <main className="container mx-auto px-4 py-8">
-          <div className="grid gap-6">
-            {[1, 2, 3, 4].map(i => (
-              <Skeleton key={i} className="h-64" />
-            ))}
-          </div>
-        </main>
+      <div className="container mx-auto px-6 py-8 max-w-7xl">
+        <SkeletonStatsGrid count={4} />
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <SkeletonChart />
+          <SkeletonChart />
+        </div>
+        <div className="mt-8">
+          <SkeletonChart />
+        </div>
       </div>
     );
   }
@@ -107,9 +149,38 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto px-6 py-8 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-display font-bold mb-2">Dashboard Patrimonial</h1>
-        <p className="text-muted-foreground">Análise e Estatísticas Detalhadas</p>
+      {/* Breadcrumbs */}
+      <Breadcrumb className="mb-6">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink onClick={() => navigate('/')} className="cursor-pointer">
+              Início
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Dashboard</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-display font-bold mb-2">Dashboard Patrimonial</h1>
+          <p className="text-muted-foreground">Análise e Estatísticas Detalhadas</p>
+        </div>
+        <Select value={periodFilter} onValueChange={setPeriodFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Período" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os períodos</SelectItem>
+            <SelectItem value="7">Últimos 7 dias</SelectItem>
+            <SelectItem value="30">Últimos 30 dias</SelectItem>
+            <SelectItem value="90">Últimos 90 dias</SelectItem>
+            <SelectItem value="365">Último ano</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Cards de Estatísticas */}
@@ -174,11 +245,20 @@ const Dashboard = () => {
       </div>
 
       <div className="mb-8 animate-fade-in">
-        <AssetsTimelineChart assets={assets} />
+        <ValueDistributionChart assets={filteredAssets} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in">
+        <RegistrationTimelineChart assets={filteredAssets} days={30} />
+        <AssetsTimelineChart assets={filteredAssets} />
+      </div>
+
+      <div className="mb-8 animate-fade-in">
+        <ConservationHeatmapChart assets={filteredAssets} />
       </div>
 
       <div className="animate-fade-in">
-        <TopAssetsTable assets={assets} />
+        <TopAssetsTable assets={filteredAssets} />
       </div>
     </div>
   );

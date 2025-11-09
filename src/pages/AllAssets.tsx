@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Asset, AssetFilters } from '@/types/asset';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, FileText, Tags, Edit } from 'lucide-react';
+import { ArrowLeft, FileText, Tags, PackageSearch } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import logoPrize from '@/assets/logo-prize.png';
@@ -14,13 +13,29 @@ import { AssetList } from '@/components/AssetList';
 import { AssetDetails } from '@/components/AssetDetails';
 import { AssetEditForm } from '@/components/AssetEditForm';
 import { AdvancedFilters } from '@/components/AdvancedFilters';
+import { AdvancedSearch } from '@/components/AdvancedSearch';
+import { BatchActionBar } from '@/components/BatchActionBar';
+import { EmptyState } from '@/components/EmptyState';
+import { SkeletonCardGrid } from '@/components/ui/skeleton-card';
 import { useAssetFilters } from '@/hooks/useAssetFilters';
+import { usePagination } from '@/hooks/usePagination';
+import { exportToExcel } from '@/utils/excelExport';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import * as XLSX from 'xlsx';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 const AllAssets = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [isLoadingAssets, setIsLoadingAssets] = useState(true);
+  const [selectedAssets, setSelectedAssets] = useState<Asset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const [isEditLoading, setIsEditLoading] = useState(false);
@@ -33,8 +48,18 @@ const AllAssets = () => {
   });
   
   const filteredAssets = useAssetFilters(assets, filters);
+  const { paginatedItems, currentPage, totalPages, goToPage, nextPage, prevPage, canGoNext, canGoPrev } = usePagination(filteredAssets, 50);
+  
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+
+  // Search suggestions
+  const searchSuggestions = useMemo(() => {
+    const descriptions = assets.map(a => a.description);
+    const sectors = [...new Set(assets.map(a => a.sector))];
+    const groups = [...new Set(assets.map(a => a.asset_group))];
+    return [...descriptions, ...sectors, ...groups];
+  }, [assets]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -50,6 +75,7 @@ const AllAssets = () => {
 
   const fetchAssets = async () => {
     try {
+      setIsLoadingAssets(true);
       const { data, error } = await supabase
         .from('assets')
         .select('*')
@@ -62,10 +88,12 @@ const AllAssets = () => {
         console.error('Erro ao carregar ativos:', error);
       }
       toast.error('Erro ao carregar ativos');
+    } finally {
+      setIsLoadingAssets(false);
     }
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = (assetsToExport: Asset[] = filteredAssets) => {
     const doc = new jsPDF('landscape');
     
     // Adicionar logo
@@ -101,13 +129,13 @@ const AllAssets = () => {
     // Resumo
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Total de Ativos: ${filteredAssets.length}`, 14, 35);
+    doc.text(`Total de Ativos: ${assetsToExport.length}`, 14, 35);
     
-    const totalValue = filteredAssets.reduce((sum, asset) => sum + (asset.evaluation_value || 0), 0);
+    const totalValue = assetsToExport.reduce((sum, asset) => sum + (asset.evaluation_value || 0), 0);
     doc.text(`Valor Total: R$ ${totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 100, 35);
     
     // Preparar dados da tabela
-    const tableData = filteredAssets.map(asset => [
+    const tableData = assetsToExport.map(asset => [
       asset.item_number,
       asset.description,
       asset.sector,
@@ -237,6 +265,63 @@ const AllAssets = () => {
     }
   };
 
+  // Batch operations
+  const handleBatchDelete = async (assetsToDelete: Asset[]) => {
+    if (!confirm(`Tem certeza que deseja excluir ${assetsToDelete.length} ${assetsToDelete.length === 1 ? 'ativo' : 'ativos'}?`)) {
+      return;
+    }
+
+    try {
+      const deletePromises = assetsToDelete.map(async (asset) => {
+        if (asset.invoice_url) {
+          await supabase.storage.from('invoices').remove([asset.invoice_url]);
+        }
+        return supabase.from('assets').delete().eq('id', asset.id);
+      });
+
+      await Promise.all(deletePromises);
+      toast.success(`${assetsToDelete.length} ${assetsToDelete.length === 1 ? 'ativo excluído' : 'ativos excluídos'} com sucesso!`);
+      setSelectedAssets([]);
+      await fetchAssets();
+    } catch (error) {
+      console.error('Erro ao excluir ativos:', error);
+      toast.error('Erro ao excluir alguns ativos');
+    }
+  };
+
+  const handleToggleAssetSelection = (asset: Asset) => {
+    setSelectedAssets(prev => {
+      const exists = prev.find(a => a.id === asset.id);
+      if (exists) {
+        return prev.filter(a => a.id !== asset.id);
+      }
+      return [...prev, asset];
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedAssets.length === paginatedItems.length) {
+      setSelectedAssets([]);
+    } else {
+      setSelectedAssets([...paginatedItems]);
+    }
+  };
+
+  const handleBatchExportPDF = (assetsToExport: Asset[]) => {
+    handleExportPDF(assetsToExport);
+  };
+
+  const handleBatchExportExcel = (assetsToExport: Asset[]) => {
+    exportToExcel(assetsToExport);
+    toast.success('Relatório Excel gerado com sucesso!');
+  };
+
+  const handleBatchGenerateLabels = (assetsForLabels: Asset[]) => {
+    // Store selected assets in sessionStorage and navigate to labels page
+    sessionStorage.setItem('selectedAssetsForLabels', JSON.stringify(assetsForLabels));
+    navigate('/labels');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -254,39 +339,39 @@ const AllAssets = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-primary text-primary-foreground shadow-md">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => navigate('/')}
-              className="text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div className="flex-1 text-center">
-              <h1 className="text-2xl font-bold tracking-tight">Lista de Ativos</h1>
-              <p className="text-sm opacity-90 mt-1">Gerencie todo o patrimônio</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <main className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Breadcrumbs */}
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink onClick={() => navigate('/')} className="cursor-pointer">
+                Início
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Todos os Ativos</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <div className="mb-8 space-y-4">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-2">Todos os Ativos</h2>
               <p className="text-muted-foreground">
-                Total: <span className="font-semibold text-primary">{filteredAssets.length}</span> de {assets.length} ativos
+                Mostrando <span className="font-semibold text-primary">{paginatedItems.length}</span> de {filteredAssets.length} ativos
+                {filteredAssets.length !== assets.length && ` (${assets.length} total)`}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <AdvancedFilters filters={filters} onFiltersChange={setFilters} />
-              <Button onClick={handleExportPDF} variant="outline">
+              <Button onClick={() => handleExportPDF()} variant="outline">
                 <FileText className="h-4 w-4 mr-2" />
                 Exportar PDF
+              </Button>
+              <Button onClick={() => exportToExcel(filteredAssets)} variant="outline">
+                <FileText className="h-4 w-4 mr-2" />
+                Exportar Excel
               </Button>
               <Button onClick={() => navigate('/labels')}>
                 <Tags className="h-4 w-4 mr-2" />
@@ -295,18 +380,90 @@ const AllAssets = () => {
             </div>
           </div>
           
-          <Input
-            placeholder="Buscar por descrição, setor, grupo, item nº ou marca..."
-            value={filters.searchTerm}
-            onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
-            className="max-w-md"
-          />
+          <div className="flex gap-4 items-center">
+            <AdvancedSearch
+              value={filters.searchTerm || ''}
+              onChange={(value) => setFilters({ ...filters, searchTerm: value })}
+              placeholder="Buscar por descrição, setor, grupo, item nº ou marca..."
+              suggestions={searchSuggestions}
+            />
+            {paginatedItems.length > 0 && (
+              <Button
+                variant="outline"
+                onClick={handleSelectAll}
+                className="whitespace-nowrap"
+              >
+                {selectedAssets.length === paginatedItems.length ? 'Desmarcar' : 'Selecionar'} Todos
+              </Button>
+            )}
+          </div>
         </div>
 
-        <AssetList 
-          assets={filteredAssets} 
-          onViewAsset={setSelectedAsset}
-          onEditAsset={setEditingAsset}
+        {isLoadingAssets ? (
+          <SkeletonCardGrid count={6} />
+        ) : paginatedItems.length === 0 ? (
+          <EmptyState
+            icon={PackageSearch}
+            title="Nenhum ativo encontrado"
+            description={filters.searchTerm ? "Tente ajustar sua busca ou filtros" : "Comece cadastrando seu primeiro ativo"}
+            action={!filters.searchTerm ? {
+              label: "Cadastrar Ativo",
+              onClick: () => navigate('/')
+            } : undefined}
+          />
+        ) : (
+          <>
+            <AssetList 
+              assets={paginatedItems} 
+              selectedAssets={selectedAssets}
+              onViewAsset={setSelectedAsset}
+              onEditAsset={setEditingAsset}
+              onToggleSelection={handleToggleAssetSelection}
+            />
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex justify-center">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={prevPage}
+                        className={!canGoPrev ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => goToPage(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={nextPage}
+                        className={!canGoNext ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Batch Action Bar */}
+        <BatchActionBar
+          selectedAssets={selectedAssets}
+          onClearSelection={() => setSelectedAssets([])}
+          onExportPDF={handleBatchExportPDF}
+          onExportExcel={handleBatchExportExcel}
+          onGenerateLabels={handleBatchGenerateLabels}
+          onBatchDelete={handleBatchDelete}
         />
 
         {selectedAsset && (

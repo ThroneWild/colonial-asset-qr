@@ -8,6 +8,14 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -155,6 +163,20 @@ const AssetView = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <Breadcrumb className="mb-6 max-w-3xl mx-auto">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink onClick={() => navigate('/')} className="cursor-pointer">
+                Início
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Detalhes do Ativo</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         <Card className="p-8 max-w-3xl mx-auto">
           <div className="space-y-6">
             <div className="text-center pb-6 border-b">
