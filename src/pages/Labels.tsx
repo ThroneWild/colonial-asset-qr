@@ -39,7 +39,9 @@ const Labels = () => {
       if (error) throw error;
       setAssets(data || []);
     } catch (error) {
-      console.error('Erro ao carregar ativos:', error);
+      if (import.meta.env.DEV) {
+        console.error('Erro ao carregar ativos:', error);
+      }
       toast.error('Erro ao carregar ativos');
     }
   };

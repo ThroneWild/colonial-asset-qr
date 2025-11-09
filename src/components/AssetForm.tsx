@@ -12,6 +12,17 @@ import {
 } from '@/components/ui/select';
 import { AssetFormData, SECTORS, ASSET_GROUPS, CONSERVATION_STATES } from '@/types/asset';
 import { Loader2 } from 'lucide-react';
+import { z } from 'zod';
+import { toast } from 'sonner';
+
+const assetSchema = z.object({
+  description: z.string().trim().min(3, 'Descrição deve ter no mínimo 3 caracteres').max(500, 'Descrição deve ter no máximo 500 caracteres'),
+  sector: z.string().trim().min(2, 'Selecione um setor').max(100),
+  asset_group: z.string().trim().min(2, 'Selecione um grupo').max(100),
+  conservation_state: z.enum(['Novo', 'Bom', 'Regular', 'Ruim']),
+  brand_model: z.string().trim().max(200, 'Marca/Modelo deve ter no máximo 200 caracteres').optional().or(z.literal('')),
+  evaluation_value: z.number().positive('Valor deve ser positivo').max(9999999.99, 'Valor muito alto').optional(),
+});
 
 interface AssetFormProps {
   onSubmit: (data: AssetFormData) => Promise<void>;
@@ -31,7 +42,17 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
+    
+    // Validate form data
+    try {
+      assetSchema.parse(formData);
+      await onSubmit(formData);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(firstError.message);
+      }
+    }
   };
 
   return (

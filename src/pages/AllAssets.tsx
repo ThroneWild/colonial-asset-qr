@@ -58,7 +58,9 @@ const AllAssets = () => {
       if (error) throw error;
       setAssets(data || []);
     } catch (error) {
-      console.error('Erro ao carregar ativos:', error);
+      if (import.meta.env.DEV) {
+        console.error('Erro ao carregar ativos:', error);
+      }
       toast.error('Erro ao carregar ativos');
     }
   };
@@ -195,7 +197,9 @@ const AllAssets = () => {
         if (updated) setSelectedAsset({ ...updated, ...data } as Asset);
       }
     } catch (error) {
-      console.error('Erro ao atualizar ativo:', error);
+      if (import.meta.env.DEV) {
+        console.error('Erro ao atualizar ativo:', error);
+      }
       toast.error('Erro ao atualizar ativo');
     } finally {
       setIsEditLoading(false);
@@ -224,7 +228,9 @@ const AllAssets = () => {
       setEditingAsset(null);
       await fetchAssets();
     } catch (error) {
-      console.error('Erro ao excluir ativo:', error);
+      if (import.meta.env.DEV) {
+        console.error('Erro ao excluir ativo:', error);
+      }
       toast.error('Erro ao excluir ativo. Verifique suas permissões.');
     } finally {
       setIsEditLoading(false);
