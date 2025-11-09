@@ -8,24 +8,24 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* iOS 26 Glass Theme - Light Mode */
-    --background: 210 40% 98%;
-    --foreground: 220 15% 10%;
+    /* iOS 26 Glass Theme - Light Mode - Professional */
+    --background: 215 25% 94%;
+    --foreground: 215 20% 20%;
 
-    --card: 0 0% 100% / 0.7;
-    --card-foreground: 220 15% 10%;
+    --card: 215 20% 98% / 0.6;
+    --card-foreground: 215 20% 20%;
 
-    --popover: 0 0% 100% / 0.8;
-    --popover-foreground: 220 15% 10%;
+    --popover: 215 20% 98% / 0.75;
+    --popover-foreground: 215 20% 20%;
 
     --primary: 211 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 10% 95% / 0.8;
-    --secondary-foreground: 220 15% 10%;
+    --secondary: 215 15% 92% / 0.7;
+    --secondary-foreground: 215 20% 20%;
 
-    --muted: 220 10% 96% / 0.6;
-    --muted-foreground: 220 10% 46%;
+    --muted: 215 15% 90% / 0.55;
+    --muted-foreground: 215 12% 42%;
 
     --accent: 211 100% 50%;
     --accent-foreground: 0 0% 100%;
@@ -33,16 +33,16 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91% / 0.5;
-    --input: 220 13% 91% / 0.6;
+    --border: 215 15% 85% / 0.45;
+    --input: 215 15% 88% / 0.55;
     --ring: 211 100% 50%;
 
     --radius: 1.25rem;
 
-    /* iOS Glass Colors */
-    --glass-fill: 0 0% 100% / 0.7;
-    --glass-border: 0 0% 100% / 0.18;
-    --glass-shadow: 0 0% 0% / 0.12;
+    /* iOS Glass Colors - Professional */
+    --glass-fill: 215 20% 98% / 0.6;
+    --glass-border: 215 15% 85% / 0.25;
+    --glass-shadow: 215 20% 30% / 0.08;
     
     /* Prize Brand Colors (adapted for glass) */
     --prize-petrol: 200 75% 22%;
@@ -78,24 +78,24 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* iOS 26 Glass Theme - Dark Mode */
-    --background: 220 20% 8%;
-    --foreground: 220 10% 98%;
+    /* iOS 26 Glass Theme - Dark Mode - Professional */
+    --background: 215 20% 12%;
+    --foreground: 215 15% 88%;
 
-    --card: 220 15% 15% / 0.7;
-    --card-foreground: 220 10% 98%;
+    --card: 215 18% 18% / 0.6;
+    --card-foreground: 215 15% 88%;
 
-    --popover: 220 15% 15% / 0.8;
-    --popover-foreground: 220 10% 98%;
+    --popover: 215 18% 18% / 0.75;
+    --popover-foreground: 215 15% 88%;
 
     --primary: 211 100% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 10% 20% / 0.8;
-    --secondary-foreground: 220 10% 98%;
+    --secondary: 215 15% 22% / 0.7;
+    --secondary-foreground: 215 15% 88%;
 
-    --muted: 220 10% 18% / 0.6;
-    --muted-foreground: 220 10% 70%;
+    --muted: 215 12% 20% / 0.55;
+    --muted-foreground: 215 10% 65%;
 
     --accent: 211 100% 55%;
     --accent-foreground: 0 0% 100%;
@@ -103,14 +103,14 @@ All colors MUST be HSL.
     --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 10% 30% / 0.5;
-    --input: 220 10% 30% / 0.6;
+    --border: 215 12% 28% / 0.45;
+    --input: 215 12% 26% / 0.55;
     --ring: 211 100% 55%;
 
-    /* iOS Glass Colors (dark) */
-    --glass-fill: 220 15% 15% / 0.7;
-    --glass-border: 0 0% 100% / 0.1;
-    --glass-shadow: 0 0% 0% / 0.5;
+    /* iOS Glass Colors (dark) - Professional */
+    --glass-fill: 215 18% 18% / 0.6;
+    --glass-border: 215 15% 35% / 0.15;
+    --glass-shadow: 215 20% 8% / 0.4;
     
     /* Prize Brand Colors (adapted for dark glass) */
     --prize-petrol: 200 75% 45%;
