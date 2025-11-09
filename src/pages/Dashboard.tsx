@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Asset, AssetStatistics } from '@/types/asset';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, BarChart3, TrendingUp, DollarSign, Package } from 'lucide-react';
+import { BarChart3, TrendingUp, DollarSign, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { AssetsBySectorChart } from '@/components/charts/AssetsBySectorChart';
 import { AssetsByConservationChart } from '@/components/charts/AssetsByConservationChart';
@@ -107,94 +106,80 @@ const Dashboard = () => {
   if (!user || !statistics) return null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-primary text-primary-foreground shadow-md">
-        <div className="container mx-auto px-4 py-6">
+    <div className="container mx-auto px-6 py-8 max-w-7xl">
+      <div className="mb-8">
+        <h1 className="text-4xl font-display font-bold mb-2">Dashboard Patrimonial</h1>
+        <p className="text-muted-foreground">Análise e Estatísticas Detalhadas</p>
+      </div>
+
+      {/* Cards de Estatísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-fade-in">
+        <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
           <div className="flex items-center gap-4">
-            <Button
-              onClick={() => navigate('/')}
-              variant="ghost"
-              size="sm"
-              className="text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div className="flex-1 text-center">
-              <h1 className="text-3xl font-bold tracking-tight">Dashboard Patrimonial</h1>
-              <p className="text-sm opacity-90 mt-1">Análise e Estatísticas</p>
+            <div className="p-3 rounded-2xl bg-primary/10">
+              <Package className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Total de Ativos</p>
+              <p className="text-3xl font-bold text-foreground">{statistics.totalAssets}</p>
             </div>
           </div>
-        </div>
-      </header>
+        </Card>
 
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Cards de Estatísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <Package className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total de Ativos</p>
-                <p className="text-2xl font-bold text-foreground">{statistics.totalAssets}</p>
-              </div>
+        <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-prize-gold/10">
+              <DollarSign className="h-6 w-6 text-prize-gold" />
             </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <DollarSign className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Valor Total</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statistics.totalValue)}
-                </p>
-              </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Valor Total</p>
+              <p className="text-2xl font-bold text-foreground">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statistics.totalValue)}
+              </p>
             </div>
-          </Card>
+          </div>
+        </Card>
 
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <TrendingUp className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Valor Médio</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statistics.averageValue)}
-                </p>
-              </div>
+        <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-primary/10">
+              <TrendingUp className="h-6 w-6 text-primary" />
             </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-destructive/10">
-                <BarChart3 className="h-6 w-6 text-destructive" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Taxa Manutenção</p>
-                <p className="text-2xl font-bold text-foreground">{statistics.maintenanceRate.toFixed(1)}%</p>
-              </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Valor Médio</p>
+              <p className="text-2xl font-bold text-foreground">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statistics.averageValue)}
+              </p>
             </div>
-          </Card>
-        </div>
+          </div>
+        </Card>
 
-        {/* Gráficos */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <AssetsBySectorChart data={statistics.assetsBySector} />
-          <AssetsByConservationChart data={statistics.assetsByConservation} />
-        </div>
+        <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-destructive/10">
+              <BarChart3 className="h-6 w-6 text-destructive" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Taxa Manutenção</p>
+              <p className="text-3xl font-bold text-foreground">{statistics.maintenanceRate.toFixed(1)}%</p>
+            </div>
+          </div>
+        </Card>
+      </div>
 
-        <div className="mb-8">
-          <AssetsTimelineChart assets={assets} />
-        </div>
+      {/* Gráficos */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-scale-in">
+        <AssetsBySectorChart data={statistics.assetsBySector} />
+        <AssetsByConservationChart data={statistics.assetsByConservation} />
+      </div>
 
+      <div className="mb-8 animate-fade-in">
+        <AssetsTimelineChart assets={assets} />
+      </div>
+
+      <div className="animate-fade-in">
         <TopAssetsTable assets={assets} />
-      </main>
+      </div>
     </div>
   );
 };
