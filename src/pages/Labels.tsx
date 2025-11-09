@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
-import logoColonial from '@/assets/logo-colonial.png';
+import logoPrize from '@/assets/logo-prize.png';
 
 const Labels = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -87,7 +87,7 @@ const Labels = () => {
             <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-primary-foreground hover:bg-primary-foreground/10">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <img src={logoColonial} alt="Hotel Colonial Iguaçu" className="h-10 w-auto" />
+            <img src={logoPrize} alt="Prize Patrimônios" className="h-10 w-auto" />
             <div>
               <h1 className="text-xl font-bold">Geração de Etiquetas</h1>
               <p className="text-xs text-primary-foreground/90">
@@ -156,7 +156,7 @@ const Labels = () => {
               >
                 <div className="flex flex-col h-full">
                   <div className="flex items-center justify-center border-b-2 border-black pb-1 mb-2">
-                    <img src={logoColonial} alt="Hotel Colonial Iguaçu" className="h-8 w-auto" />
+                    <img src={logoPrize} alt="Prize Patrimônios" className="h-8 w-auto" />
                   </div>
 
                   <div className="flex-1 flex gap-2">

@@ -3,7 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Printer, X } from 'lucide-react';
-import logoColonial from '@/assets/logo-colonial.png';
+import logoPrize from '@/assets/logo-prize.png';
 
 interface SingleLabelProps {
   asset: Asset;
@@ -48,7 +48,7 @@ export const SingleLabel = ({ asset, onClose }: SingleLabelProps) => {
           >
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-center border-b-2 border-black pb-1 mb-2">
-                <img src={logoColonial} alt="Hotel Colonial Iguaçu" className="h-8 w-auto" />
+                <img src={logoPrize} alt="Prize Patrimônios" className="h-8 w-auto" />
               </div>
 
               <div className="flex-1 flex gap-2">

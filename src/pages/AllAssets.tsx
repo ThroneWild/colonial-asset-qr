@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { ArrowLeft, FileText, Tags, Edit } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import logoColonial from '@/assets/logo-colonial.png';
+import logoPrize from '@/assets/logo-prize.png';
 import { AssetList } from '@/components/AssetList';
 import { AssetDetails } from '@/components/AssetDetails';
 import { AssetEditForm } from '@/components/AssetEditForm';
@@ -69,7 +69,7 @@ const AllAssets = () => {
     // Adicionar logo
     const imgWidth = 30;
     const imgHeight = 15;
-    doc.addImage(logoColonial, 'PNG', 14, 10, imgWidth, imgHeight);
+    doc.addImage(logoPrize, 'PNG', 14, 10, imgWidth, imgHeight);
     
     // Cabeçalho - Título
     doc.setFontSize(18);
@@ -162,7 +162,7 @@ const AllAssets = () => {
         { align: 'center' }
       );
       doc.text(
-        'Colonial Patrimônio - Sistema de Gestão Patrimonial',
+        'Prize Patrimônios - Sistema de Gestão Patrimonial | By prize hoteis',
         148,
         doc.internal.pageSize.height - 6,
         { align: 'center' }

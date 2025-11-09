@@ -135,8 +135,9 @@ const Index = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
             <div className="text-center flex-1">
-              <h1 className="text-3xl font-bold tracking-tight">Colonial Patrimônio</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Prize Patrimônios</h1>
               <p className="text-sm opacity-90 mt-1">Sistema de Controle Patrimonial</p>
+              <p className="text-xs opacity-70 mt-0.5">By prize hoteis</p>
             </div>
             <Button 
               onClick={handleLogout} 

@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
-import logoColonial from '@/assets/logo-colonial.png';
+import logoPrize from '@/assets/logo-prize.png';
 
 const AssetView = () => {
   const { id } = useParams<{ id: string }>();
@@ -141,10 +141,10 @@ const AssetView = () => {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <img src={logoColonial} alt="Hotel Colonial Iguaçu" className="h-10 w-auto" />
+            <img src={logoPrize} alt="Prize Patrimônios" className="h-10 w-auto" />
             <div>
-              <h1 className="text-xl font-bold">Hotel Colonial Iguaçu</h1>
-              <p className="text-xs text-primary-foreground/90">Detalhes do Ativo</p>
+              <h1 className="text-xl font-bold">Prize Patrimônios</h1>
+              <p className="text-xs text-primary-foreground/90">Detalhes do Ativo | By prize hoteis</p>
             </div>
           </div>
         </div>
