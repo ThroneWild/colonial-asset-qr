@@ -11,18 +11,20 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Asset, SECTORS, ASSET_GROUPS, CONSERVATION_STATES } from '@/types/asset';
-import { Loader2, Upload, X, FileText } from 'lucide-react';
+import { Loader2, Upload, X, FileText, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface AssetEditFormProps {
   asset: Asset;
   onSubmit: (id: string, data: Partial<Asset>) => Promise<void>;
   onCancel: () => void;
+  onDelete?: () => Promise<void>;
   isLoading?: boolean;
 }
 
-export const AssetEditForm = ({ asset, onSubmit, onCancel, isLoading }: AssetEditFormProps) => {
+export const AssetEditForm = ({ asset, onSubmit, onCancel, onDelete, isLoading }: AssetEditFormProps) => {
   const [formData, setFormData] = useState({
     description: asset.description,
     sector: asset.sector,
@@ -241,6 +243,30 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, isLoading }: AssetEdi
         <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
           Cancelar
         </Button>
+        {onDelete && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button type="button" variant="destructive" disabled={isLoading}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Tem certeza que deseja excluir o ativo <strong>#{asset.item_number}</strong>?
+                  Esta ação não pode ser desfeita e removerá todos os dados incluindo a nota fiscal anexada.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={onDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Excluir Definitivamente
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
     </form>
   );

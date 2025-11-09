@@ -202,6 +202,35 @@ const AllAssets = () => {
     }
   };
 
+  const handleDeleteAsset = async () => {
+    if (!editingAsset) return;
+    
+    setIsEditLoading(true);
+    try {
+      // Delete invoice file if exists
+      if (editingAsset.invoice_url) {
+        await supabase.storage.from('invoices').remove([editingAsset.invoice_url]);
+      }
+
+      // Delete asset
+      const { error } = await supabase
+        .from('assets')
+        .delete()
+        .eq('id', editingAsset.id);
+
+      if (error) throw error;
+
+      toast.success('Ativo excluído com sucesso!');
+      setEditingAsset(null);
+      await fetchAssets();
+    } catch (error) {
+      console.error('Erro ao excluir ativo:', error);
+      toast.error('Erro ao excluir ativo. Verifique suas permissões.');
+    } finally {
+      setIsEditLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -282,7 +311,6 @@ const AllAssets = () => {
               setEditingAsset(selectedAsset);
               setSelectedAsset(null);
             }}
-            onDelete={fetchAssets}
           />
         )}
 
@@ -296,6 +324,7 @@ const AllAssets = () => {
                 asset={editingAsset}
                 onSubmit={handleEditAsset}
                 onCancel={() => setEditingAsset(null)}
+                onDelete={handleDeleteAsset}
                 isLoading={isEditLoading}
               />
             </DialogContent>
