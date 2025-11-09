@@ -220,7 +220,7 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
           </TabsContent>
 
           <TabsContent value="history">
-            <AssetHistory history={history} loading={historyLoading} />
+            <AssetHistory history={history} loading={historyLoading} asset={asset} />
           </TabsContent>
         </Tabs>
       </div>

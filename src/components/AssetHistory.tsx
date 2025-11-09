@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
-import { AssetHistoryEntry } from '@/types/asset';
+import { AssetHistoryEntry, Asset } from '@/types/asset';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Clock, User, Edit, Plus, Trash2, Filter, X, Calendar, ArrowRight, TrendingUp, AlertCircle } from 'lucide-react';
+import { Clock, User, Edit, Plus, Trash2, Filter, X, Calendar, ArrowRight, TrendingUp, AlertCircle, FileDown } from 'lucide-react';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
@@ -16,10 +16,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from '@/components/ui/input';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import logoPrize from '@/assets/logo-prize.png';
+import { toast } from 'sonner';
 
 interface AssetHistoryProps {
   history: AssetHistoryEntry[];
   loading: boolean;
+  asset?: Asset;
 }
 
 interface HistoryFilters {
@@ -120,7 +125,7 @@ const formatRelativeDate = (date: Date) => {
   return format(date, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
 };
 
-export const AssetHistory = ({ history, loading }: AssetHistoryProps) => {
+export const AssetHistory = ({ history, loading, asset }: AssetHistoryProps) => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<HistoryFilters>({
     action: 'all',
@@ -182,6 +187,193 @@ export const AssetHistory = ({ history, loading }: AssetHistoryProps) => {
 
   const hasActiveFilters = filters.action !== 'all' || filters.user !== 'all' || filters.dateFrom || filters.dateTo;
 
+  const handleExportPDF = () => {
+    const doc = new jsPDF('portrait');
+    
+    // Add logo
+    const imgWidth = 30;
+    const imgHeight = 15;
+    doc.addImage(logoPrize, 'PNG', 14, 10, imgWidth, imgHeight);
+    
+    // Header - Title
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Relatório de Histórico de Auditoria', 105, 17, { align: 'center' });
+    
+    // Asset info
+    if (asset) {
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Ativo: #${asset.item_number} - ${asset.description}`, 14, 32);
+    }
+    
+    // Report info
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const now = new Date();
+    const dateStr = format(now, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+    
+    doc.text(`Data do Relatório: ${dateStr}`, 14, 40);
+    doc.text(`Total de Registros: ${filteredHistory.length}`, 14, 46);
+    
+    // Separator line
+    doc.setDrawColor(200, 200, 200);
+    doc.line(14, 52, 196, 52);
+    
+    let yPos = 58;
+    
+    // Summary section
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Resumo de Alterações', 14, yPos);
+    yPos += 8;
+    
+    // Count by action type
+    const actionCounts = filteredHistory.reduce((acc, entry) => {
+      acc[entry.action] = (acc[entry.action] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    Object.entries(actionCounts).forEach(([action, count]) => {
+      doc.text(`• ${getActionLabel(action)}: ${count}`, 20, yPos);
+      yPos += 6;
+    });
+    
+    yPos += 6;
+    
+    // Detailed history
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Histórico Detalhado', 14, yPos);
+    yPos += 8;
+    
+    // Process each history entry
+    filteredHistory.forEach((entry, index) => {
+      // Check if we need a new page
+      if (yPos > 260) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      // Entry header with colored background
+      const actionColors: Record<string, [number, number, number]> = {
+        created: [76, 175, 80],
+        updated: [33, 150, 243],
+        deleted: [244, 67, 54],
+        sector_changed: [156, 39, 176],
+      };
+      
+      const color = actionColors[entry.action] || [158, 158, 158];
+      doc.setFillColor(...color);
+      doc.rect(14, yPos - 4, 182, 8, 'F');
+      
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(255, 255, 255);
+      doc.text(`${index + 1}. ${getActionLabel(entry.action)}`, 16, yPos + 2);
+      
+      const entryDate = format(new Date(entry.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+      doc.text(entryDate, 180, yPos + 2, { align: 'right' });
+      
+      doc.setTextColor(0, 0, 0);
+      yPos += 10;
+      
+      // User info
+      if (entry.user_profile) {
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Responsável: ${entry.user_profile.full_name}`, 16, yPos);
+        yPos += 5;
+        doc.text(`Email: ${entry.user_profile.email}`, 16, yPos);
+        yPos += 7;
+      } else {
+        yPos += 3;
+      }
+      
+      // Changed fields for updates
+      if (entry.changed_fields && entry.changed_fields.length > 0 && entry.action === 'updated') {
+        const relevantFields = entry.changed_fields.filter(
+          field => !['id', 'created_at', 'updated_at', 'modified_by', 'user_id', 'qr_code_url'].includes(field)
+        );
+        
+        if (relevantFields.length > 0) {
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'bold');
+          doc.text(`Campos Alterados (${relevantFields.length}):`, 16, yPos);
+          yPos += 6;
+          
+          relevantFields.forEach((field) => {
+            // Check page break
+            if (yPos > 260) {
+              doc.addPage();
+              yPos = 20;
+            }
+            
+            const oldValue = entry.old_values?.[field as keyof typeof entry.old_values];
+            const newValue = entry.new_values?.[field as keyof typeof entry.new_values];
+            
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`• ${fieldLabels[field] || field}`, 20, yPos);
+            yPos += 5;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(200, 0, 0);
+            const oldText = `  Anterior: ${formatFieldValue(field, oldValue)}`;
+            doc.text(oldText, 22, yPos);
+            yPos += 5;
+            
+            doc.setTextColor(0, 150, 0);
+            const newText = `  Novo: ${formatFieldValue(field, newValue)}`;
+            doc.text(newText, 22, yPos);
+            yPos += 6;
+            
+            doc.setTextColor(0, 0, 0);
+          });
+        }
+      } else if (entry.action === 'created') {
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'italic');
+        doc.text('Ativo cadastrado no sistema com sucesso', 16, yPos);
+        yPos += 5;
+      }
+      
+      // Separator between entries
+      doc.setDrawColor(230, 230, 230);
+      doc.line(14, yPos + 2, 196, yPos + 2);
+      yPos += 8;
+    });
+    
+    // Footer on all pages
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(128);
+      doc.text(
+        `Página ${i} de ${pageCount}`,
+        105,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+      doc.text(
+        'Prize Patrimônios - Sistema de Gestão Patrimonial | By prize hoteis',
+        105,
+        doc.internal.pageSize.height - 6,
+        { align: 'center' }
+      );
+    }
+    
+    const fileName = asset 
+      ? `historico-ativo-${asset.item_number}-${format(now, 'yyyy-MM-dd')}.pdf`
+      : `historico-auditoria-${format(now, 'yyyy-MM-dd')}.pdf`;
+    
+    doc.save(fileName);
+    toast.success('Relatório PDF gerado com sucesso!');
+  };
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -222,14 +414,26 @@ export const AssetHistory = ({ history, loading }: AssetHistoryProps) => {
       {/* Filters Section */}
       <Card className="p-4 glass-light">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-muted-foreground" />
-            <h3 className="font-semibold text-foreground">Filtros</h3>
-            {hasActiveFilters && (
-              <Badge variant="glass-primary" className="ml-2">
-                {filteredHistory.length} de {history.length}
-              </Badge>
-            )}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Filter className="h-5 w-5 text-muted-foreground" />
+              <h3 className="font-semibold text-foreground">Filtros</h3>
+              {hasActiveFilters && (
+                <Badge variant="glass-primary" className="ml-2">
+                  {filteredHistory.length} de {history.length}
+                </Badge>
+              )}
+            </div>
+            <Button
+              onClick={handleExportPDF}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              disabled={filteredHistory.length === 0}
+            >
+              <FileDown className="h-4 w-4" />
+              Exportar PDF
+            </Button>
           </div>
           <Button
             variant="ghost"
