@@ -17,6 +17,7 @@ import { AdvancedSearch } from '@/components/AdvancedSearch';
 import { BatchActionBar } from '@/components/BatchActionBar';
 import { EmptyState } from '@/components/EmptyState';
 import { SkeletonCardGrid } from '@/components/ui/skeleton-card';
+import { DeleteAssetDialog } from '@/components/DeleteAssetDialog';
 import { useAssetFilters } from '@/hooks/useAssetFilters';
 import { usePagination } from '@/hooks/usePagination';
 import { exportToExcel } from '@/utils/excelExport';
@@ -39,6 +40,8 @@ const AllAssets = () => {
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const [isEditLoading, setIsEditLoading] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null);
   const [filters, setFilters] = useState<AssetFilters>({
     searchTerm: '',
     sectors: [],
@@ -234,25 +237,44 @@ const AllAssets = () => {
     }
   };
 
-  const handleDeleteAsset = async () => {
-    if (!editingAsset) return;
+  const handleDeleteAsset = async (reason: string) => {
+    if (!assetToDelete || !user) return;
     
     setIsEditLoading(true);
     try {
+      // Create deletion history entry BEFORE deleting the asset
+      const { error: historyError } = await supabase
+        .from('asset_history')
+        .insert([{
+          asset_id: assetToDelete.id,
+          user_id: user.id,
+          action: 'deleted',
+          old_values: assetToDelete as any,
+          new_values: {} as any,
+          changed_fields: [],
+          deletion_reason: reason,
+        }]);
+
+      if (historyError) {
+        console.error('Erro ao registrar histórico:', historyError);
+      }
+
       // Delete invoice file if exists
-      if (editingAsset.invoice_url) {
-        await supabase.storage.from('invoices').remove([editingAsset.invoice_url]);
+      if (assetToDelete.invoice_url) {
+        await supabase.storage.from('invoices').remove([assetToDelete.invoice_url]);
       }
 
       // Delete asset
       const { error } = await supabase
         .from('assets')
         .delete()
-        .eq('id', editingAsset.id);
+        .eq('id', assetToDelete.id);
 
       if (error) throw error;
 
       toast.success('Ativo excluído com sucesso!');
+      setShowDeleteDialog(false);
+      setAssetToDelete(null);
       setEditingAsset(null);
       await fetchAssets();
     } catch (error) {
@@ -262,6 +284,13 @@ const AllAssets = () => {
       toast.error('Erro ao excluir ativo. Verifique suas permissões.');
     } finally {
       setIsEditLoading(false);
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    if (editingAsset) {
+      setAssetToDelete(editingAsset);
+      setShowDeleteDialog(true);
     }
   };
 
@@ -487,12 +516,21 @@ const AllAssets = () => {
                 asset={editingAsset}
                 onSubmit={handleEditAsset}
                 onCancel={() => setEditingAsset(null)}
-                onDelete={handleDeleteAsset}
+                onDelete={handleDeleteClick}
                 isLoading={isEditLoading}
               />
             </DialogContent>
           </Dialog>
         )}
+
+        {/* Delete Confirmation Dialog */}
+        <DeleteAssetDialog
+          open={showDeleteDialog}
+          onOpenChange={setShowDeleteDialog}
+          onConfirm={handleDeleteAsset}
+          assetDescription={assetToDelete?.description || ''}
+          isLoading={isEditLoading}
+        />
       </main>
     </div>
   );

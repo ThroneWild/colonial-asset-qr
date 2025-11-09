@@ -20,6 +20,7 @@ export type Database = {
           asset_id: string
           changed_fields: string[] | null
           created_at: string
+          deletion_reason: string | null
           id: string
           new_values: Json | null
           old_values: Json | null
@@ -30,6 +31,7 @@ export type Database = {
           asset_id: string
           changed_fields?: string[] | null
           created_at?: string
+          deletion_reason?: string | null
           id?: string
           new_values?: Json | null
           old_values?: Json | null
@@ -40,6 +42,7 @@ export type Database = {
           asset_id?: string
           changed_fields?: string[] | null
           created_at?: string
+          deletion_reason?: string | null
           id?: string
           new_values?: Json | null
           old_values?: Json | null

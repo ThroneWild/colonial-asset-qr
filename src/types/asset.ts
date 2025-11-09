@@ -58,6 +58,7 @@ export interface AssetHistoryEntry {
   new_values: Partial<Asset>;
   changed_fields: string[];
   created_at: string;
+  deletion_reason?: string;
   user_profile?: {
     full_name: string;
     email: string;

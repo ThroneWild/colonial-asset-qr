@@ -1,4 +1,4 @@
-import { Home, BarChart3, Package, QrCode, List, Settings, LogOut } from "lucide-react";
+import { Home, BarChart3, Package, QrCode, List, Settings, LogOut, ScrollText, Tag } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,7 +22,8 @@ const menuItems = [
   { title: "Início", url: "/", icon: Home },
   { title: "Dashboard", url: "/dashboard", icon: BarChart3 },
   { title: "Todos os Ativos", url: "/assets", icon: Package },
-  { title: "Etiquetas", url: "/labels", icon: QrCode },
+  { title: "Registros de Auditoria", url: "/auditoria", icon: ScrollText },
+  { title: "Etiquetas", url: "/labels", icon: Tag },
 ];
 
 export function AppSidebar() {

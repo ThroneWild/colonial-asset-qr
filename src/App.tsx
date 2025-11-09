@@ -10,6 +10,7 @@ import AssetView from "./pages/AssetView";
 import Auth from "./pages/Auth";
 import AllAssets from "./pages/AllAssets";
 import Dashboard from "./pages/Dashboard";
+import AuditLogs from "./pages/AuditLogs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/" element={<AppLayout><Index /></AppLayout>} />
           <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />
           <Route path="/assets" element={<AppLayout><AllAssets /></AppLayout>} />
+          <Route path="/auditoria" element={<AppLayout><AuditLogs /></AppLayout>} />
           <Route path="/labels" element={<AppLayout><Labels /></AppLayout>} />
           <Route path="/asset/:id" element={<AssetView />} />
           <Route path="*" element={<NotFound />} />

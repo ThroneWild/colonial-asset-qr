@@ -338,6 +338,17 @@ export const AssetHistory = ({ history, loading, asset }: AssetHistoryProps) => 
         doc.setFont('helvetica', 'italic');
         doc.text('Ativo cadastrado no sistema com sucesso', 16, yPos);
         yPos += 5;
+      } else if (entry.action === 'deleted' && entry.deletion_reason) {
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Motivo da Exclusão:', 16, yPos);
+        yPos += 5;
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(200, 0, 0);
+        const lines = doc.splitTextToSize(entry.deletion_reason, 170);
+        doc.text(lines, 20, yPos);
+        yPos += (lines.length * 5) + 2;
+        doc.setTextColor(0, 0, 0);
       }
       
       // Separator between entries
@@ -617,6 +628,19 @@ export const AssetHistory = ({ history, loading, asset }: AssetHistoryProps) => 
                         <p className="text-sm text-muted-foreground">
                           <span className="font-semibold text-primary">Ativo cadastrado</span> no sistema com sucesso
                         </p>
+                      </div>
+                    )}
+
+                    {/* Deletion reason */}
+                    {entry.action === 'deleted' && entry.deletion_reason && (
+                      <div className="p-4 glass-light rounded-lg border border-destructive/20 bg-destructive/5">
+                        <div className="flex items-start gap-3">
+                          <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-semibold text-destructive mb-2">Motivo da Exclusão:</p>
+                            <p className="text-sm text-foreground">{entry.deletion_reason}</p>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
