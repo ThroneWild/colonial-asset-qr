@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Plus, QrCode, List, BarChart3, UserCog } from 'lucide-react';
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { AssetForm } from '@/components/AssetForm';
 import { QRScanner } from '@/components/QRScanner';
 import { SingleLabel } from '@/components/SingleLabel';
@@ -22,6 +23,11 @@ const Index = () => {
   const [newAssetLabel, setNewAssetLabel] = useState<Asset | null>(null);
   const navigate = useNavigate();
   const { user, loading, profile, isAdmin } = useAuth();
+  
+  // Debug: verificar isAdmin
+  useEffect(() => {
+    console.log('isAdmin:', isAdmin, 'user:', user?.email);
+  }, [isAdmin, user]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -274,34 +280,17 @@ const Index = () => {
             </div>
           </Card>
         </div>
-
-        {isAdmin && (
-          <div className="relative">
-            <GlowingEffect
-              spread={40}
-              glow={true}
-              disabled={false}
-              proximity={64}
-              inactiveZone={0.01}
-              borderWidth={2}
-            />
-            <Card 
-              className="relative p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-              onClick={() => navigate('/users')}
-            >
-              <div className="flex flex-col items-center gap-3 sm:gap-4">
-                <div className="p-4 sm:p-5 rounded-2xl bg-gold/10 group-hover:bg-gold/20 transition-smooth">
-                  <UserCog className="h-8 w-8 sm:h-10 sm:w-10 text-gold" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Gerenciar Usuários</h3>
-                  <p className="text-xs text-muted-foreground">Adicione e gerencie usuários</p>
-                </div>
-              </div>
-            </Card>
-          </div>
-        )}
       </div>
+
+      {isAdmin && (
+        <div className="flex justify-center mb-8 animate-fade-in">
+          <InteractiveHoverButton 
+            text="Usuários"
+            onClick={() => navigate('/users')}
+            className="w-48 h-12 text-base"
+          />
+        </div>
+      )}
 
         {isFormOpen && (
           <Card className="p-5 sm:p-6 mb-6 shadow-card animate-scale-in border-0">
