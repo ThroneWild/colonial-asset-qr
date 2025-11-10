@@ -21,7 +21,7 @@ const Index = () => {
   const [showScanner, setShowScanner] = useState(false);
   const [newAssetLabel, setNewAssetLabel] = useState<Asset | null>(null);
   const navigate = useNavigate();
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, profile } = useAuth();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -105,12 +105,6 @@ const Index = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await signOut();
-    toast.success('Logout realizado com sucesso');
-    navigate('/auth');
-  };
-
   const handleScanQR = (data: string) => {
     setShowScanner(false);
     // Se for uma URL do nosso sistema, navegar para ela
@@ -143,7 +137,7 @@ const Index = () => {
     <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
       <div className="mb-6 sm:mb-8">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold mb-2">
-          Bem-vindo ao <span className="text-gold">Prize</span> Patrimônios
+          Bem-vindo{profile ? `, ${profile.full_name.split(' ')[0]}` : ''} ao <span className="text-gold">Prize</span> Patrimônios
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground">Sistema de Controle Patrimonial Empresarial</p>
       </div>

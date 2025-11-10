@@ -214,12 +214,30 @@ export type Database = {
       }
     }
     Functions: {
+      admin_create_user: {
+        Args: {
+          user_email: string
+          user_full_name: string
+          user_password: string
+        }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      list_all_users: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          role: string
+        }[]
       }
     }
     Enums: {

@@ -29,7 +29,9 @@ import {
 interface User {
   id: string;
   email: string;
+  full_name: string;
   created_at: string;
+  role?: string;
 }
 
 const UserManagement = () => {
@@ -38,6 +40,7 @@ const UserManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserFullName, setNewUserFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [creatingUser, setCreatingUser] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
@@ -61,11 +64,11 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const { data: { users: authUsers }, error } = await supabase.auth.admin.listUsers();
+      const { data, error } = await supabase.rpc('list_all_users');
       
       if (error) throw error;
       
-      setUsers(authUsers as User[]);
+      setUsers(data || []);
     } catch (error: any) {
       console.error('Erro ao carregar usuários:', error);
       toast.error('Erro ao carregar lista de usuários');
@@ -79,18 +82,37 @@ const UserManagement = () => {
     setCreatingUser(true);
 
     try {
-      const { data, error } = await supabase.auth.admin.createUser({
-        email: newUserEmail,
-        password: newUserPassword,
-        email_confirm: true,
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast.error('Sessão expirada. Faça login novamente.');
+        return;
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          email: newUserEmail,
+          password: newUserPassword,
+          full_name: newUserFullName,
+        }),
       });
 
-      if (error) throw error;
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao criar usuário');
+      }
 
       toast.success('Usuário criado com sucesso!');
       setIsDialogOpen(false);
       setNewUserEmail('');
       setNewUserPassword('');
+      setNewUserFullName('');
       fetchUsers();
     } catch (error: any) {
       toast.error(error.message || 'Erro ao criar usuário');
@@ -103,9 +125,29 @@ const UserManagement = () => {
     if (!userToDelete) return;
 
     try {
-      const { error } = await supabase.auth.admin.deleteUser(userToDelete.id);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast.error('Sessão expirada. Faça login novamente.');
+        return;
+      }
 
-      if (error) throw error;
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          user_id: userToDelete.id,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao excluir usuário');
+      }
 
       toast.success('Usuário excluído com sucesso!');
       setUserToDelete(null);
@@ -150,6 +192,18 @@ const UserManagement = () => {
               <DialogTitle>Criar Novo Usuário</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleCreateUser} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="full_name">Nome Completo</Label>
+                <Input
+                  id="full_name"
+                  type="text"
+                  placeholder="Nome completo do usuário"
+                  value={newUserFullName}
+                  onChange={(e) => setNewUserFullName(e.target.value)}
+                  required
+                />
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -214,21 +268,24 @@ const UserManagement = () => {
           users.map((userItem) => (
             <Card key={userItem.id} className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className="flex-1">
+              <div className="flex-1">
                   <h3 className="font-semibold text-foreground text-base sm:text-lg">
-                    {userItem.email}
+                    {userItem.full_name}
                   </h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {userItem.email}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
                     Criado em: {new Date(userItem.created_at).toLocaleDateString('pt-BR')}
                   </p>
-                  {userItem.email === 'alicio@prizehoteis.com' && (
+                  {userItem.role === 'admin' && (
                     <span className="inline-block mt-2 text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
                       Administrador
                     </span>
                   )}
                 </div>
 
-                {userItem.email !== 'alicio@prizehoteis.com' && (
+                {userItem.role !== 'admin' && (
                   <Button
                     variant="destructive"
                     size="sm"
@@ -249,7 +306,7 @@ const UserManagement = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir o usuário <strong>{userToDelete?.email}</strong>?
+              Tem certeza que deseja excluir o usuário <strong>{userToDelete?.full_name}</strong> ({userToDelete?.email})?
               Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
