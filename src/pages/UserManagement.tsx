@@ -32,6 +32,7 @@ interface User {
   full_name: string;
   created_at: string;
   role?: string;
+  username: string;
 }
 
 const UserManagement = () => {
@@ -41,6 +42,7 @@ const UserManagement = () => {
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserFullName, setNewUserFullName] = useState('');
+  const [newUserUsername, setNewUserUsername] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [creatingUser, setCreatingUser] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
@@ -99,6 +101,7 @@ const UserManagement = () => {
           email: newUserEmail,
           password: newUserPassword,
           full_name: newUserFullName,
+          username: newUserUsername,
         }),
       });
 
@@ -113,6 +116,7 @@ const UserManagement = () => {
       setNewUserEmail('');
       setNewUserPassword('');
       setNewUserFullName('');
+      setNewUserUsername('');
       fetchUsers();
     } catch (error: any) {
       toast.error(error.message || 'Erro ao criar usuário');
@@ -205,6 +209,21 @@ const UserManagement = () => {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="username">Nome de Usuário</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="usuario (usado para login)"
+                  value={newUserUsername}
+                  onChange={(e) => setNewUserUsername(e.target.value.toLowerCase().replace(/\s/g, ''))}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Será usado para fazer login no sistema
+                </p>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -272,6 +291,9 @@ const UserManagement = () => {
                   <h3 className="font-semibold text-foreground text-base sm:text-lg">
                     {userItem.full_name}
                   </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    <strong>Usuário:</strong> {userItem.username}
+                  </p>
                   <p className="text-xs sm:text-sm text-muted-foreground">
                     {userItem.email}
                   </p>

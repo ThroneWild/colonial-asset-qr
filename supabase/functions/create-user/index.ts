@@ -44,12 +44,12 @@ Deno.serve(async (req) => {
     }
 
     // Obter dados do novo usuário
-    const { email, password, full_name } = await req.json()
+    const { email, password, full_name, username } = await req.json()
 
     // Validações
-    if (!email || !password || !full_name) {
+    if (!email || !password || !full_name || !username) {
       return new Response(
-        JSON.stringify({ error: 'Email, senha e nome completo são obrigatórios' }),
+        JSON.stringify({ error: 'Email, senha, nome completo e usuário são obrigatórios' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -61,13 +61,28 @@ Deno.serve(async (req) => {
       )
     }
 
+    // Verificar se o username já existe
+    const { data: existingUsername } = await supabaseClient
+      .from('profiles')
+      .select('username')
+      .eq('username', username)
+      .single()
+
+    if (existingUsername) {
+      return new Response(
+        JSON.stringify({ error: 'Este nome de usuário já está em uso' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Criar novo usuário
     const { data: newUser, error: createError } = await supabaseClient.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
       user_metadata: {
-        full_name
+        full_name,
+        username
       }
     })
 
@@ -84,7 +99,8 @@ Deno.serve(async (req) => {
         user: {
           id: newUser.user?.id,
           email: newUser.user?.email,
-          full_name
+          full_name,
+          username
         }
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
