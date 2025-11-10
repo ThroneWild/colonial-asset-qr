@@ -368,9 +368,9 @@ const AllAssets = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
+      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
         {/* Breadcrumbs */}
-        <Breadcrumb className="mb-6">
+        <Breadcrumb className="mb-4 sm:mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink onClick={() => navigate('/')} className="cursor-pointer">
@@ -383,44 +383,47 @@ const AllAssets = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="mb-8 space-y-4">
-          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div className="mb-6 sm:mb-8 space-y-4">
+          <div className="flex flex-col gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">Todos os Ativos</h2>
-              <p className="text-muted-foreground">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2">Todos os Ativos</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Mostrando <span className="font-semibold text-primary">{paginatedItems.length}</span> de {filteredAssets.length} ativos
                 {filteredAssets.length !== assets.length && ` (${assets.length} total)`}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2">
               <AdvancedFilters filters={filters} onFiltersChange={setFilters} />
-              <Button onClick={() => handleExportPDF()} variant="outline">
-                <FileText className="h-4 w-4 mr-2" />
-                Exportar PDF
+              <Button onClick={() => handleExportPDF()} variant="outline" size="sm" className="sm:size-default">
+                <FileText className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Exportar PDF</span>
               </Button>
-              <Button onClick={() => exportToExcel(filteredAssets)} variant="outline">
-                <FileText className="h-4 w-4 mr-2" />
-                Exportar Excel
+              <Button onClick={() => exportToExcel(filteredAssets)} variant="outline" size="sm" className="sm:size-default">
+                <FileText className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Exportar Excel</span>
               </Button>
-              <Button onClick={() => navigate('/labels')}>
-                <Tags className="h-4 w-4 mr-2" />
-                Gerar Etiquetas
+              <Button onClick={() => navigate('/labels')} size="sm" className="sm:size-default">
+                <Tags className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Gerar Etiquetas</span>
               </Button>
             </div>
           </div>
           
-          <div className="flex gap-4 items-center">
-            <AdvancedSearch
-              value={filters.searchTerm || ''}
-              onChange={(value) => setFilters({ ...filters, searchTerm: value })}
-              placeholder="Buscar por descrição, setor, grupo, item nº ou marca..."
-              suggestions={searchSuggestions}
-            />
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center">
+            <div className="flex-1">
+              <AdvancedSearch
+                value={filters.searchTerm || ''}
+                onChange={(value) => setFilters({ ...filters, searchTerm: value })}
+                placeholder="Buscar por descrição, setor, grupo..."
+                suggestions={searchSuggestions}
+              />
+            </div>
             {paginatedItems.length > 0 && (
               <Button
                 variant="outline"
                 onClick={handleSelectAll}
                 className="whitespace-nowrap"
+                size="sm"
               >
                 {selectedAssets.length === paginatedItems.length ? 'Desmarcar' : 'Selecionar'} Todos
               </Button>

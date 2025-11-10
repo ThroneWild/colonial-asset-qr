@@ -140,47 +140,47 @@ const Index = () => {
   const maintenanceCount = assets.filter(a => a.conservation_state === 'Precisa de Manutenção').length;
 
   return (
-    <div className="container mx-auto px-6 py-8 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-display font-bold mb-2">
+    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold mb-2">
           Bem-vindo ao <span className="text-gold">Prize</span> Patrimônios
         </h1>
-        <p className="text-muted-foreground">Sistema de Controle Patrimonial Empresarial</p>
+        <p className="text-sm sm:text-base text-muted-foreground">Sistema de Controle Patrimonial Empresarial</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 animate-fade-in">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 animate-fade-in">
         {isLoadingAssets ? (
           <SkeletonStatsGrid count={4} />
         ) : (
           <>
-            <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Total de Itens</h3>
-              <p className="text-5xl font-bold text-primary mb-2">{assets.length}</p>
+            <Card className="p-5 sm:p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
+              <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 uppercase tracking-wider">Total de Itens</h3>
+              <p className="text-4xl sm:text-5xl font-bold text-primary mb-1 sm:mb-2">{assets.length}</p>
               <p className="text-xs text-muted-foreground">Itens cadastrados</p>
             </Card>
             
-            <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Itens Ativos</h3>
-              <p className="text-5xl font-bold text-primary mb-2">{assets.filter(a => a.conservation_state !== 'Precisa de Manutenção').length}</p>
+            <Card className="p-5 sm:p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
+              <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 uppercase tracking-wider">Itens Ativos</h3>
+              <p className="text-4xl sm:text-5xl font-bold text-primary mb-1 sm:mb-2">{assets.filter(a => a.conservation_state !== 'Precisa de Manutenção').length}</p>
               <p className="text-xs text-muted-foreground">Em uso regular</p>
             </Card>
             
-            <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Em Manutenção</h3>
-              <p className="text-5xl font-bold text-destructive mb-2">{maintenanceCount}</p>
+            <Card className="p-5 sm:p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
+              <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 uppercase tracking-wider">Em Manutenção</h3>
+              <p className="text-4xl sm:text-5xl font-bold text-destructive mb-1 sm:mb-2">{maintenanceCount}</p>
               <p className="text-xs text-muted-foreground">Necessitam atenção</p>
             </Card>
             
-            <Card className="p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Localizações</h3>
-              <p className="text-5xl font-bold text-primary mb-2">{new Set(assets.map(a => a.sector)).size}</p>
+            <Card className="p-5 sm:p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
+              <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 uppercase tracking-wider">Localizações</h3>
+              <p className="text-4xl sm:text-5xl font-bold text-primary mb-1 sm:mb-2">{new Set(assets.map(a => a.sector)).size}</p>
               <p className="text-xs text-muted-foreground">Setores diferentes</p>
             </Card>
           </>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 animate-scale-in">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 animate-scale-in">
         <div className="relative">
           <GlowingEffect
             spread={40}
@@ -191,15 +191,15 @@ const Index = () => {
             borderWidth={2}
           />
           <Card 
-            className="relative p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+            className="relative p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
             onClick={() => navigate('/dashboard')}
           >
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-                <BarChart3 className="h-10 w-10 text-primary" />
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                <BarChart3 className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground mb-2">Dashboard</h3>
+                <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Dashboard</h3>
                 <p className="text-xs text-muted-foreground">Visualize estatísticas e gráficos</p>
               </div>
             </div>
@@ -216,15 +216,15 @@ const Index = () => {
             borderWidth={2}
           />
           <Card 
-            className="relative p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+            className="relative p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
             onClick={() => setIsFormOpen(true)}
           >
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-                <Plus className="h-10 w-10 text-primary" />
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                <Plus className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground mb-2">Cadastrar Item</h3>
+                <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Cadastrar Item</h3>
                 <p className="text-xs text-muted-foreground">Adicione um novo item ao patrimônio</p>
               </div>
             </div>
@@ -241,15 +241,15 @@ const Index = () => {
             borderWidth={2}
           />
           <Card 
-            className="relative p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+            className="relative p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
             onClick={() => setShowScanner(true)}
           >
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-                <QrCode className="h-10 w-10 text-primary" />
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                <QrCode className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground mb-2">Ler QR Code</h3>
+                <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Ler QR Code</h3>
                 <p className="text-xs text-muted-foreground">Escaneie o código para ver detalhes</p>
               </div>
             </div>
@@ -266,15 +266,15 @@ const Index = () => {
             borderWidth={2}
           />
           <Card 
-            className="relative p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+            className="relative p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
             onClick={() => navigate('/assets')}
           >
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-                <List className="h-10 w-10 text-primary" />
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                <List className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground mb-2">Ver Todos os Itens</h3>
+                <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Ver Todos os Itens</h3>
                 <p className="text-xs text-muted-foreground">Liste e gerencie o patrimônio</p>
               </div>
             </div>
@@ -283,8 +283,8 @@ const Index = () => {
       </div>
 
         {isFormOpen && (
-          <Card className="p-6 mb-6 shadow-card animate-scale-in border-0">
-            <h3 className="text-xl font-semibold mb-6 text-foreground">Cadastrar Novo Ativo</h3>
+          <Card className="p-5 sm:p-6 mb-6 shadow-card animate-scale-in border-0">
+            <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-foreground">Cadastrar Novo Ativo</h3>
             <AssetForm
               onSubmit={handleSubmit}
               onCancel={() => setIsFormOpen(false)}

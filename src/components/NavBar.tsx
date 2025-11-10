@@ -47,11 +47,11 @@ export function NavBar({ items, className }: NavBarProps) {
   return (
     <div
       className={cn(
-        "fixed bottom-0 md:top-0 left-1/2 -translate-x-1/2 z-50 mb-6 md:mt-6",
+        "fixed bottom-0 md:top-0 left-1/2 -translate-x-1/2 z-50 mb-4 sm:mb-6 md:mt-4 lg:mt-6 px-4",
         className
       )}
     >
-      <div className="flex items-center gap-1 bg-background/80 border border-border backdrop-blur-lg py-2 px-2 rounded-full shadow-lg">
+      <div className="flex items-center gap-0.5 sm:gap-1 bg-background/80 border border-border backdrop-blur-lg py-1.5 sm:py-2 px-1.5 sm:px-2 rounded-full shadow-lg">
         {items.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.url);
@@ -61,14 +61,14 @@ export function NavBar({ items, className }: NavBarProps) {
               key={item.name}
               onClick={() => item.action ? item.action() : navigate(item.url)}
               className={cn(
-                "relative cursor-pointer text-sm font-semibold px-5 py-2.5 rounded-full transition-colors",
+                "relative cursor-pointer text-xs sm:text-sm font-semibold px-3 sm:px-5 py-2 sm:py-2.5 rounded-full transition-colors",
                 "text-foreground/80 hover:text-primary",
                 active && "text-primary"
               )}
             >
               <span className="hidden md:inline">{item.name}</span>
               <span className="md:hidden flex items-center justify-center">
-                <Icon size={20} strokeWidth={2.5} />
+                <Icon size={18} strokeWidth={2.5} className="sm:w-5 sm:h-5" />
               </span>
               {active && (
                 <motion.div
@@ -97,13 +97,13 @@ export function NavBar({ items, className }: NavBarProps) {
         <button
           onClick={handleLogout}
           className={cn(
-            "relative cursor-pointer text-sm font-semibold px-5 py-2.5 rounded-full transition-colors",
+            "relative cursor-pointer text-xs sm:text-sm font-semibold px-3 sm:px-5 py-2 sm:py-2.5 rounded-full transition-colors",
             "text-destructive/80 hover:text-destructive"
           )}
         >
           <span className="hidden md:inline">Sair</span>
           <span className="md:hidden flex items-center justify-center">
-            <LogOut size={20} strokeWidth={2.5} />
+            <LogOut size={18} strokeWidth={2.5} className="sm:w-5 sm:h-5" />
           </span>
         </button>
       </div>

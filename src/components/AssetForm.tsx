@@ -56,9 +56,9 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="description">Descrição *</Label>
+        <Label htmlFor="description" className="text-sm sm:text-base">Descrição *</Label>
         <Textarea
           id="description"
           placeholder="Ex: Mesa de escritório em madeira"
@@ -66,10 +66,11 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           required
           rows={3}
+          className="text-sm sm:text-base"
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="sector">Setor *</Label>
           <Select
@@ -159,12 +160,12 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
         />
       </div>
 
-      <div className="flex gap-3 pt-4">
-        <Button type="submit" disabled={isLoading} className="flex-1">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-4">
+        <Button type="submit" disabled={isLoading} className="flex-1 text-sm sm:text-base">
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Cadastrar Ativo
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading} className="text-sm sm:text-base">
           Cancelar
         </Button>
       </div>

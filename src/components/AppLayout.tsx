@@ -16,7 +16,7 @@ const navItems = [
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div className="min-h-screen w-full bg-background pb-24 md:pb-0 md:pt-24">
+    <div className="min-h-screen w-full bg-background pb-20 sm:pb-24 md:pb-0 md:pt-20 lg:pt-24">
       <NavBar items={navItems} />
       <main className="flex-1 overflow-auto">
         {children}
