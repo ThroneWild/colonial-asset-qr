@@ -33,20 +33,21 @@ export function AppSidebar() {
   return (
     <SidebarBody className="justify-between gap-10">
       <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <div className="mt-8 flex flex-col gap-2">
-          <div className="flex items-center gap-2 mb-4 px-2">
-            <img src={logoImage} alt="Prize Logo" className="h-8 w-8 object-contain" />
-            <motion.span
-              animate={{
-                display: open ? "inline-block" : "none",
-                opacity: open ? 1 : 0,
-              }}
-              className="text-lg font-display font-bold text-primary"
-            >
-              Prize
-            </motion.span>
-          </div>
+        <div className="flex items-center gap-3 mb-8 px-2">
+          <img src={logoImage} alt="Prize Logo" className="h-10 w-10 object-contain flex-shrink-0" />
+          <motion.div
+            animate={{
+              display: open ? "block" : "none",
+              opacity: open ? 1 : 0,
+            }}
+            className="flex-1"
+          >
+            <h2 className="text-lg font-display font-bold text-primary">Prize</h2>
+            <p className="text-xs text-muted-foreground">Patrimônios</p>
+          </motion.div>
+        </div>
 
+        <div className="flex flex-col gap-2">
           {menuItems.map((item) => (
             <SidebarLink
               key={item.href}
@@ -63,7 +64,7 @@ export function AppSidebar() {
           link={{
             label: "Sair",
             href: "#",
-            icon: <LogOut className="h-5 w-5 text-destructive" />,
+            icon: <LogOut className="h-5 w-5" />,
           }}
           onClick={handleLogout}
           className="hover:bg-destructive/10"
