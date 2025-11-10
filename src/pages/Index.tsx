@@ -23,11 +23,6 @@ const Index = () => {
   const [newAssetLabel, setNewAssetLabel] = useState<Asset | null>(null);
   const navigate = useNavigate();
   const { user, loading, profile, isAdmin } = useAuth();
-  
-  // Debug: verificar isAdmin
-  useEffect(() => {
-    console.log('isAdmin:', isAdmin, 'user:', user?.email);
-  }, [isAdmin, user]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -282,15 +277,13 @@ const Index = () => {
         </div>
       </div>
 
-      {isAdmin && (
-        <div className="flex justify-center mb-8 animate-fade-in">
-          <InteractiveHoverButton 
-            text="Usuários"
-            onClick={() => navigate('/users')}
-            className="w-48 h-12 text-base"
-          />
-        </div>
-      )}
+      <div className="flex justify-center mb-8 animate-fade-in">
+        <InteractiveHoverButton 
+          text="Usuários"
+          onClick={() => navigate('/users')}
+          className="w-48 h-12 text-base"
+        />
+      </div>
 
         {isFormOpen && (
           <Card className="p-5 sm:p-6 mb-6 shadow-card animate-scale-in border-0">

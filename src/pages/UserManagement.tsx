@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { UserPlus, Trash2, Eye, EyeOff } from 'lucide-react';
+import { UserPlus, Trash2, Eye, EyeOff, Lock } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -43,7 +43,9 @@ const UserManagement = () => {
   const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserFullName, setNewUserFullName] = useState('');
   const [newUserUsername, setNewUserUsername] = useState('');
+  const [masterPassword, setMasterPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showMasterPassword, setShowMasterPassword] = useState(false);
   const [creatingUser, setCreatingUser] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const navigate = useNavigate();
@@ -54,14 +56,8 @@ const UserManagement = () => {
       navigate('/auth');
       return;
     }
-    // Verificar se é admin
-    if (!isAdmin) {
-      toast.error('Acesso negado. Apenas administradores podem acessar esta página.');
-      navigate('/');
-      return;
-    }
     fetchUsers();
-  }, [user, isAdmin, navigate]);
+  }, [user, navigate]);
 
   const fetchUsers = async () => {
     try {
@@ -81,6 +77,13 @@ const UserManagement = () => {
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validar senha mestre
+    if (masterPassword !== 'gerencia') {
+      toast.error('Senha chave incorreta');
+      return;
+    }
+
     setCreatingUser(true);
 
     try {
@@ -117,6 +120,7 @@ const UserManagement = () => {
       setNewUserPassword('');
       setNewUserFullName('');
       setNewUserUsername('');
+      setMasterPassword('');
       fetchUsers();
     } catch (error: any) {
       toast.error(error.message || 'Erro ao criar usuário');
@@ -127,6 +131,12 @@ const UserManagement = () => {
 
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
+    
+    // Validar que apenas admin pode deletar
+    if (!isAdmin) {
+      toast.error('Apenas administradores podem excluir usuários');
+      return;
+    }
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -260,11 +270,41 @@ const UserManagement = () => {
                 </p>
               </div>
 
+              <div className="space-y-2 pt-2 border-t">
+                <Label htmlFor="master_password" className="flex items-center gap-2">
+                  <Lock className="h-4 w-4" />
+                  Senha Chave (Obrigatória)
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="master_password"
+                    type={showMasterPassword ? 'text' : 'password'}
+                    placeholder="Digite a senha chave"
+                    value={masterPassword}
+                    onChange={(e) => setMasterPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowMasterPassword(!showMasterPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showMasterPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Senha necessária para autorizar a criação de usuários
+                </p>
+              </div>
+
               <div className="flex gap-2 pt-4">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
+                  onClick={() => {
+                    setIsDialogOpen(false);
+                    setMasterPassword('');
+                  }}
                   className="flex-1"
                 >
                   Cancelar
@@ -307,7 +347,7 @@ const UserManagement = () => {
                   )}
                 </div>
 
-                {userItem.role !== 'admin' && (
+                {userItem.role !== 'admin' && isAdmin && (
                   <Button
                     variant="destructive"
                     size="sm"
