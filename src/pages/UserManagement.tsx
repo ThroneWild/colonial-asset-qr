@@ -47,21 +47,21 @@ const UserManagement = () => {
   const [creatingUser, setCreatingUser] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
 
   useEffect(() => {
     if (!user) {
       navigate('/auth');
       return;
     }
-    // Verificar se é o admin
-    if (user.email !== 'alicio@prizehoteis.com') {
+    // Verificar se é admin
+    if (!isAdmin) {
       toast.error('Acesso negado. Apenas administradores podem acessar esta página.');
       navigate('/');
       return;
     }
     fetchUsers();
-  }, [user, navigate]);
+  }, [user, isAdmin, navigate]);
 
   const fetchUsers = async () => {
     try {

@@ -1,22 +1,14 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import { NavBar } from "@/components/NavBar";
 import { Home, BarChart3, Package, ScrollText, Tag, Users } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 const AppLayout = ({ children }: AppLayoutProps) => {
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setIsAdmin(user?.email === 'alicio@prizehoteis.com');
-    };
-    checkAdmin();
-  }, []);
+  const { isAdmin } = useAuth();
 
   const navItems = [
     { name: "Início", url: "/", icon: Home },

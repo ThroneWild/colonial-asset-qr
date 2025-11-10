@@ -8,11 +8,16 @@ interface UserProfile {
   full_name: string;
 }
 
+interface UserRole {
+  role: string;
+}
+
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -24,6 +29,16 @@ export const useAuth = () => {
 
       if (error) throw error;
       setProfile(data);
+      
+      // Verificar se é admin
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .single();
+      
+      setIsAdmin(!!roleData);
     } catch (error) {
       console.error('Erro ao carregar perfil:', error);
     }
@@ -67,7 +82,8 @@ export const useAuth = () => {
   const signOut = async () => {
     await supabase.auth.signOut();
     setProfile(null);
+    setIsAdmin(false);
   };
 
-  return { user, session, profile, loading, signOut };
+  return { user, session, profile, loading, signOut, isAdmin };
 };
