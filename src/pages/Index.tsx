@@ -276,10 +276,10 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="flex justify-center mb-8 animate-fade-in">
+      <div className="relative z-10 flex justify-center mb-8 animate-fade-in">
         <Button 
           onClick={() => navigate('/users')}
-          className="w-48 h-12 text-base relative group overflow-hidden"
+          className="w-48 h-12 text-base relative group overflow-hidden cursor-pointer"
         >
           <span className="inline-block translate-x-1 transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">
             Usuários
@@ -292,24 +292,24 @@ const Index = () => {
         </Button>
       </div>
 
-        {isFormOpen && (
-          <Card className="p-5 sm:p-6 mb-6 shadow-card animate-scale-in border-0">
-            <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-foreground">Cadastrar Novo Ativo</h3>
-            <AssetForm
-              onSubmit={handleSubmit}
-              onCancel={() => setIsFormOpen(false)}
-              isLoading={isLoading}
-            />
-          </Card>
-        )}
+      {isFormOpen && (
+        <Card className="p-5 sm:p-6 mb-6 shadow-card animate-scale-in border-0">
+          <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-foreground">Cadastrar Novo Ativo</h3>
+          <AssetForm
+            onSubmit={handleSubmit}
+            onCancel={() => setIsFormOpen(false)}
+            isLoading={isLoading}
+          />
+        </Card>
+      )}
 
-        {showScanner && (
-          <QRScanner onScan={handleScanQR} onClose={() => setShowScanner(false)} />
-        )}
+      {showScanner && (
+        <QRScanner onScan={handleScanQR} onClose={() => setShowScanner(false)} />
+      )}
 
-        {newAssetLabel && (
-          <SingleLabel asset={newAssetLabel} onClose={() => setNewAssetLabel(null)} />
-        )}
+      {newAssetLabel && (
+        <SingleLabel asset={newAssetLabel} onClose={() => setNewAssetLabel(null)} />
+      )}
     </div>
   );
 };
