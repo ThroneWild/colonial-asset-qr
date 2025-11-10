@@ -1,20 +1,14 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, BarChart3, Package, ScrollText, Tag, LogOut, Moon, Sun } from "lucide-react";
+import { Home, BarChart3, Package, ScrollText, Tag, LogOut } from "lucide-react";
 import { Dock, DockIcon, DockItem, DockLabel } from "@/components/ui/dock";
-import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useTheme } from "next-themes";
 export function AppDock() {
   const navigate = useNavigate();
   const location = useLocation();
   const {
     toast
   } = useToast();
-  const {
-    theme,
-    setTheme
-  } = useTheme();
   const handleLogout = async () => {
     await supabase.auth.signOut();
     toast({
@@ -22,9 +16,6 @@ export function AppDock() {
       description: "Você foi desconectado com sucesso."
     });
     navigate("/auth");
-  };
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
   };
   const menuItems = [{
     title: "Home",
@@ -66,19 +57,6 @@ export function AppDock() {
           </div>)}
         
         <div className="h-8 w-[1px] bg-gray-300 dark:bg-neutral-700 self-center" />
-        
-        <div onClick={e => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleTheme();
-      }} className="cursor-pointer">
-          <DockItem className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 hover:bg-gray-300 dark:hover:bg-neutral-700">
-            <DockLabel>Tema</DockLabel>
-            <DockIcon>
-              {theme === "dark" ? <Sun className="h-full w-full text-neutral-600 dark:text-neutral-300" /> : <Moon className="h-full w-full text-neutral-600 dark:text-neutral-300" />}
-            </DockIcon>
-          </DockItem>
-        </div>
         
         <div onClick={e => {
         e.preventDefault();

@@ -167,6 +167,13 @@ function DockIcon({
   const restProps = rest as Record<string, unknown>;
   const width = restProps['width'] as MotionValue<number>;
   const widthTransform = useTransform(width, val => val / 2);
-  return;
+  return (
+    <motion.div
+      style={{ width: widthTransform }}
+      className={cn('flex items-center justify-center', className)}
+    >
+      {children}
+    </motion.div>
+  );
 }
 export { Dock, DockIcon, DockItem, DockLabel };
