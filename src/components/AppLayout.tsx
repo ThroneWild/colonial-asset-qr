@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
-import { AppDock } from "@/components/AppDock";
+import { AppSidebar } from "@/components/AppSidebar";
+import { Sidebar } from "@/components/ui/animated-sidebar";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -7,12 +8,13 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div className="min-h-screen w-full bg-background pb-24">
-      <main className="flex-1 overflow-auto">
-        {children}
-      </main>
-      
-      <AppDock />
-    </div>
+    <Sidebar>
+      <div className="flex w-full min-h-screen bg-background">
+        <AppSidebar />
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
+    </Sidebar>
   );
 }

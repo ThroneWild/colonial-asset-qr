@@ -1,112 +1,74 @@
-import { Home, BarChart3, Package, QrCode, List, Settings, LogOut, ScrollText, Tag } from "lucide-react";
-import { NavLink } from "@/components/NavLink";
+import { Home, BarChart3, Package, ScrollText, Tag, LogOut } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logoImage from "@/assets/logo-prize.png";
-
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarFooter,
-  useSidebar,
-} from "@/components/ui/sidebar";
-
-const menuItems = [
-  { title: "Início", url: "/", icon: Home },
-  { title: "Dashboard", url: "/dashboard", icon: BarChart3 },
-  { title: "Todos os Ativos", url: "/assets", icon: Package },
-  { title: "Registros de Auditoria", url: "/auditoria", icon: ScrollText },
-  { title: "Etiquetas", url: "/labels", icon: Tag },
-];
+import { SidebarBody, SidebarLink, useSidebar } from "@/components/ui/animated-sidebar";
+import { motion } from "framer-motion";
 
 export function AppSidebar() {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
-  const currentPath = location.pathname;
+  const { open } = useSidebar();
 
-  const isActive = (path: string) => {
-    if (path === "/") return currentPath === "/";
-    return currentPath.startsWith(path);
-  };
+  const menuItems = [
+    { label: "Início", href: "/", icon: <Home className="h-5 w-5" /> },
+    { label: "Dashboard", href: "/dashboard", icon: <BarChart3 className="h-5 w-5" /> },
+    { label: "Todos os Ativos", href: "/assets", icon: <Package className="h-5 w-5" /> },
+    { label: "Registros de Auditoria", href: "/auditoria", icon: <ScrollText className="h-5 w-5" /> },
+    { label: "Etiquetas", href: "/labels", icon: <Tag className="h-5 w-5" /> },
+  ];
 
   const handleLogout = async () => {
-    await signOut();
+    await supabase.auth.signOut();
     toast.success('Logout realizado com sucesso');
     navigate('/auth');
   };
 
+  const isActive = (path: string) => {
+    if (path === "/") return location.pathname === "/";
+    return location.pathname.startsWith(path);
+  };
+
   return (
-    <Sidebar
-      className={`${collapsed ? "w-16" : "w-64"} border-r border-border/50 glass-heavy transition-all duration-300`}
-      collapsible="icon"
-    >
-      <div className="p-4 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <img src={logoImage} alt="Prize Logo" className="h-10 w-10 object-contain" />
-          {!collapsed && (
-            <div className="flex-1">
-              <h2 className="text-lg font-display font-bold">
-                <span className="text-gold">Prize</span>
-              </h2>
-              <p className="text-xs text-muted-foreground">Patrimônios</p>
-            </div>
-          )}
+    <SidebarBody className="justify-between gap-10">
+      <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+        <div className="mt-8 flex flex-col gap-2">
+          <div className="flex items-center gap-2 mb-4 px-2">
+            <img src={logoImage} alt="Prize Logo" className="h-8 w-8 object-contain" />
+            <motion.span
+              animate={{
+                display: open ? "inline-block" : "none",
+                opacity: open ? 1 : 0,
+              }}
+              className="text-lg font-display font-bold text-primary"
+            >
+              Prize
+            </motion.span>
+          </div>
+
+          {menuItems.map((item) => (
+            <SidebarLink
+              key={item.href}
+              link={item}
+              onClick={() => navigate(item.href)}
+              isActive={isActive(item.href)}
+            />
+          ))}
         </div>
       </div>
 
-      <SidebarContent>
-        <SidebarGroup>
-          {!collapsed && (
-            <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-4 py-2">
-              Menu Principal
-            </SidebarGroupLabel>
-          )}
-
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink
-                      to={item.url}
-                      end={item.url === "/"}
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-smooth hover:bg-primary/10"
-                      activeClassName="bg-primary/15 text-primary font-semibold shadow-sm"
-                    >
-                      <item.icon className="h-5 w-5 flex-shrink-0" />
-                      {!collapsed && <span className="text-sm">{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-
-      <SidebarFooter className="border-t border-border/50 p-2">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-smooth hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-            >
-              <LogOut className="h-5 w-5 flex-shrink-0" />
-              {!collapsed && <span className="text-sm">Sair</span>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+      <div className="border-t border-border/50 pt-4">
+        <SidebarLink
+          link={{
+            label: "Sair",
+            href: "#",
+            icon: <LogOut className="h-5 w-5 text-destructive" />,
+          }}
+          onClick={handleLogout}
+          className="hover:bg-destructive/10"
+        />
+      </div>
+    </SidebarBody>
   );
 }
