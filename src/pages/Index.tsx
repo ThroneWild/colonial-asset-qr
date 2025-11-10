@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Plus, QrCode, List, BarChart3, UserCog } from 'lucide-react';
-import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { AssetForm } from '@/components/AssetForm';
 import { QRScanner } from '@/components/QRScanner';
 import { SingleLabel } from '@/components/SingleLabel';
@@ -278,11 +277,19 @@ const Index = () => {
       </div>
 
       <div className="flex justify-center mb-8 animate-fade-in">
-        <InteractiveHoverButton 
-          text="Usuários"
+        <Button 
           onClick={() => navigate('/users')}
-          className="w-48 h-12 text-base"
-        />
+          className="w-48 h-12 text-base relative group overflow-hidden"
+        >
+          <span className="inline-block translate-x-1 transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">
+            Usuários
+          </span>
+          <div className="absolute top-0 z-10 flex h-full w-full translate-x-12 items-center justify-center gap-2 opacity-0 transition-all duration-300 group-hover:-translate-x-1 group-hover:opacity-100">
+            <span>Usuários</span>
+            <UserCog className="h-4 w-4" />
+          </div>
+          <div className="absolute left-[20%] top-[40%] h-2 w-2 scale-[1] rounded-lg bg-primary transition-all duration-300 group-hover:left-[0%] group-hover:top-[0%] group-hover:h-full group-hover:w-full group-hover:scale-[1.8]"></div>
+        </Button>
       </div>
 
         {isFormOpen && (
