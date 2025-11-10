@@ -47,31 +47,28 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
+        },
+        chart: {
+          1: "hsl(var(--chart-1))",
+          2: "hsl(var(--chart-2))",
+          3: "hsl(var(--chart-3))",
+          4: "hsl(var(--chart-4))",
+          5: "hsl(var(--chart-5))",
+        },
         prize: {
           petrol: "hsl(var(--prize-petrol))",
           beige: "hsl(var(--prize-beige))",
           gold: "hsl(var(--prize-gold))",
           charcoal: "hsl(var(--prize-charcoal))",
-        },
-        emerald: {
-          300: "hsl(156 73% 74%)",
-          500: "hsl(160 84% 39%)",
-          700: "hsl(161 94% 30%)",
-        },
-        blue: {
-          300: "hsl(205 97% 75%)",
-          500: "hsl(211 100% 50%)",
-          700: "hsl(212 100% 48%)",
-        },
-        amber: {
-          300: "hsl(41 100% 71%)",
-          500: "hsl(38 92% 50%)",
-          700: "hsl(32 95% 44%)",
-        },
-        red: {
-          300: "hsl(0 91% 71%)",
-          500: "hsl(0 84% 60%)",
-          700: "hsl(0 74% 42%)",
         },
       },
       fontFamily: {
@@ -82,11 +79,6 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-      },
-      backdropBlur: {
-        glass: "var(--blur-glass)",
-        heavy: "var(--blur-heavy)",
-        light: "var(--blur-light)",
       },
       keyframes: {
         "accordion-down": {

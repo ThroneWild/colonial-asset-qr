@@ -42,8 +42,8 @@ export function AppSidebar() {
             }}
             className="flex-1"
           >
-            <h2 className="text-lg font-display font-bold text-primary">Prize</h2>
-            <p className="text-xs text-muted-foreground">Patrimônios</p>
+            <h2 className="text-lg font-display font-bold text-sidebar-primary">Prize</h2>
+            <p className="text-xs text-sidebar-foreground">Patrimônios</p>
           </motion.div>
         </div>
 
@@ -59,7 +59,7 @@ export function AppSidebar() {
         </div>
       </div>
 
-      <div className="border-t border-border/50 pt-4">
+      <div className="border-t border-sidebar-border pt-4">
         <SidebarLink
           link={{
             label: "Sair",

@@ -90,7 +90,7 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-screen px-4 py-4 hidden md:flex md:flex-col bg-background border-r border-border/50 w-[300px] flex-shrink-0 sticky top-0",
+        "h-screen px-4 py-4 hidden md:flex md:flex-col bg-sidebar border-r border-sidebar-border w-[300px] flex-shrink-0 sticky top-0",
         className
       )}
       animate={{
@@ -115,13 +115,13 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-background border-b border-border/50 w-full sticky top-0 z-50"
+          "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-sidebar border-b border-sidebar-border w-full sticky top-0 z-50"
         )}
         {...props}
       >
         <div className="flex justify-end z-20 w-full">
           <Menu
-            className="text-foreground cursor-pointer h-6 w-6"
+            className="text-sidebar-foreground cursor-pointer h-6 w-6"
             onClick={() => setOpen(!open)}
           />
         </div>
@@ -136,12 +136,12 @@ export const MobileSidebar = ({
                 ease: "easeInOut",
               }}
               className={cn(
-                "fixed h-full w-full inset-0 bg-background p-10 z-[100] flex flex-col justify-between",
+                "fixed h-full w-full inset-0 bg-sidebar p-10 z-[100] flex flex-col justify-between",
                 className
               )}
             >
               <div
-                className="absolute right-10 top-10 z-50 text-foreground cursor-pointer"
+                className="absolute right-10 top-10 z-50 text-sidebar-foreground cursor-pointer"
                 onClick={() => setOpen(!open)}
               >
                 <X />
@@ -172,15 +172,15 @@ export const SidebarLink = ({
     <div
       onClick={onClick}
       className={cn(
-        "flex items-center justify-start gap-3 group/sidebar py-3 cursor-pointer rounded-lg px-3 hover:bg-primary/10 transition-all duration-200",
-        isActive && "bg-primary/15 shadow-sm",
+        "flex items-center justify-start gap-3 group/sidebar py-3 cursor-pointer rounded-lg px-3 hover:bg-sidebar-accent transition-all duration-200",
+        isActive && "bg-sidebar-accent",
         className
       )}
       {...props}
     >
       <div className={cn(
         "transition-colors",
-        isActive ? "text-primary" : "text-muted-foreground"
+        isActive ? "text-sidebar-primary" : "text-sidebar-foreground"
       )}>
         {link.icon}
       </div>
@@ -191,7 +191,7 @@ export const SidebarLink = ({
         }}
         className={cn(
           "text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0",
-          isActive ? "text-primary font-semibold" : "text-foreground"
+          isActive ? "text-sidebar-primary font-semibold" : "text-sidebar-foreground"
         )}
       >
         {link.label}
