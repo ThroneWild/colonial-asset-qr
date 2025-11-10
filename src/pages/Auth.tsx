@@ -1,45 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { LogIn, UserPlus } from 'lucide-react';
-import { z } from 'zod';
-import logoPrize from '@/assets/logo-prize.png';
-import { ThemeToggle } from '@/components/ThemeToggle';
-
-const signUpSchema = z.object({
-  full_name: z.string().trim().min(3, 'Nome deve ter no mínimo 3 caracteres').max(100, 'Nome muito longo'),
-  email: z.string().trim().email('Email inválido').max(255, 'Email muito longo'),
-  password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres').max(100, 'Senha muito longa'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'As senhas não coincidem',
-  path: ['confirmPassword'],
-});
-
-const loginSchema = z.object({
-  email: z.string().trim().email('Email inválido'),
-  password: z.string().min(1, 'Senha é obrigatória'),
-});
+import { motion, AnimatePresence } from 'framer-motion';
+import { CanvasRevealEffect } from '@/components/ui/canvas-reveal-effect';
+import { Eye, EyeOff } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const Auth = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    full_name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    // Verificar se já está autenticado
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -49,223 +24,120 @@ const Auth = () => {
     checkAuth();
   }, [navigate]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Limpar erro do campo quando usuário começar a digitar
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
-    
+    setLoading(true);
+
     try {
-      const validatedData = signUpSchema.parse(formData);
-      setIsLoading(true);
-
-      const { error } = await supabase.auth.signUp({
-        email: validatedData.email,
-        password: validatedData.password,
-        options: {
-          data: {
-            full_name: validatedData.full_name,
-          },
-          emailRedirectTo: `${window.location.origin}/`,
-        },
-      });
-
-      if (error) {
-        if (error.message.includes('already registered')) {
-          toast.error('Este email já está cadastrado. Tente fazer login.');
-        } else {
-          toast.error(error.message);
-        }
-        return;
-      }
-
-      toast.success('Conta criada com sucesso! Você já pode fazer login.');
-      setIsLogin(true);
-      setFormData({ full_name: '', email: '', password: '', confirmPassword: '' });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const fieldErrors: Record<string, string> = {};
-        error.errors.forEach((err) => {
-          if (err.path[0]) {
-            fieldErrors[err.path[0].toString()] = err.message;
-          }
-        });
-        setErrors(fieldErrors);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-    
-    try {
-      const validatedData = loginSchema.parse({
-        email: formData.email,
-        password: formData.password,
-      });
-      setIsLoading(true);
-
       const { error } = await supabase.auth.signInWithPassword({
-        email: validatedData.email,
-        password: validatedData.password,
+        email,
+        password,
       });
 
-      if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          toast.error('Email ou senha incorretos');
-        } else {
-          toast.error(error.message);
-        }
-        return;
-      }
+      if (error) throw error;
 
       toast.success('Login realizado com sucesso!');
       navigate('/');
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const fieldErrors: Record<string, string> = {};
-        error.errors.forEach((err) => {
-          if (err.path[0]) {
-            fieldErrors[err.path[0].toString()] = err.message;
-          }
-        });
-        setErrors(fieldErrors);
-      }
+    } catch (error: any) {
+      toast.error('Usuário ou senha incorretos');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4 relative">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
+    <div className="flex w-full flex-col min-h-screen bg-black relative overflow-hidden">
+      {/* Animated Canvas Background */}
+      <div className="absolute inset-0 z-0">
+        <CanvasRevealEffect
+          animationSpeed={3}
+          containerClassName="bg-black"
+          colors={[
+            [37, 99, 235], // primary blue
+            [37, 99, 235],
+          ]}
+          dotSize={6}
+          reverse={false}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.8)_0%,_transparent_100%)]" />
+        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-black to-transparent" />
       </div>
-      
-      <Card className="w-full max-w-md p-8 shadow-elegant border-0 animate-scale-in bg-card/80 backdrop-blur">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <img src={logoPrize} alt="Prize Patrimônios" className="h-20 w-auto drop-shadow-lg" />
-          </div>
-          <h1 className="text-3xl font-display font-bold text-foreground mb-1">
-            <span className="text-gold">Prize</span> Patrimônios
-          </h1>
-          <p className="text-sm text-muted-foreground font-sans">Sistema de Gestão Patrimonial</p>
-          <p className="text-xs text-muted-foreground/70 mt-1 font-sans italic">By prize hoteis</p>
+
+      {/* Content */}
+      <div className="relative z-10 flex flex-1 items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key="login"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="space-y-6 text-center"
+            >
+              <div className="space-y-2">
+                <h1 className="text-4xl sm:text-5xl font-bold leading-tight tracking-tight text-white">
+                  Prize <span className="text-gold">Patrimônios</span>
+                </h1>
+                <p className="text-lg sm:text-xl text-white/70 font-light">
+                  Sistema de Controle Patrimonial
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4 mt-8">
+                <div className="relative">
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full backdrop-blur-sm bg-white/5 text-white border border-white/10 rounded-full py-3 px-6 focus:outline-none focus:border-white/30 text-center placeholder:text-white/40"
+                    required
+                  />
+                </div>
+
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Senha"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full backdrop-blur-sm bg-white/5 text-white border border-white/10 rounded-full py-3 px-6 pr-12 focus:outline-none focus:border-white/30 text-center placeholder:text-white/40"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  className={cn(
+                    "w-full rounded-full font-semibold py-3 px-6 transition-all duration-200",
+                    "bg-gradient-to-br from-primary to-primary/80 text-white",
+                    "hover:from-primary/90 hover:to-primary/70",
+                    "disabled:opacity-50 disabled:cursor-not-allowed",
+                    "shadow-lg shadow-primary/20"
+                  )}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {loading ? 'Entrando...' : 'Entrar'}
+                </motion.button>
+              </form>
+
+              <p className="text-xs text-white/30 pt-8 px-4">
+                Sistema restrito. Apenas usuários autorizados podem acessar.
+              </p>
+            </motion.div>
+          </AnimatePresence>
         </div>
-
-        <div className="flex gap-2 mb-6">
-          <Button
-            variant={isLogin ? 'default' : 'outline'}
-            onClick={() => {
-              setIsLogin(true);
-              setErrors({});
-            }}
-            className="flex-1"
-          >
-            <LogIn className="h-4 w-4 mr-2" />
-            Entrar
-          </Button>
-          <Button
-            variant={!isLogin ? 'default' : 'outline'}
-            onClick={() => {
-              setIsLogin(false);
-              setErrors({});
-            }}
-            className="flex-1"
-          >
-            <UserPlus className="h-4 w-4 mr-2" />
-            Cadastrar
-          </Button>
-        </div>
-
-        <form onSubmit={isLogin ? handleLogin : handleSignUp} className="space-y-4">
-          {!isLogin && (
-            <div className="space-y-2">
-              <Label htmlFor="full_name">Nome Completo</Label>
-              <Input
-                id="full_name"
-                name="full_name"
-                type="text"
-                value={formData.full_name}
-                onChange={handleInputChange}
-                placeholder="Seu nome completo"
-                disabled={isLoading}
-              />
-              {errors.full_name && (
-                <p className="text-sm text-destructive">{errors.full_name}</p>
-              )}
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="seu@email.com"
-              disabled={isLoading}
-              autoComplete="email"
-            />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              placeholder="••••••••"
-              disabled={isLoading}
-              autoComplete={isLogin ? 'current-password' : 'new-password'}
-            />
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password}</p>
-            )}
-          </div>
-
-          {!isLogin && (
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                placeholder="••••••••"
-                disabled={isLoading}
-                autoComplete="new-password"
-              />
-              {errors.confirmPassword && (
-                <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-              )}
-            </div>
-          )}
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Aguarde...' : isLogin ? 'Entrar' : 'Cadastrar'}
-          </Button>
-        </form>
-      </Card>
+      </div>
     </div>
   );
 };
