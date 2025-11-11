@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { SkeletonStatsGrid } from '@/components/ui/skeleton-stats';
-import { GlowingEffect } from '@/components/ui/glowing-effect';
+
 
 const Index = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -175,105 +175,65 @@ const Index = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 animate-scale-in">
-        <div className="relative">
-          <GlowingEffect
-            spread={40}
-            glow={true}
-            disabled={false}
-            proximity={64}
-            inactiveZone={0.01}
-            borderWidth={2}
-          />
-          <Card 
-            className="relative p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-            onClick={() => navigate('/dashboard')}
-          >
-            <div className="flex flex-col items-center gap-3 sm:gap-4">
-              <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-                <BarChart3 className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Dashboard</h3>
-                <p className="text-xs text-muted-foreground">Visualize estatísticas e gráficos</p>
-              </div>
+        <Card 
+          className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+          onClick={() => navigate('/dashboard')}
+        >
+          <div className="flex flex-col items-center gap-3 sm:gap-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+              <BarChart3 className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-          </Card>
-        </div>
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Dashboard</h3>
+              <p className="text-xs text-muted-foreground">Visualize estatísticas e gráficos</p>
+            </div>
+          </div>
+        </Card>
 
-        <div className="relative">
-          <GlowingEffect
-            spread={40}
-            glow={true}
-            disabled={false}
-            proximity={64}
-            inactiveZone={0.01}
-            borderWidth={2}
-          />
-          <Card 
-            className="relative p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-            onClick={() => setIsFormOpen(true)}
-          >
-            <div className="flex flex-col items-center gap-3 sm:gap-4">
-              <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-                <Plus className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Cadastrar Item</h3>
-                <p className="text-xs text-muted-foreground">Adicione um novo item ao patrimônio</p>
-              </div>
+        <Card 
+          className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+          onClick={() => setIsFormOpen(true)}
+        >
+          <div className="flex flex-col items-center gap-3 sm:gap-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+              <Plus className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-          </Card>
-        </div>
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Cadastrar Item</h3>
+              <p className="text-xs text-muted-foreground">Adicione um novo item ao patrimônio</p>
+            </div>
+          </div>
+        </Card>
 
-        <div className="relative">
-          <GlowingEffect
-            spread={40}
-            glow={true}
-            disabled={false}
-            proximity={64}
-            inactiveZone={0.01}
-            borderWidth={2}
-          />
-          <Card 
-            className="relative p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-            onClick={() => setShowScanner(true)}
-          >
-            <div className="flex flex-col items-center gap-3 sm:gap-4">
-              <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-                <QrCode className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Ler QR Code</h3>
-                <p className="text-xs text-muted-foreground">Escaneie o código para ver detalhes</p>
-              </div>
+        <Card 
+          className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+          onClick={() => setShowScanner(true)}
+        >
+          <div className="flex flex-col items-center gap-3 sm:gap-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+              <QrCode className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-          </Card>
-        </div>
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Ler QR Code</h3>
+              <p className="text-xs text-muted-foreground">Escaneie o código para ver detalhes</p>
+            </div>
+          </div>
+        </Card>
 
-        <div className="relative">
-          <GlowingEffect
-            spread={40}
-            glow={true}
-            disabled={false}
-            proximity={64}
-            inactiveZone={0.01}
-            borderWidth={2}
-          />
-          <Card 
-            className="relative p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-            onClick={() => navigate('/assets')}
-          >
-            <div className="flex flex-col items-center gap-3 sm:gap-4">
-              <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-                <List className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Ver Todos os Itens</h3>
-                <p className="text-xs text-muted-foreground">Liste e gerencie o patrimônio</p>
-              </div>
+        <Card 
+          className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+          onClick={() => navigate('/assets')}
+        >
+          <div className="flex flex-col items-center gap-3 sm:gap-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+              <List className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
-          </Card>
-        </div>
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Ver Todos os Itens</h3>
+              <p className="text-xs text-muted-foreground">Liste e gerencie o patrimônio</p>
+            </div>
+          </div>
+        </Card>
       </div>
 
       <div className="relative z-10 flex justify-center mb-8 animate-fade-in">
