@@ -52,24 +52,36 @@ const UserManagement = () => {
   const { user, isAdmin } = useAuth();
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       navigate('/auth');
       return;
     }
-    fetchUsers();
-  }, [user, navigate]);
+    if (user && !loading) {
+      fetchUsers();
+    }
+  }, [user, loading, navigate]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
+      console.log('Fetching users...');
       const { data, error } = await supabase.rpc('list_all_users');
       
-      if (error) throw error;
+      if (error) {
+        console.error('RPC Error:', error);
+        throw error;
+      }
       
+      console.log('Users fetched:', data);
       setUsers(data || []);
     } catch (error: any) {
       console.error('Erro ao carregar usuários:', error);
-      toast.error('Erro ao carregar lista de usuários');
+      if (error.message?.includes('administradores')) {
+        toast.error('Você não tem permissão para acessar esta página');
+        navigate('/');
+      } else {
+        toast.error('Erro ao carregar lista de usuários');
+      }
     } finally {
       setLoading(false);
     }
@@ -171,10 +183,14 @@ const UserManagement = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Carregando...</p>
+          <p className="text-muted-foreground">Carregando usuários...</p>
         </div>
       </div>
     );
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (
