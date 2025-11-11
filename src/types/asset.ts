@@ -19,41 +19,58 @@ export interface AssetFormData {
   description: string;
   sector: string;
   asset_group: string;
-  conservation_state: 'Novo' | 'Bom' | 'Regular' | 'Ruim';
+  conservation_state: "Novo" | "Bom" | "Regular" | "Ruim";
   brand_model?: string;
   evaluation_value?: number;
 }
 
 export const SECTORS = [
-  'Gerência',
-  'Recepção',
-  'Manutenção',
-  'Cozinha',
-  'Restaurante',
-  'Lavanderia',
-  'Apartamentos',
-  'Área Externa',
-  'Administrativo',
+  "Gerência",
+  "Recepção",
+  "Hall recepção",
+  "Manutenção",
+  "Cozinha",
+  "Restaurante",
+  "Lavanderia",
+  "Apartamentos",
+  "Área Externa",
+  "Administrativo",
+  "Reservas",
+  "Cafeteria",
+  "Copa",
+  "Lava louças",
+  "Almoxarifado",
+  "Refeitorio",
+  "Sala de descanço",
+  "Bar da pscina",
+  "Governança",
+  "Deposito",
+  "Ala 100",
+  "Ala 200",
+  "Ala 300",
+  "Ala 80",
+  "Ala 60",
+  "Ala 600",
 ] as const;
 
 export const ASSET_GROUPS = [
-  'Móveis',
-  'Eletrodomésticos',
-  'Eletrônicos',
-  'TI',
-  'Decoração',
-  'Ferramentas',
-  'Equipamentos',
-  'Utensílios',
+  "Móveis",
+  "Eletrodomésticos",
+  "Eletrônicos",
+  "TI",
+  "Decoração",
+  "Ferramentas",
+  "Equipamentos",
+  "Utensílios",
 ] as const;
 
-export const CONSERVATION_STATES = ['Novo', 'Bom', 'Regular', 'Ruim'] as const;
+export const CONSERVATION_STATES = ["Novo", "Bom", "Regular", "Ruim"] as const;
 
 export interface AssetHistoryEntry {
   id: string;
   asset_id: string;
   user_id: string;
-  action: 'created' | 'updated' | 'deleted' | 'sector_changed';
+  action: "created" | "updated" | "deleted" | "sector_changed";
   old_values: Partial<Asset> | null;
   new_values: Partial<Asset>;
   changed_fields: string[];
@@ -74,7 +91,7 @@ export interface AssetFilters {
   valueMax?: number;
   dateFrom?: Date;
   dateTo?: Date;
-  sortBy?: 'date_desc' | 'date_asc' | 'value_desc' | 'value_asc' | 'alpha';
+  sortBy?: "date_desc" | "date_asc" | "value_desc" | "value_asc" | "alpha";
 }
 
 export interface AssetStatistics {
