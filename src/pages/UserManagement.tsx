@@ -116,11 +116,6 @@ const UserManagement = () => {
 
       toast.success('Usuário criado com sucesso!');
       setIsDialogOpen(false);
-      setNewUserEmail('');
-      setNewUserPassword('');
-      setNewUserFullName('');
-      setNewUserUsername('');
-      setMasterPassword('');
       fetchUsers();
     } catch (error: any) {
       toast.error(error.message || 'Erro ao criar usuário');
@@ -194,14 +189,25 @@ const UserManagement = () => {
           </p>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setNewUserEmail('');
+            setNewUserPassword('');
+            setNewUserFullName('');
+            setNewUserUsername('');
+            setMasterPassword('');
+            setShowPassword(false);
+            setShowMasterPassword(false);
+          }
+        }}>
           <DialogTrigger asChild>
-            <Button>
+            <Button onClick={() => setIsDialogOpen(true)}>
               <UserPlus className="h-4 w-4 mr-2" />
               Novo Usuário
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Criar Novo Usuário</DialogTitle>
             </DialogHeader>
@@ -301,10 +307,7 @@ const UserManagement = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    setIsDialogOpen(false);
-                    setMasterPassword('');
-                  }}
+                  onClick={() => setIsDialogOpen(false)}
                   className="flex-1"
                 >
                   Cancelar
