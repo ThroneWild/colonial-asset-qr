@@ -1,6 +1,6 @@
-import { ReactNode, useMemo } from "react";
+import { ReactNode } from "react";
 import { AdaptiveNavigationBar } from "@/components/ui/3d-adaptive-navigation-bar";
-import { ShaderAnimation } from "@/components/ui/shader-animation";
+import { Spotlight } from "@/components/ui/spotlight";
 import ThemeSwitch from "@/components/ui/theme-switch";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,9 +24,18 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground">
-      <ShaderAnimation />
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(30,58,138,0.45),transparent_55%)]" />
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-background/60 via-background/80 to-background" />
+      <div
+        className="pointer-events-none fixed inset-0 -z-30 bg-gradient-to-b from-slate-950 via-slate-950/95 to-background"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none fixed inset-0 -z-20 bg-grid-white/[0.02] opacity-60 [mask-image:radial-gradient(circle_at_center,_rgba(0,0,0,0.85),_transparent_75%)]"
+        aria-hidden
+      />
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden>
+        <Spotlight className="-top-32 left-[10%] md:-top-20 md:left-[20%]" fill="rgba(59,130,246,0.45)" />
+        <Spotlight className="bottom-[-25%] right-[-10%] rotate-180" fill="rgba(168,85,247,0.4)" />
+      </div>
 
       <div className="fixed left-1/2 top-6 z-50 -translate-x-1/2">
         <AdaptiveNavigationBar />
