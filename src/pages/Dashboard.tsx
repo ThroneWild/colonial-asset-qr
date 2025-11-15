@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
+import { differenceInCalendarDays, format, isBefore, isSameMonth } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Asset, AssetStatistics } from '@/types/asset';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BarChart3, TrendingUp, DollarSign, Package, Loader2 } from 'lucide-react';
+import { BarChart3, TrendingUp, DollarSign, Package, Loader2, Wrench, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { AssetsBySectorChart } from '@/components/charts/AssetsBySectorChart';
 import { AssetsByConservationChart } from '@/components/charts/AssetsByConservationChart';
@@ -32,6 +34,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from '@/lib/utils';
+import { MaintenanceDashboardMetrics, MAINTENANCE_STATUSES, MaintenanceStatus } from '@/types/maintenance';
+import { MaintenanceStatusBadge } from '@/components/maintenance/MaintenanceStatusBadge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
+
+const MAINTENANCE_STATUS_COLORS = ['#facc15', '#38bdf8', '#fb923c', '#34d399', '#f87171'];
 
 const Dashboard = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -62,6 +70,80 @@ const Dashboard = () => {
       }
     });
   }, [assets, periodFilter]);
+
+  const maintenanceMetrics = useMemo<MaintenanceDashboardMetrics>(() => {
+    const today = new Date();
+    const maintenanceAssets = assets.filter(asset => asset.next_maintenance_date);
+
+    const statusDistribution: Record<MaintenanceStatus, number> = {
+      Pendente: 0,
+      Agendada: 0,
+      'Em andamento': 0,
+      Concluída: 0,
+      Atrasada: 0,
+    };
+
+    const totalThisMonth = maintenanceAssets.filter(asset =>
+      asset.next_maintenance_date ? isSameMonth(new Date(asset.next_maintenance_date), today) : false,
+    ).length;
+
+    const overdue = maintenanceAssets.filter(asset => {
+      if (!asset.next_maintenance_date) return false;
+      const nextDate = new Date(asset.next_maintenance_date);
+      const status = (asset.maintenance_status as MaintenanceStatus) || 'Pendente';
+      return (status === 'Atrasada' || isBefore(nextDate, today)) && status !== 'Concluída';
+    }).length;
+
+    const nextSevenDays = maintenanceAssets.filter(asset => {
+      if (!asset.next_maintenance_date) return false;
+      const nextDate = new Date(asset.next_maintenance_date);
+      const diff = differenceInCalendarDays(nextDate, today);
+      return diff >= 0 && diff <= 7;
+    }).length;
+
+    const totalCost = maintenanceAssets.reduce((sum, asset) => sum + (asset.maintenance_cost || 0), 0);
+
+    maintenanceAssets.forEach(asset => {
+      const status = (asset.maintenance_status as MaintenanceStatus) || 'Pendente';
+      statusDistribution[status] += 1;
+    });
+
+    const criticalItems = maintenanceAssets
+      .filter(asset => asset.maintenance_criticality === 'Alta')
+      .map(asset => ({
+        assetId: asset.id,
+        name: asset.description,
+        status: (asset.maintenance_status as MaintenanceStatus) || 'Pendente',
+        nextMaintenance: asset.next_maintenance_date,
+      }))
+      .sort((a, b) => {
+        if (a.status === 'Atrasada' && b.status !== 'Atrasada') return -1;
+        if (b.status === 'Atrasada' && a.status !== 'Atrasada') return 1;
+        return 0;
+      })
+      .slice(0, 5);
+
+    return {
+      totalThisMonth,
+      overdue,
+      nextSevenDays,
+      totalCost,
+      criticalItems,
+      statusDistribution,
+    };
+  }, [assets]);
+
+  const maintenanceStatusData = useMemo(
+    () => MAINTENANCE_STATUSES.map(status => ({ name: status, value: maintenanceMetrics.statusDistribution[status] })),
+    [maintenanceMetrics],
+  );
+
+  const upcomingMaintenance = useMemo(() =>
+    assets
+      .filter(asset => asset.next_maintenance_date)
+      .sort((a, b) => new Date(a.next_maintenance_date!).getTime() - new Date(b.next_maintenance_date!).getTime())
+      .slice(0, 5),
+  [assets]);
 
   const handlePeriodChange = (value: string) => {
     setIsApplyingFilter(true);
@@ -308,14 +390,105 @@ const Dashboard = () => {
 
       <div className="relative mb-8 animate-fade-in">
         {isApplyingFilter && renderFilterOverlay()}
-        <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
+        <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}> 
           <ConservationHeatmapChart assets={filteredAssets} />
+        </div>
+      </div>
+
+      <div className="relative mb-8 animate-fade-in">
+        {isApplyingFilter && renderFilterOverlay()}
+        <div
+          className={cn(
+            "grid grid-cols-1 xl:grid-cols-3 gap-6",
+            isApplyingFilter && "pointer-events-none opacity-50",
+          )}
+        >
+          <Card className="p-6 border-0 shadow-card">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 rounded-2xl bg-primary/10">
+                <Wrench className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <p className="text-xs uppercase text-muted-foreground">Manutenções do mês</p>
+                <p className="text-3xl font-bold text-foreground">{maintenanceMetrics.totalThisMonth}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="rounded-lg border border-border/60 p-3">
+                <p className="text-[11px] uppercase text-muted-foreground">Atrasadas</p>
+                <p className="text-xl font-semibold text-destructive">{maintenanceMetrics.overdue}</p>
+              </div>
+              <div className="rounded-lg border border-border/60 p-3">
+                <p className="text-[11px] uppercase text-muted-foreground">Próximos 7 dias</p>
+                <p className="text-xl font-semibold text-emerald-500">{maintenanceMetrics.nextSevenDays}</p>
+              </div>
+              <div className="rounded-lg border border-border/60 p-3 col-span-2">
+                <p className="text-[11px] uppercase text-muted-foreground">Custo estimado</p>
+                <p className="text-lg font-semibold">
+                  {maintenanceMetrics.totalCost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6 border-0 shadow-card">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold">Status das manutenções</h3>
+              <Badge variant="outline" className="gap-1 text-xs">
+                <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
+                {maintenanceMetrics.overdue} atrasadas
+              </Badge>
+            </div>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={maintenanceStatusData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={80}>
+                    {maintenanceStatusData.map((entry, index) => (
+                      <Cell key={entry.name} fill={MAINTENANCE_STATUS_COLORS[index % MAINTENANCE_STATUS_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value: number) => [`${value} manutenções`, 'Quantidade']} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+
+          <Card className="p-6 border-0 shadow-card">
+            <h3 className="text-sm font-semibold mb-4">Próximas manutenções</h3>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Item</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {upcomingMaintenance.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center text-sm text-muted-foreground">
+                      Nenhuma manutenção programada.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {upcomingMaintenance.map(asset => (
+                  <TableRow key={asset.id}>
+                    <TableCell>{format(new Date(asset.next_maintenance_date!), 'dd/MM/yyyy')}</TableCell>
+                    <TableCell className="font-medium">{asset.description}</TableCell>
+                    <TableCell>
+                      <MaintenanceStatusBadge status={(asset.maintenance_status as MaintenanceStatus) || 'Pendente'} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
         </div>
       </div>
 
       <div className="relative animate-fade-in">
         {isApplyingFilter && renderFilterOverlay()}
-        <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
+        <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}> 
           <TopAssetsTable assets={filteredAssets} />
         </div>
       </div>
