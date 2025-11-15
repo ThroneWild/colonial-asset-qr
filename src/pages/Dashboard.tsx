@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from '@/lib/utils';
+import { PageHeading } from '@/components/ui/page-heading';
 
 const Dashboard = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -149,15 +150,13 @@ const Dashboard = () => {
 
   if (authLoading || loading) {
     return (
-      <div className="container mx-auto px-6 py-8 max-w-7xl">
+      <div className="space-y-8">
         <SkeletonStatsGrid count={4} />
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <SkeletonChart />
           <SkeletonChart />
         </div>
-        <div className="mt-8">
-          <SkeletonChart />
-        </div>
+        <SkeletonChart />
       </div>
     );
   }
@@ -165,40 +164,43 @@ const Dashboard = () => {
   if (!user || !statistics) return null;
 
   return (
-    <div className="container mx-auto px-6 py-8 max-w-7xl">
-      {/* Breadcrumbs */}
-      <Breadcrumb className="mb-6">
+    <div className="space-y-8">
+      <Breadcrumb className="w-fit rounded-full border border-white/10 bg-background/60 px-5 py-2 text-xs uppercase tracking-[0.35em] text-slate-300/70">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink onClick={() => navigate('/')} className="cursor-pointer">
+            <BreadcrumbLink onClick={() => navigate('/')} className="cursor-pointer text-slate-300">
               Início
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Dashboard</BreadcrumbPage>
+            <BreadcrumbPage className="text-slate-200">Dashboard</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-4xl font-display font-bold mb-2">Dashboard Patrimonial</h1>
-          <p className="text-muted-foreground">Análise e Estatísticas Detalhadas</p>
-        </div>
-        <Select value={periodFilter} onValueChange={handlePeriodChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Período" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os períodos</SelectItem>
-            <SelectItem value="7">Últimos 7 dias</SelectItem>
-            <SelectItem value="30">Últimos 30 dias</SelectItem>
-            <SelectItem value="90">Últimos 90 dias</SelectItem>
-            <SelectItem value="365">Último ano</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <PageHeading
+        eyebrow="Visão geral"
+        title="Painel patrimonial"
+        description="Acompanhe ativos, valores e manutenção do hotel com indicadores consolidados."
+        actions={
+          <div className="flex items-center gap-3">
+            <span className="hidden text-xs uppercase tracking-[0.35em] text-slate-400 sm:inline">Período</span>
+            <Select value={periodFilter} onValueChange={handlePeriodChange}>
+              <SelectTrigger className="w-[180px] border-white/10 bg-background/70 text-slate-200">
+                <SelectValue placeholder="Período" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os períodos</SelectItem>
+                <SelectItem value="7">Últimos 7 dias</SelectItem>
+                <SelectItem value="30">Últimos 30 dias</SelectItem>
+                <SelectItem value="90">Últimos 90 dias</SelectItem>
+                <SelectItem value="365">Último ano</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        }
+      />
 
       {filteredAssets.length === 0 && !loading && (
         <div className="mb-6 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/20 px-4 py-3 text-center text-sm text-muted-foreground">

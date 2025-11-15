@@ -62,21 +62,16 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
   (
     {
       className,
-      title = "Build products for everyone",
+      title = "Prize Patrimônios",
       subtitle = {
-        regular: "Designing your projects faster with ",
-        gradient: "the largest figma UI kit.",
+        regular: "Inventário hoteleiro com ",
+        gradient: "controle em tempo real.",
       },
       description =
-        "Sed ut perspiciatis unde omnis iste natus voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae.",
-      ctaText = "Browse courses",
-      ctaHref = "#",
-      bottomImage = {
-        light:
-          "https://images.unsplash.com/photo-1523475472560-d2df97ec485c?auto=format&fit=crop&w=1600&q=80",
-        dark:
-          "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
-      },
+        "Centralize o ciclo de vida de móveis, enxoval e equipamentos do hotel. Monitore localização, responsável e histórico de auditoria com precisão digna de cinco estrelas.",
+      ctaText = "Registrar novo patrimônio",
+      ctaHref = "/assets",
+      bottomImage = undefined,
       gridOptions,
       ...props
     },
@@ -84,33 +79,35 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
   ) => {
     return (
       <div className={cn("relative", className)} ref={ref} {...props}>
-        <div className="absolute top-0 z-0 h-screen w-screen bg-primary/5 bg-[radial-gradient(ellipse_20%_80%_at_50%_-20%,rgba(110,113,202,0.18),rgba(255,255,255,0))] dark:bg-primary/10 dark:bg-[radial-gradient(ellipse_20%_80%_at_50%_-20%,rgba(110,113,202,0.35),rgba(255,255,255,0))]" />
+        <div className="absolute top-0 z-0 h-screen w-screen bg-[radial-gradient(ellipse_60%_70%_at_50%_-20%,rgba(30,64,175,0.35),rgba(2,6,23,0))] dark:bg-[radial-gradient(ellipse_60%_70%_at_50%_-20%,rgba(37,99,235,0.45),rgba(2,6,23,0))]" />
         <section className="relative z-10 mx-auto max-w-full">
           <RetroGrid {...gridOptions} />
           <div className="mx-auto max-w-screen-xl gap-12 px-4 py-28 md:px-8">
             <div className="mx-auto max-w-3xl space-y-5 text-center">
-              <h1 className="group mx-auto inline-flex items-center justify-center gap-2 rounded-3xl border border-border/50 bg-gradient-to-tr from-slate-200/40 via-white/40 to-transparent px-5 py-2 text-sm font-medium text-slate-600 shadow-sm backdrop-blur-md transition-colors dark:from-slate-900/50 dark:via-slate-900/30 dark:text-slate-300 dark:shadow-none">
-                {title}
-                <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <h1 className="group mx-auto inline-flex items-center justify-center gap-2 rounded-3xl border border-white/10 bg-gradient-to-r from-white/10 via-white/5 to-transparent px-5 py-2 text-sm font-medium text-slate-200 shadow-sm backdrop-blur-2xl">
+                <span className="flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-slate-300/70">
+                  {title}
+                </span>
+                <ChevronRight className="h-4 w-4 text-gold transition-transform duration-300 group-hover:translate-x-1" />
               </h1>
               <h2 className="text-4xl font-display tracking-tight text-transparent md:text-6xl">
-                <span className="bg-[linear-gradient(180deg,_#0f172a_0%,_rgba(15,23,42,0.75)_100%)] bg-clip-text text-transparent dark:bg-[linear-gradient(180deg,_#f8fafc_0%,_rgba(248,250,252,0.05)_100%)]">
+                <span className="bg-[linear-gradient(180deg,_rgba(148,163,184,0.9)_0%,_rgba(226,232,240,0.2)_100%)] bg-clip-text text-transparent">
                   {subtitle.regular}
                 </span>
-                <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent dark:from-purple-300 dark:to-orange-200">
+                <span className="heading-shine bg-clip-text text-transparent">
                   {subtitle.gradient}
                 </span>
               </h2>
-              <p className="mx-auto max-w-2xl text-base text-slate-600 dark:text-slate-300">
+              <p className="mx-auto max-w-2xl text-base text-slate-300">
                 {description}
               </p>
               <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <span className="relative inline-block overflow-hidden rounded-full p-[1.5px]">
-                  <span className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
-                  <div className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-white text-xs font-semibold text-slate-900 shadow-sm backdrop-blur-3xl dark:bg-slate-950 dark:text-white">
+                <span className="relative inline-flex overflow-hidden rounded-full border border-white/10 bg-white/10 px-[1.5px] py-[1.5px] backdrop-blur-xl">
+                  <span className="absolute inset-0 animate-[spin_8s_linear_infinite] bg-[conic-gradient(from_120deg_at_50%_50%,rgba(251,191,36,0.45)_0%,rgba(30,64,175,0.6)_40%,rgba(251,191,36,0.45)_100%)] opacity-60" />
+                  <div className="relative inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-background/80 px-10 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-foreground transition-all hover:bg-background/70">
                     <a
                       href={ctaHref}
-                      className="inline-flex w-full items-center justify-center rounded-full border border-input bg-gradient-to-tr from-slate-200/50 via-purple-200/40 to-transparent px-10 py-4 text-center transition-all hover:from-slate-200/70 hover:via-purple-200/60 hover:to-transparent dark:from-slate-800/50 dark:via-purple-800/40 dark:hover:from-slate-700/60 dark:hover:via-purple-700/50 sm:w-auto"
+                      className="inline-flex w-full items-center justify-center gap-2 text-sm font-medium text-foreground sm:w-auto"
                     >
                       {ctaText}
                     </a>
@@ -118,20 +115,6 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
                 </span>
               </div>
             </div>
-            {bottomImage && (
-              <div className="relative z-10 mt-32">
-                <img
-                  src={bottomImage.light}
-                  className="w-full rounded-lg border border-slate-200 shadow-xl dark:hidden"
-                  alt="Dashboard preview"
-                />
-                <img
-                  src={bottomImage.dark}
-                  className="hidden w-full rounded-lg border border-slate-800 shadow-xl dark:block"
-                  alt="Dashboard preview"
-                />
-              </div>
-            )}
           </div>
         </section>
       </div>

@@ -32,6 +32,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { PageHeading } from '@/components/ui/page-heading';
 
 const AllAssets = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -369,10 +370,10 @@ const AllAssets = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Carregando...</p>
+      <div className="flex min-h-[60vh] items-center justify-center rounded-3xl border border-white/10 bg-background/70 p-12 text-center shadow-card">
+        <div>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-2 border-white/20 border-t-accent"></div>
+          <p className="text-sm text-muted-foreground">Carregando inventário do hotel...</p>
         </div>
       </div>
     );
@@ -383,73 +384,82 @@ const AllAssets = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
-        {/* Breadcrumbs */}
-        <Breadcrumb className="mb-4 sm:mb-6">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink onClick={() => navigate('/')} className="cursor-pointer">
-                Início
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Todos os Ativos</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <div className="mb-6 sm:mb-8 space-y-4">
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2">Todos os Ativos</h2>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                Mostrando <span className="font-semibold text-primary">{paginatedItems.length}</span> de {filteredAssets.length} ativos
-                {filteredAssets.length !== assets.length && ` (${assets.length} total)`}
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row flex-wrap gap-2">
-              <AdvancedFilters filters={filters} onFiltersChange={setFilters} />
-              <Button onClick={() => handleExportPDF()} variant="outline" size="sm" className="sm:size-default">
-                <FileText className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Exportar PDF</span>
-              </Button>
-              <Button onClick={() => handleExportExcel()} variant="outline" size="sm" className="sm:size-default">
-                <FileText className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Exportar Excel</span>
-              </Button>
-              <Button onClick={() => navigate('/labels', { state: { from: location.pathname } })} size="sm" className="sm:size-default">
-                <Tags className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Gerar Etiquetas</span>
-              </Button>
-            </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center">
-            <div className="flex-1">
-              <AdvancedSearch
-                value={filters.searchTerm || ''}
-                onChange={(value) => setFilters({ ...filters, searchTerm: value })}
-                placeholder="Buscar por descrição, setor, grupo..."
-                suggestions={searchSuggestions}
-              />
-            </div>
-            {paginatedItems.length > 0 && (
-              <Button
-                variant="outline"
-                onClick={handleSelectAll}
-                className="whitespace-nowrap"
-                size="sm"
-              >
-                {selectedAssets.length === paginatedItems.length ? 'Desmarcar' : 'Selecionar'} Todos
-              </Button>
-            )}
-          </div>
-        </div>
+    <div className="space-y-8">
+      <Breadcrumb className="w-fit rounded-full border border-white/10 bg-background/60 px-5 py-2 text-xs uppercase tracking-[0.35em] text-slate-300/70">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink onClick={() => navigate('/')} className="cursor-pointer text-slate-300">
+              Início
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage className="text-slate-200">Inventário</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
-        {isLoadingAssets ? (
-          <SkeletonCardGrid count={6} />
-        ) : paginatedItems.length === 0 ? (
+      <PageHeading
+        eyebrow="Inventário completo"
+        title="Todos os ativos do hotel"
+        description={`Mostrando ${paginatedItems.length} de ${filteredAssets.length} ativos${filteredAssets.length !== assets.length ? ` (${assets.length} no total)` : ''}.`}
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={() => handleExportPDF()}
+              variant="outline"
+              size="sm"
+              className="border-white/15 bg-background/60 text-slate-200 hover:border-accent/50 hover:bg-accent/10"
+            >
+              <FileText className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Exportar PDF</span>
+            </Button>
+            <Button
+              onClick={() => handleExportExcel()}
+              variant="outline"
+              size="sm"
+              className="border-white/15 bg-background/60 text-slate-200 hover:border-accent/50 hover:bg-accent/10"
+            >
+              <FileText className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Exportar Excel</span>
+            </Button>
+            <Button
+              onClick={() => navigate('/labels', { state: { from: location.pathname } })}
+              size="sm"
+              className="border-white/15 bg-accent/10 text-accent hover:bg-accent/20"
+            >
+              <Tags className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Gerar etiquetas</span>
+            </Button>
+          </div>
+        }
+      />
+
+      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
+        <div className="flex-1">
+          <AdvancedSearch
+            value={filters.searchTerm || ''}
+            onChange={(value) => setFilters({ ...filters, searchTerm: value })}
+            placeholder="Buscar por descrição, setor, grupo..."
+            suggestions={searchSuggestions}
+          />
+        </div>
+        <AdvancedFilters filters={filters} onFiltersChange={setFilters} />
+        {paginatedItems.length > 0 && (
+          <Button
+            variant="outline"
+            onClick={handleSelectAll}
+            className="whitespace-nowrap border-white/15 bg-background/60 text-slate-200 hover:border-primary/50 hover:bg-primary/10"
+            size="sm"
+          >
+            {selectedAssets.length === paginatedItems.length ? 'Desmarcar' : 'Selecionar'} Todos
+          </Button>
+        )}
+      </div>
+
+      {isLoadingAssets ? (
+        <SkeletonCardGrid count={6} />
+      ) : paginatedItems.length === 0 ? (
           <EmptyState
             icon={PackageSearch}
             title="Nenhum ativo encontrado"
@@ -550,8 +560,7 @@ const AllAssets = () => {
           assetDescription={assetToDelete?.description || ''}
           isLoading={isEditLoading}
         />
-      </main>
-    </div>
+      </div>
   );
 };
 
