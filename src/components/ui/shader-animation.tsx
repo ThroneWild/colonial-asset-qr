@@ -3,26 +3,22 @@
 import { useEffect, useRef } from "react"
 import * as THREE from "three"
 
-import { cn } from "@/lib/utils"
+type ShaderUniforms = (Record<string, THREE.IUniform> & {
+  time: THREE.IUniform & { value: number }
+  resolution: THREE.IUniform & { value: THREE.Vector2 }
+})
 
-interface ShaderAnimationState {
+type SceneResources = {
   camera: THREE.Camera
   scene: THREE.Scene
   renderer: THREE.WebGLRenderer
-  uniforms: {
-    time: { value: number }
-    resolution: { value: THREE.Vector2 }
-  }
+  uniforms: ShaderUniforms
   animationId: number
 }
 
-interface ShaderAnimationProps {
-  className?: string
-}
-
-export function ShaderAnimation({ className }: ShaderAnimationProps) {
+export function ShaderAnimation() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const sceneRef = useRef<ShaderAnimationState | null>(null)
+  const sceneRef = useRef<SceneResources | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -65,15 +61,15 @@ export function ShaderAnimation({ className }: ShaderAnimationProps) {
     const scene = new THREE.Scene()
     const geometry = new THREE.PlaneGeometry(2, 2)
 
-    const uniforms = {
+    const uniforms: ShaderUniforms = {
       time: { value: 1.0 },
       resolution: { value: new THREE.Vector2() },
     }
 
     const material = new THREE.ShaderMaterial({
       uniforms,
-      vertexShader,
-      fragmentShader,
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
     })
 
     const mesh = new THREE.Mesh(geometry, material)
@@ -81,6 +77,7 @@ export function ShaderAnimation({ className }: ShaderAnimationProps) {
 
     const renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
+
     container.appendChild(renderer.domElement)
 
     const onWindowResize = () => {
@@ -134,12 +131,9 @@ export function ShaderAnimation({ className }: ShaderAnimationProps) {
   return (
     <div
       ref={containerRef}
-      className={cn(
-        "pointer-events-none fixed inset-0 -z-10 h-screen w-full",
-        className,
-      )}
+      className="h-full w-full"
       style={{
-        background: "#020617",
+        background: "#000",
         overflow: "hidden",
       }}
     />
