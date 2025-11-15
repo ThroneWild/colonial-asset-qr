@@ -12,8 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { SkeletonStatsGrid } from '@/components/ui/skeleton-stats';
 import { SkeletonActionCards } from '@/components/ui/skeleton-action-cards';
-
-
 const Index = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [isLoadingAssets, setIsLoadingAssets] = useState(true);
@@ -23,28 +21,31 @@ const Index = () => {
   const [newAssetLabel, setNewAssetLabel] = useState<Asset | null>(null);
   const [initialLoad, setInitialLoad] = useState(true);
   const navigate = useNavigate();
-  const { user, loading, profile, isAdmin } = useAuth();
-
+  const {
+    user,
+    loading,
+    profile,
+    isAdmin
+  } = useAuth();
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
-
   useEffect(() => {
     if (user) {
       fetchAssets();
     }
   }, [user]);
-
   const fetchAssets = async () => {
     try {
       setIsLoadingAssets(true);
-      const { data, error } = await supabase
-        .from('assets')
-        .select('*')
-        .order('item_number', { ascending: false });
-
+      const {
+        data,
+        error
+      } = await supabase.from('assets').select('*').order('item_number', {
+        ascending: false
+      });
       if (error) throw error;
       setAssets(data || []);
     } catch (error) {
@@ -57,42 +58,33 @@ const Index = () => {
       setTimeout(() => setInitialLoad(false), 300);
     }
   };
-
   const handleSubmit = async (formData: AssetFormData) => {
     if (!user) {
       toast.error('Você precisa estar autenticado');
       return;
     }
-
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('assets')
-        .insert([{
-          ...formData,
-          user_id: user.id,
-          modified_by: user.id,
-        }])
-        .select()
-        .single();
-
+      const {
+        data,
+        error
+      } = await supabase.from('assets').insert([{
+        ...formData,
+        user_id: user.id,
+        modified_by: user.id
+      }]).select().single();
       if (error) throw error;
-
       const qrCodeUrl = `${window.location.origin}/asset/${data.id}`;
-      
-      const { data: updatedAsset, error: updateError } = await supabase
-        .from('assets')
-        .update({ qr_code_url: qrCodeUrl })
-        .eq('id', data.id)
-        .select()
-        .single();
-
+      const {
+        data: updatedAsset,
+        error: updateError
+      } = await supabase.from('assets').update({
+        qr_code_url: qrCodeUrl
+      }).eq('id', data.id).select().single();
       if (updateError) throw updateError;
-
       toast.success('Ativo cadastrado com sucesso!');
       setIsFormOpen(false);
       await fetchAssets();
-      
       if (updatedAsset) {
         setNewAssetLabel(updatedAsset);
       }
@@ -105,7 +97,6 @@ const Index = () => {
       setIsLoading(false);
     }
   };
-
   const handleScanQR = (data: string) => {
     setShowScanner(false);
     if (data.includes('/asset/')) {
@@ -115,26 +106,19 @@ const Index = () => {
       toast.error('QR Code inválido');
     }
   };
-
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+    return <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Carregando...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   if (!user) {
     return null;
   }
-
   const maintenanceCount = assets.filter(a => a.conservation_state === 'Precisa de Manutenção').length;
-
-  return (
-    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
+  return <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
       <div className="mb-6 sm:mb-8">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold mb-2">
           Bem-vindo{profile ? `, ${profile.full_name.split(' ')[0]}` : ''} ao <span className="text-gold">Prize</span> Patrimônios
@@ -143,10 +127,7 @@ const Index = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 animate-fade-in">
-        {isLoadingAssets ? (
-          <SkeletonStatsGrid count={4} />
-        ) : (
-          <>
+        {isLoadingAssets ? <SkeletonStatsGrid count={4} /> : <>
             <Card className="p-5 sm:p-6 text-center shadow-card hover:shadow-hover transition-smooth border-0">
               <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2 sm:mb-3 uppercase tracking-wider">Total de Itens</h3>
               <p className="text-4xl sm:text-5xl font-bold text-primary mb-1 sm:mb-2">{assets.length}</p>
@@ -170,19 +151,12 @@ const Index = () => {
               <p className="text-4xl sm:text-5xl font-bold text-primary mb-1 sm:mb-2">{new Set(assets.map(a => a.sector)).size}</p>
               <p className="text-xs text-muted-foreground">Setores diferentes</p>
             </Card>
-          </>
-        )}
+          </>}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 animate-scale-in">
-        {initialLoad ? (
-          <SkeletonActionCards count={4} />
-        ) : (
-          <>
-            <Card 
-              className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-              onClick={() => navigate('/dashboard')}
-            >
+        {initialLoad ? <SkeletonActionCards count={4} /> : <>
+            <Card className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0" onClick={() => navigate('/dashboard')}>
               <div className="flex flex-col items-center gap-3 sm:gap-4">
                 <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
                   <BarChart3 className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
@@ -194,10 +168,7 @@ const Index = () => {
               </div>
             </Card>
 
-            <Card 
-              className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-              onClick={() => setIsFormOpen(true)}
-            >
+            <Card className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0" onClick={() => setIsFormOpen(true)}>
               <div className="flex flex-col items-center gap-3 sm:gap-4">
                 <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
                   <Plus className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
@@ -209,10 +180,7 @@ const Index = () => {
               </div>
             </Card>
 
-            <Card 
-              className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-              onClick={() => setShowScanner(true)}
-            >
+            <Card className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0" onClick={() => setShowScanner(true)}>
               <div className="flex flex-col items-center gap-3 sm:gap-4">
                 <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
                   <QrCode className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
@@ -224,10 +192,7 @@ const Index = () => {
               </div>
             </Card>
 
-            <Card 
-              className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-              onClick={() => navigate('/assets')}
-            >
+            <Card className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0" onClick={() => navigate('/assets')}>
               <div className="flex flex-col items-center gap-3 sm:gap-4">
                 <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
                   <List className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
@@ -238,29 +203,14 @@ const Index = () => {
                 </div>
               </div>
             </Card>
-          </>
-        )}
+          </>}
       </div>
 
-      {isAdmin && !initialLoad && (
-        <div className="flex justify-center mb-8 animate-fade-in">
-          <Card 
-            className="inline-flex items-center gap-3 px-6 py-4 shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-            onClick={() => navigate('/users')}
-          >
-            <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-              <UserCog className="h-6 w-6 text-primary" />
-            </div>
-            <div className="text-left">
-              <h3 className="text-base font-bold text-foreground">Gerenciar Usuários</h3>
-              <p className="text-xs text-muted-foreground">Administre contas e permissões</p>
-            </div>
-          </Card>
-        </div>
-      )}
+      {isAdmin && !initialLoad && <div className="flex justify-center mb-8 animate-fade-in">
+          
+        </div>}
 
-      {isAdmin && initialLoad && (
-        <div className="flex justify-center mb-8 animate-pulse">
+      {isAdmin && initialLoad && <div className="flex justify-center mb-8 animate-pulse">
           <Card className="inline-flex items-center gap-3 px-6 py-4 shadow-card border-0">
             <div className="p-3 rounded-xl bg-muted">
               <div className="h-6 w-6 bg-muted-foreground/20 rounded" />
@@ -270,29 +220,16 @@ const Index = () => {
               <div className="h-3 w-40 bg-muted rounded" />
             </div>
           </Card>
-        </div>
-      )}
+        </div>}
 
-      {isFormOpen && (
-        <Card className="p-5 sm:p-6 mb-6 shadow-card animate-scale-in border-0">
+      {isFormOpen && <Card className="p-5 sm:p-6 mb-6 shadow-card animate-scale-in border-0">
           <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-foreground">Cadastrar Novo Ativo</h3>
-          <AssetForm
-            onSubmit={handleSubmit}
-            onCancel={() => setIsFormOpen(false)}
-            isLoading={isLoading}
-          />
-        </Card>
-      )}
+          <AssetForm onSubmit={handleSubmit} onCancel={() => setIsFormOpen(false)} isLoading={isLoading} />
+        </Card>}
 
-      {showScanner && (
-        <QRScanner onScan={handleScanQR} onClose={() => setShowScanner(false)} />
-      )}
+      {showScanner && <QRScanner onScan={handleScanQR} onClose={() => setShowScanner(false)} />}
 
-      {newAssetLabel && (
-        <SingleLabel asset={newAssetLabel} onClose={() => setNewAssetLabel(null)} />
-      )}
-    </div>
-  );
+      {newAssetLabel && <SingleLabel asset={newAssetLabel} onClose={() => setNewAssetLabel(null)} />}
+    </div>;
 };
-
 export default Index;
