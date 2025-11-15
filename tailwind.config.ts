@@ -127,12 +127,13 @@ export default {
           }
         },
       },
-      animation: {
-        grid: "grid 30s linear infinite",
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.3s ease-out",
-        "scale-in": "scale-in 0.2s ease-out",
+      transitionTimingFunction: {
+        'smooth': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        'spring': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+      },
+      boxShadow: {
+        'card': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        'hover': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
       },
     },
   },
