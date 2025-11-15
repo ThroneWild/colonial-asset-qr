@@ -204,67 +204,18 @@ All colors MUST be HSL.
   .glass {
     position: relative;
     overflow: hidden;
-    border: 1px solid hsl(var(--border) / 0.6);
-    background: linear-gradient(
-      135deg,
-      hsl(var(--background) / 0.92),
-      hsl(var(--background) / 0.78)
-    );
-    color: hsl(var(--foreground));
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.7));
     backdrop-filter: blur(18px);
-    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.3s ease;
   }
 
   .glass::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at top left, hsl(var(--accent) / 0.12), transparent 55%);
-    opacity: 0.55;
-    pointer-events: none;
-  }
-
-  .dark .glass {
-    border-color: rgba(148, 163, 184, 0.15);
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.85));
-  }
-
-  .dark .glass::before {
-    opacity: 0.8;
     background: radial-gradient(circle at top left, rgba(251, 191, 36, 0.12), transparent 55%);
-  }
-
-  .glass-light {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid hsl(var(--border) / 0.5);
-    background: linear-gradient(
-      140deg,
-      hsl(var(--background) / 0.94),
-      hsl(var(--background) / 0.82)
-    );
-    backdrop-filter: blur(16px);
-    box-shadow: inset 0 1px 0 hsla(0, 0%, 100%, 0.35);
-  }
-
-  .glass-light::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at top right, hsl(var(--primary) / 0.08), transparent 55%);
-    opacity: 0.45;
+    opacity: 0.8;
     pointer-events: none;
-  }
-
-  .dark .glass-light {
-    border-color: rgba(148, 163, 184, 0.12);
-    background: linear-gradient(140deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.78));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  }
-
-  .dark .glass-light::before {
-    background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 55%);
-    opacity: 0.65;
   }
 
   .hover-lift {

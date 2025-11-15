@@ -30,7 +30,7 @@ const ThemeSwitch = ({
   return (
     <div
       className={cn(
-        "relative flex items-center justify-center rounded-full border border-border/50 bg-background/60 backdrop-blur-sm shadow-sm transition-colors dark:border-white/15 dark:bg-background/40 dark:shadow-none",
+        "relative flex items-center justify-center bg-background/50 backdrop-blur-sm rounded-full border border-border/50",
         "h-9 w-20",
         className
       )}

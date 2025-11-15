@@ -137,32 +137,32 @@ const Index = () => {
           <SkeletonStatsGrid count={4} />
         ) : (
           <>
-            <Card className="rounded-3xl border border-border/60 p-6 text-center text-foreground shadow-hover transition-colors dark:border-white/10">
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground">Total de itens</h3>
+            <Card className="glass rounded-3xl border border-white/10 p-6 text-center text-slate-200 shadow-hover">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Total de itens</h3>
               <p className="mb-1 text-4xl font-bold text-primary sm:text-5xl">{assets.length}</p>
-              <p className="text-xs text-muted-foreground">Patrimônios catalogados</p>
+              <p className="text-xs text-slate-400">Patrimônios catalogados</p>
             </Card>
 
-            <Card className="rounded-3xl border border-border/60 p-6 text-center text-foreground shadow-hover transition-colors dark:border-white/10">
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground">Disponíveis</h3>
+            <Card className="glass rounded-3xl border border-white/10 p-6 text-center text-slate-200 shadow-hover">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Disponíveis</h3>
               <p className="mb-1 text-4xl font-bold text-primary sm:text-5xl">
                 {assets.filter((a) => a.conservation_state !== "Precisa de Manutenção").length}
               </p>
-              <p className="text-xs text-muted-foreground">Em uso pelos setores</p>
+              <p className="text-xs text-slate-400">Em uso pelos setores</p>
             </Card>
 
-            <Card className="rounded-3xl border border-border/60 p-6 text-center text-foreground shadow-hover transition-colors dark:border-white/10">
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground">Manutenção</h3>
+            <Card className="glass rounded-3xl border border-white/10 p-6 text-center text-slate-200 shadow-hover">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Manutenção</h3>
               <p className="mb-1 text-4xl font-bold text-accent sm:text-5xl">{maintenanceCount}</p>
-              <p className="text-xs text-muted-foreground">Intervenções agendadas</p>
+              <p className="text-xs text-slate-400">Intervenções agendadas</p>
             </Card>
 
-            <Card className="rounded-3xl border border-border/60 p-6 text-center text-foreground shadow-hover transition-colors dark:border-white/10">
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground">Setores</h3>
+            <Card className="glass rounded-3xl border border-white/10 p-6 text-center text-slate-200 shadow-hover">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Setores</h3>
               <p className="mb-1 text-4xl font-bold text-primary sm:text-5xl">
                 {new Set(assets.map((a) => a.sector)).size}
               </p>
-              <p className="text-xs text-muted-foreground">Áreas acompanhadas</p>
+              <p className="text-xs text-slate-400">Áreas acompanhadas</p>
             </Card>
           </>
         )}
@@ -174,61 +174,61 @@ const Index = () => {
         ) : (
           <>
             <Card
-              className="group cursor-pointer rounded-3xl border border-border/60 p-8 text-center text-foreground transition-smooth hover:border-primary/60 dark:border-white/10 dark:text-slate-200"
+              className="glass group cursor-pointer rounded-3xl border border-white/10 p-8 text-center text-slate-200 transition-smooth hover:border-primary/50 hover:text-white"
               onClick={() => navigate("/dashboard")}
             >
               <div className="flex flex-col items-center gap-4">
-                <div className="rounded-2xl border border-border/50 bg-primary/10 p-5 transition-smooth group-hover:bg-primary/15 dark:border-white/10">
+                <div className="rounded-2xl border border-white/10 bg-primary/10 p-5 transition-smooth group-hover:bg-primary/20">
                   <BarChart3 className="h-10 w-10 text-primary" />
                 </div>
                 <div>
                   <h3 className="mb-1 text-lg font-semibold">Visão executiva</h3>
-                  <p className="text-xs text-muted-foreground">KPIs de ocupação patrimonial e valores investidos</p>
+                  <p className="text-xs text-slate-400">KPIs de ocupação patrimonial e valores investidos</p>
                 </div>
               </div>
             </Card>
 
             <Card
-              className="group cursor-pointer rounded-3xl border border-border/60 p-8 text-center text-foreground transition-smooth hover:border-primary/60 dark:border-white/10 dark:text-slate-200"
+              className="glass group cursor-pointer rounded-3xl border border-white/10 p-8 text-center text-slate-200 transition-smooth hover:border-primary/50 hover:text-white"
               onClick={() => setIsFormOpen(true)}
             >
               <div className="flex flex-col items-center gap-4">
-                <div className="rounded-2xl border border-border/50 bg-primary/10 p-5 transition-smooth group-hover:bg-primary/15 dark:border-white/10">
+                <div className="rounded-2xl border border-white/10 bg-primary/10 p-5 transition-smooth group-hover:bg-primary/20">
                   <Plus className="h-10 w-10 text-primary" />
                 </div>
                 <div>
                   <h3 className="mb-1 text-lg font-semibold">Novo patrimônio</h3>
-                  <p className="text-xs text-muted-foreground">Cadastre bens com fotos, notas fiscais e responsáveis</p>
+                  <p className="text-xs text-slate-400">Cadastre bens com fotos, notas fiscais e responsáveis</p>
                 </div>
               </div>
             </Card>
 
             <Card
-              className="group cursor-pointer rounded-3xl border border-border/60 p-8 text-center text-foreground transition-smooth hover:border-primary/60 dark:border-white/10 dark:text-slate-200"
+              className="glass group cursor-pointer rounded-3xl border border-white/10 p-8 text-center text-slate-200 transition-smooth hover:border-primary/50 hover:text-white"
               onClick={() => setShowScanner(true)}
             >
               <div className="flex flex-col items-center gap-4">
-                <div className="rounded-2xl border border-border/50 bg-primary/10 p-5 transition-smooth group-hover:bg-primary/15 dark:border-white/10">
+                <div className="rounded-2xl border border-white/10 bg-primary/10 p-5 transition-smooth group-hover:bg-primary/20">
                   <QrCode className="h-10 w-10 text-primary" />
                 </div>
                 <div>
                   <h3 className="mb-1 text-lg font-semibold">Auditoria por QR Code</h3>
-                  <p className="text-xs text-muted-foreground">Valide etiquetas em campo direto pelo celular</p>
+                  <p className="text-xs text-slate-400">Valide etiquetas em campo direto pelo celular</p>
                 </div>
               </div>
             </Card>
 
             <Card
-              className="group cursor-pointer rounded-3xl border border-border/60 p-8 text-center text-foreground transition-smooth hover:border-primary/60 dark:border-white/10 dark:text-slate-200"
+              className="glass group cursor-pointer rounded-3xl border border-white/10 p-8 text-center text-slate-200 transition-smooth hover:border-primary/50 hover:text-white"
               onClick={() => navigate("/assets")}
             >
               <div className="flex flex-col items-center gap-4">
-                <div className="rounded-2xl border border-border/50 bg-primary/10 p-5 transition-smooth group-hover:bg-primary/15 dark:border-white/10">
+                <div className="rounded-2xl border border-white/10 bg-primary/10 p-5 transition-smooth group-hover:bg-primary/20">
                   <List className="h-10 w-10 text-primary" />
                 </div>
                 <div>
                   <h3 className="mb-1 text-lg font-semibold">Lista completa</h3>
-                  <p className="text-xs text-muted-foreground">Filtre por suíte, categoria e status de conservação</p>
+                  <p className="text-xs text-slate-400">Filtre por suíte, categoria e status de conservação</p>
                 </div>
               </div>
             </Card>
@@ -237,8 +237,8 @@ const Index = () => {
       </section>
 
       {isFormOpen && (
-        <Card id="novo-patrimonio" className="rounded-3xl border border-border/60 p-6 shadow-hover transition-colors dark:border-white/10">
-          <h3 className="mb-6 text-xl font-semibold text-foreground">Cadastrar novo patrimônio</h3>
+        <Card id="novo-patrimonio" className="glass rounded-3xl border border-white/10 p-6 shadow-hover">
+          <h3 className="mb-6 text-xl font-semibold text-slate-100">Cadastrar novo patrimônio</h3>
           <AssetForm onSubmit={handleSubmit} onCancel={() => setIsFormOpen(false)} isLoading={isLoading} />
         </Card>
       )}
