@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, BarChart3, Package, ScrollText, Tag, LogOut } from "lucide-react";
+import { Home, BarChart3, Package, ScrollText, Tag, LogOut, Wrench } from "lucide-react";
 import { Dock, DockIcon, DockItem, DockLabel } from "@/components/ui/dock";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +30,10 @@ export function AppDock() {
     icon: <Package className="h-full w-full text-neutral-600 dark:text-neutral-300" />,
     href: "/assets"
   }, {
+    title: "Manutenções",
+    icon: <Wrench className="h-full w-full text-neutral-600 dark:text-neutral-300" />,
+    href: "/maintenance"
+  }, {
     title: "Registros de Auditoria",
     icon: <ScrollText className="h-full w-full text-neutral-600 dark:text-neutral-300" />,
     href: "/auditoria"
@@ -38,7 +42,10 @@ export function AppDock() {
     icon: <Tag className="h-full w-full text-neutral-600 dark:text-neutral-300" />,
     href: "/labels"
   }];
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    if (path === "/") return location.pathname === "/";
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
   return <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
       <Dock className="items-end pb-3">
         {menuItems.map((item, idx) => <div key={idx} onClick={e => {

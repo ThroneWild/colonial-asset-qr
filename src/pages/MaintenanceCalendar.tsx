@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   addDays,
   addMonths,
@@ -100,6 +100,7 @@ const STATUS_CHART_COLORS = ['#FACC15', '#38BDF8', '#FB923C', '#34D399', '#F8717
 
 const MaintenanceCalendar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading } = useAuth();
 
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -133,6 +134,19 @@ const MaintenanceCalendar = () => {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    const state = location.state as { openSchedule?: boolean; action?: 'register' | 'schedule' } | null;
+    if (state?.openSchedule) {
+      setIsScheduleOpen(true);
+      if (state.action === 'register') {
+        setScheduleForm(prev => ({ ...prev, status: 'Concluída' }));
+      } else if (state.action === 'schedule') {
+        setScheduleForm(prev => ({ ...prev, status: 'Agendada' }));
+      }
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate]);
 
   useEffect(() => {
     if (user) {

@@ -11,6 +11,7 @@ import AssetView from "./pages/AssetView";
 import Auth from "./pages/Auth";
 import AllAssets from "./pages/AllAssets";
 import Dashboard from "./pages/Dashboard";
+import MaintenanceDashboard from "./pages/MaintenanceDashboard";
 import AuditLogs from "./pages/AuditLogs";
 import UserManagement from "./pages/UserManagement";
 import NotFound from "./pages/NotFound";
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<AppLayout><Index /></AppLayout>} />
             <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />
+            <Route path="/maintenance" element={<AppLayout><MaintenanceDashboard /></AppLayout>} />
             <Route path="/maintenance/calendar" element={<AppLayout><MaintenanceCalendar /></AppLayout>} />
             <Route path="/assets" element={<AppLayout><AllAssets /></AppLayout>} />
             <Route path="/auditoria" element={<AppLayout><AuditLogs /></AppLayout>} />
