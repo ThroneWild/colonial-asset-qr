@@ -1,3 +1,12 @@
+import {
+  MaintenanceFrequencyValue,
+  MaintenanceRecord,
+  MaintenanceStatus,
+  MaintenanceType,
+  MaintenancePriority,
+  MaintenanceCriticality,
+} from "./maintenance";
+
 export interface Asset {
   id: string;
   item_number: number;
@@ -13,6 +22,18 @@ export interface Asset {
   modified_by: string | null;
   created_at: string;
   updated_at: string;
+  maintenance_frequency?: MaintenanceFrequencyValue | null;
+  maintenance_custom_interval?: number | null;
+  last_maintenance_date?: string | null;
+  next_maintenance_date?: string | null;
+  maintenance_type?: MaintenanceType | null;
+  maintenance_responsible?: string | null;
+  maintenance_notes?: string | null;
+  maintenance_status?: MaintenanceStatus | null;
+  maintenance_priority?: MaintenancePriority | null;
+  maintenance_criticality?: MaintenanceCriticality | null;
+  maintenance_cost?: number | null;
+  maintenance_history?: MaintenanceRecord[] | null;
 }
 
 export interface AssetFormData {
@@ -22,6 +43,17 @@ export interface AssetFormData {
   conservation_state: "Novo" | "Bom" | "Regular" | "Ruim";
   brand_model?: string;
   evaluation_value?: number;
+  maintenance_frequency?: MaintenanceFrequencyValue | null;
+  maintenance_custom_interval?: number | null;
+  last_maintenance_date?: string | null;
+  next_maintenance_date?: string | null;
+  maintenance_type?: MaintenanceType | null;
+  maintenance_responsible?: string | null;
+  maintenance_notes?: string | null;
+  maintenance_status?: MaintenanceStatus | null;
+  maintenance_priority?: MaintenancePriority | null;
+  maintenance_criticality?: MaintenanceCriticality | null;
+  maintenance_cost?: number | null;
 }
 
 export const SECTORS = [

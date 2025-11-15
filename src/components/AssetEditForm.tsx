@@ -10,12 +10,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Asset, SECTORS, ASSET_GROUPS, CONSERVATION_STATES } from '@/types/asset';
 import { Loader2, Upload, X, FileText, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { z } from 'zod';
+import {
+  MAINTENANCE_FREQUENCIES,
+  MAINTENANCE_TYPES,
+  MAINTENANCE_STATUSES,
+  MAINTENANCE_RESPONSIBLES,
+  MAINTENANCE_PRIORITIES,
+  MAINTENANCE_CRITICALITIES,
+} from '@/types/maintenance';
+import { addDays, parseISO } from 'date-fns';
 
 const assetEditSchema = z.object({
   description: z.string().trim().min(3, 'Descrição deve ter no mínimo 3 caracteres').max(500, 'Descrição deve ter no máximo 500 caracteres'),
@@ -24,6 +34,17 @@ const assetEditSchema = z.object({
   conservation_state: z.enum(['Novo', 'Bom', 'Regular', 'Ruim']),
   brand_model: z.string().trim().max(200, 'Marca/Modelo deve ter no máximo 200 caracteres').optional().or(z.literal('')),
   evaluation_value: z.number().positive('Valor deve ser positivo').max(9999999.99, 'Valor muito alto').optional(),
+  maintenance_frequency: z.string().optional().nullable(),
+  maintenance_custom_interval: z.number().optional().nullable(),
+  last_maintenance_date: z.string().optional().nullable(),
+  next_maintenance_date: z.string().optional().nullable(),
+  maintenance_type: z.string().optional().nullable(),
+  maintenance_responsible: z.string().optional().nullable(),
+  maintenance_notes: z.string().max(1000, 'Observações muito longas').optional().nullable(),
+  maintenance_status: z.string().optional().nullable(),
+  maintenance_priority: z.string().optional().nullable(),
+  maintenance_criticality: z.string().optional().nullable(),
+  maintenance_cost: z.number().optional().nullable(),
 });
 
 interface AssetEditFormProps {
@@ -43,9 +64,60 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, onDelete, isLoading }
     brand_model: asset.brand_model || '',
     evaluation_value: asset.evaluation_value || undefined,
     invoice_url: asset.invoice_url || null,
+    maintenance_frequency: asset.maintenance_frequency || null,
+    maintenance_custom_interval: asset.maintenance_custom_interval || null,
+    last_maintenance_date: asset.last_maintenance_date || null,
+    next_maintenance_date: asset.next_maintenance_date || null,
+    maintenance_type: asset.maintenance_type || null,
+    maintenance_responsible: asset.maintenance_responsible || null,
+    maintenance_notes: asset.maintenance_notes || null,
+    maintenance_status: asset.maintenance_status || 'Pendente',
+    maintenance_priority: asset.maintenance_priority || 'Média',
+    maintenance_criticality: asset.maintenance_criticality || 'Média',
+    maintenance_cost: asset.maintenance_cost || null,
   });
   const [uploading, setUploading] = useState(false);
   const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
+  const [lastMaintenanceDate, setLastMaintenanceDate] = useState<Date | null>(
+    asset.last_maintenance_date ? new Date(asset.last_maintenance_date) : null,
+  );
+
+  useEffect(() => {
+    if (!formData.last_maintenance_date || !formData.maintenance_frequency) {
+      setFormData((prev) =>
+        prev.next_maintenance_date !== null
+          ? { ...prev, next_maintenance_date: null }
+          : prev,
+      );
+      return;
+    }
+
+    let interval = 0;
+    if (formData.maintenance_frequency === 'custom') {
+      interval = formData.maintenance_custom_interval || 0;
+    } else {
+      interval = parseInt(formData.maintenance_frequency, 10);
+    }
+
+    if (!interval) {
+      setFormData((prev) =>
+        prev.next_maintenance_date !== null
+          ? { ...prev, next_maintenance_date: null }
+          : prev,
+      );
+      return;
+    }
+
+    const lastDate = parseISO(formData.last_maintenance_date);
+    const nextDate = addDays(lastDate, interval);
+    const nextIso = nextDate.toISOString();
+
+    setFormData((prev) =>
+      prev.next_maintenance_date === nextIso
+        ? prev
+        : { ...prev, next_maintenance_date: nextIso },
+    );
+  }, [formData.last_maintenance_date, formData.maintenance_frequency, formData.maintenance_custom_interval]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -211,13 +283,216 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, onDelete, isLoading }
           step="0.01"
           min="0"
           placeholder="Ex: 1500.00"
-          value={formData.evaluation_value || ''}
+          value={formData.evaluation_value ?? ''}
           onChange={(e) =>
             setFormData({
               ...formData,
               evaluation_value: e.target.value ? parseFloat(e.target.value) : undefined,
             })
           }
+        />
+      </div>
+
+      <div className="pt-4">
+        <h3 className="text-lg font-semibold">Configurações de manutenção</h3>
+        <p className="text-sm text-muted-foreground">
+          Atualize as informações de manutenção preventiva para garantir o acompanhamento correto.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Frequência de manutenção</Label>
+          <Select
+            value={formData.maintenance_frequency ?? ''}
+            onValueChange={(value) =>
+              setFormData({
+                ...formData,
+                maintenance_frequency: value,
+                maintenance_custom_interval: value === 'custom' ? formData.maintenance_custom_interval : null,
+              })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione a frequência" />
+            </SelectTrigger>
+            <SelectContent>
+              {MAINTENANCE_FREQUENCIES.map((frequency) => (
+                <SelectItem key={frequency.value} value={frequency.value}>
+                  {frequency.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {formData.maintenance_frequency === 'custom' && (
+          <div className="space-y-2">
+            <Label>Intervalo personalizado (dias)</Label>
+            <Input
+              type="number"
+              min={1}
+              value={formData.maintenance_custom_interval ?? ''}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  maintenance_custom_interval: e.target.value ? parseInt(e.target.value, 10) : null,
+                })
+              }
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Última manutenção</Label>
+          <DatePicker
+            value={lastMaintenanceDate}
+            onChange={(date) => {
+              setLastMaintenanceDate(date ?? null);
+              setFormData({
+                ...formData,
+                last_maintenance_date: date ? date.toISOString() : null,
+              });
+            }}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Próxima manutenção</Label>
+          <DatePicker
+            value={formData.next_maintenance_date ? new Date(formData.next_maintenance_date) : null}
+            onChange={(date) =>
+              setFormData({
+                ...formData,
+                next_maintenance_date: date ? date.toISOString() : null,
+              })
+            }
+            placeholder="Defina frequência e última manutenção"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Tipo de manutenção</Label>
+          <Select
+            value={formData.maintenance_type ?? ''}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_type: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione o tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              {MAINTENANCE_TYPES.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Responsável</Label>
+          <Select
+            value={formData.maintenance_responsible ?? ''}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_responsible: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione a equipe" />
+            </SelectTrigger>
+            <SelectContent>
+              {MAINTENANCE_RESPONSIBLES.map((responsible) => (
+                <SelectItem key={responsible} value={responsible}>
+                  {responsible}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <Label>Status</Label>
+          <Select
+            value={formData.maintenance_status ?? ''}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_status: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione" />
+            </SelectTrigger>
+            <SelectContent>
+              {MAINTENANCE_STATUSES.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Prioridade</Label>
+          <Select
+            value={formData.maintenance_priority ?? ''}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_priority: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione" />
+            </SelectTrigger>
+            <SelectContent>
+              {MAINTENANCE_PRIORITIES.map((priority) => (
+                <SelectItem key={priority} value={priority}>
+                  {priority}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Criticidade</Label>
+          <Select
+            value={formData.maintenance_criticality ?? ''}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_criticality: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione" />
+            </SelectTrigger>
+            <SelectContent>
+              {MAINTENANCE_CRITICALITIES.map((criticality) => (
+                <SelectItem key={criticality} value={criticality}>
+                  {criticality}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Custo estimado (R$)</Label>
+          <Input
+            type="number"
+            step="0.01"
+            min="0"
+            value={formData.maintenance_cost ?? ''}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                maintenance_cost: e.target.value ? parseFloat(e.target.value) : null,
+              })
+            }
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Observações de manutenção</Label>
+        <Textarea
+          placeholder="Histórico ou observações técnicas"
+          value={formData.maintenance_notes ?? ''}
+          onChange={(e) => setFormData({ ...formData, maintenance_notes: e.target.value })}
+          rows={3}
         />
       </div>
 

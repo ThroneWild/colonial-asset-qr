@@ -24,6 +24,7 @@ export const AdaptiveNavigationBar: React.FC = () => {
   const navItems: NavItem[] = [
     { label: 'Início', id: 'home', path: '/' },
     { label: 'Dashboard', id: 'dashboard', path: '/dashboard' },
+    { label: 'Manutenção', id: 'maintenance', path: '/maintenance' },
     { label: 'Ativos', id: 'assets', path: '/assets' },
     { label: 'Auditoria', id: 'audit', path: '/auditoria' },
     { label: 'Etiquetas', id: 'labels', path: '/labels' },
@@ -31,8 +32,16 @@ export const AdaptiveNavigationBar: React.FC = () => {
 
   // Determine active section based on current route
   const getActiveSectionFromPath = (pathname: string) => {
-    const item = navItems.find(item => item.path === pathname)
-    return item ? item.id : 'home'
+    if (pathname === '/') {
+      return 'home'
+    }
+
+    const match = navItems
+      .filter(item => item.path !== '/')
+      .sort((a, b) => b.path.length - a.path.length)
+      .find(item => pathname === item.path || pathname.startsWith(`${item.path}/`))
+
+    return match ? match.id : 'home'
   }
 
   const [activeSection, setActiveSection] = useState(() => getActiveSectionFromPath(location.pathname))

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { X, Printer, Download, Info, History, Edit, FileText } from 'lucide-react';
+import { X, Printer, Download, Info, History, Edit, FileText, Wrench } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -11,6 +11,9 @@ import { AssetHistory } from './AssetHistory';
 import { useAssetHistory } from '@/hooks/useAssetHistory';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { MaintenanceStatusBadge } from '@/components/maintenance/MaintenanceStatusBadge';
+import { MaintenanceHistoryList } from '@/components/maintenance/MaintenanceHistoryList';
+import { MAINTENANCE_STATUSES } from '@/types/maintenance';
 
 interface AssetDetailsProps {
   asset: Asset;
@@ -113,7 +116,7 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
 
       <div className="flex-1 overflow-y-auto p-6">
         <Tabs defaultValue="info" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="info" className="flex items-center gap-2">
               <Info className="h-4 w-4" />
               Informações
@@ -121,6 +124,10 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
             <TabsTrigger value="history" className="flex items-center gap-2">
               <History className="h-4 w-4" />
               Histórico
+            </TabsTrigger>
+            <TabsTrigger value="maintenance" className="flex items-center gap-2">
+              <Wrench className="h-4 w-4" />
+              Manutenções
             </TabsTrigger>
           </TabsList>
 
@@ -182,6 +189,81 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
               </dl>
             </Card>
 
+            <Card className="p-6 bg-muted/30 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">Controle de Manutenção</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Acompanhe o status preventivo deste ativo.
+                  </p>
+                </div>
+                {asset.maintenance_status && MAINTENANCE_STATUSES.includes(asset.maintenance_status as any) && (
+                  <MaintenanceStatusBadge status={asset.maintenance_status as any} />
+                )}
+              </div>
+
+              <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {asset.maintenance_type && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground mb-1">Tipo de manutenção</dt>
+                    <dd className="text-foreground">{asset.maintenance_type}</dd>
+                  </div>
+                )}
+                {asset.maintenance_responsible && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground mb-1">Responsável</dt>
+                    <dd className="text-foreground">{asset.maintenance_responsible}</dd>
+                  </div>
+                )}
+                {asset.last_maintenance_date && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground mb-1">Última manutenção</dt>
+                    <dd className="text-foreground">
+                      {format(new Date(asset.last_maintenance_date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                    </dd>
+                  </div>
+                )}
+                {asset.next_maintenance_date && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground mb-1">Próxima manutenção</dt>
+                    <dd className="text-foreground">
+                      {format(new Date(asset.next_maintenance_date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                    </dd>
+                  </div>
+                )}
+                {asset.maintenance_frequency && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground mb-1">Frequência</dt>
+                    <dd className="text-foreground">
+                      {asset.maintenance_frequency === 'custom'
+                        ? `${asset.maintenance_custom_interval ?? 0} dias`
+                        : `${asset.maintenance_frequency} dias`}
+                    </dd>
+                  </div>
+                )}
+                {asset.maintenance_priority && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground mb-1">Prioridade</dt>
+                    <dd className="text-foreground">{asset.maintenance_priority}</dd>
+                  </div>
+                )}
+                {asset.maintenance_cost && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground mb-1">Custo estimado</dt>
+                    <dd className="text-foreground font-semibold">
+                      {asset.maintenance_cost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </dd>
+                  </div>
+                )}
+                {asset.maintenance_notes && (
+                  <div className="md:col-span-2">
+                    <dt className="text-sm font-medium text-muted-foreground mb-1">Observações</dt>
+                    <dd className="text-foreground leading-relaxed">{asset.maintenance_notes}</dd>
+                  </div>
+                )}
+              </dl>
+            </Card>
+
             <Card className="p-6 bg-muted/30">
               <h3 className="text-lg font-semibold mb-4 text-foreground">QR Code</h3>
               <div className="flex flex-col items-center gap-4">
@@ -221,6 +303,10 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
 
           <TabsContent value="history">
             <AssetHistory history={history} loading={historyLoading} asset={asset} />
+          </TabsContent>
+
+          <TabsContent value="maintenance">
+            <MaintenanceHistoryList records={asset.maintenance_history || undefined} />
           </TabsContent>
         </Tabs>
       </div>
