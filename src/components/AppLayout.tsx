@@ -23,31 +23,30 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-background">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <ShaderAnimation className="absolute inset-0 min-h-screen" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
-      </div>
-      
-      <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
+    <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground">
+      <ShaderAnimation />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(30,58,138,0.45),transparent_55%)]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-background/60 via-background/80 to-background" />
+
+      <div className="fixed left-1/2 top-6 z-50 -translate-x-1/2">
         <AdaptiveNavigationBar />
       </div>
-      
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+
+      <div className="fixed right-6 top-6 z-50 flex items-center gap-3 rounded-full border border-white/10 bg-background/70 px-4 py-2 backdrop-blur-xl">
         <ThemeSwitch className="h-8 w-16" />
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="icon"
           onClick={handleLogout}
-          className="h-8 w-8 rounded-full bg-background/50 backdrop-blur-sm border-border/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-smooth"
+          className="h-8 w-8 rounded-full border-white/10 bg-background/30 text-foreground transition-smooth hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive"
           title="Sair"
         >
           <LogOut className="h-4 w-4" />
         </Button>
       </div>
-      
-      <main className="relative z-10 flex-1 overflow-auto pt-24">
-        {children}
+
+      <main className="relative z-10 flex-1 overflow-auto px-4 pb-16 pt-28 sm:px-6 lg:px-12">
+        <div className="mx-auto w-full max-w-7xl space-y-10">{children}</div>
       </main>
     </div>
   );

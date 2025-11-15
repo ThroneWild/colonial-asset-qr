@@ -31,6 +31,7 @@ import {
   Loader2,
   Wrench,
 } from 'lucide-react';
+import { PageHeading } from '@/components/ui/page-heading';
 
 const MAINTENANCE_STATUS_COLORS = ['#facc15', '#38bdf8', '#fb923c', '#34d399', '#f87171'];
 
@@ -181,62 +182,63 @@ const MaintenanceDashboard = () => {
   }
 
   return (
-    <div className="container mx-auto px-6 py-8 max-w-7xl space-y-8">
-      <Breadcrumb>
+    <div className="space-y-8">
+      <Breadcrumb className="w-fit rounded-full border border-white/10 bg-background/60 px-5 py-2 text-xs uppercase tracking-[0.35em] text-slate-300/70">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink onClick={() => navigate('/')} className="cursor-pointer">
+            <BreadcrumbLink onClick={() => navigate('/')} className="cursor-pointer text-slate-300">
               Início
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Manutenções</BreadcrumbPage>
+            <BreadcrumbPage className="text-slate-200">Manutenções</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-4xl font-display font-bold">Controle de Manutenção</h1>
-          <p className="text-muted-foreground">
-            Acompanhe indicadores, ordens de serviço e agendamentos preventivos em um único lugar.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/maintenance/calendar')}
-          >
-            <CalendarDays className="mr-2 h-4 w-4" />
-            Ver calendário
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() =>
-              navigate('/maintenance/calendar', {
-                state: { openSchedule: true, action: 'register' },
-              })
-            }
-          >
-            <ClipboardList className="mr-2 h-4 w-4" />
-            Registrar manutenção
-          </Button>
-          <Button
-            onClick={() =>
-              navigate('/maintenance/calendar', {
-                state: { openSchedule: true, action: 'schedule' },
-              })
-            }
-          >
-            <CalendarPlus className="mr-2 h-4 w-4" />
-            Programar manutenção
-          </Button>
-        </div>
-      </div>
+      <PageHeading
+        eyebrow="Manutenção"
+        title="Controle das ordens de serviço"
+        description="Monitore agendamentos preventivos, intervenções corretivas e custos associados a cada patrimônio."
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              className="border-white/15 bg-background/60 text-slate-200 hover:border-primary/50 hover:bg-primary/10"
+              onClick={() => navigate('/maintenance/calendar')}
+            >
+              <CalendarDays className="mr-2 h-4 w-4" />
+              Ver calendário
+            </Button>
+            <Button
+              className="border-white/15 bg-accent/10 text-accent hover:bg-accent/20"
+              onClick={() =>
+                navigate('/maintenance/calendar', {
+                  state: { openSchedule: true, action: 'register' },
+                })
+              }
+            >
+              <ClipboardList className="mr-2 h-4 w-4" />
+              Registrar manutenção
+            </Button>
+            <Button
+              className="border-white/15 bg-primary/20 text-primary hover:bg-primary/30"
+              onClick={() =>
+                navigate('/maintenance/calendar', {
+                  state: { openSchedule: true, action: 'schedule' },
+                })
+              }
+            >
+              <CalendarPlus className="mr-2 h-4 w-4" />
+              Programar manutenção
+            </Button>
+          </div>
+        }
+      />
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <Card className="p-6 border-0 shadow-card">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <Card className="glass rounded-3xl border border-white/10 p-6 shadow-hover">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-3 rounded-2xl bg-primary/10">
               <Wrench className="h-6 w-6 text-primary" />
@@ -247,24 +249,24 @@ const MaintenanceDashboard = () => {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="rounded-lg border border-border/60 p-3">
-              <p className="text-[11px] uppercase text-muted-foreground">Atrasadas</p>
-              <p className="text-xl font-semibold text-destructive">{maintenanceMetrics.overdue}</p>
+            <div className="rounded-2xl border border-white/10 bg-background/60 p-3">
+              <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400">Atrasadas</p>
+              <p className="text-xl font-semibold text-accent">{maintenanceMetrics.overdue}</p>
             </div>
-            <div className="rounded-lg border border-border/60 p-3">
-              <p className="text-[11px] uppercase text-muted-foreground">Próximos 7 dias</p>
-              <p className="text-xl font-semibold text-emerald-500">{maintenanceMetrics.nextSevenDays}</p>
+            <div className="rounded-2xl border border-white/10 bg-background/60 p-3">
+              <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400">Próximos 7 dias</p>
+              <p className="text-xl font-semibold text-emerald-400">{maintenanceMetrics.nextSevenDays}</p>
             </div>
-            <div className="col-span-2 rounded-lg border border-border/60 p-3">
-              <p className="text-[11px] uppercase text-muted-foreground">Custo estimado</p>
-              <p className="text-lg font-semibold">
+            <div className="col-span-2 rounded-2xl border border-white/10 bg-background/60 p-3">
+              <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400">Custo estimado</p>
+              <p className="text-lg font-semibold text-slate-100">
                 {maintenanceMetrics.totalCost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 border-0 shadow-card">
+        <Card className="glass rounded-3xl border border-white/10 p-6 shadow-hover">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold">Status das manutenções</h3>
             <Badge variant="outline" className="gap-1 text-xs">
@@ -286,7 +288,7 @@ const MaintenanceDashboard = () => {
           </div>
         </Card>
 
-        <Card className="p-6 border-0 shadow-card">
+        <Card className="glass rounded-3xl border border-white/10 p-6 shadow-hover">
           <h3 className="text-sm font-semibold mb-4">Próximas manutenções</h3>
           <Table>
             <TableHeader>
@@ -319,7 +321,7 @@ const MaintenanceDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6 border-0 shadow-card">
+        <Card className="glass rounded-3xl border border-white/10 p-6 shadow-hover">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold">Itens críticos</h3>
             <Badge variant="secondary" className="text-xs">
@@ -359,7 +361,7 @@ const MaintenanceDashboard = () => {
           </Table>
         </Card>
 
-        <Card className="p-6 border-0 shadow-card">
+        <Card className="glass rounded-3xl border border-white/10 p-6 shadow-hover">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold">Manutenções atrasadas</h3>
             <Badge variant="destructive" className="text-xs">

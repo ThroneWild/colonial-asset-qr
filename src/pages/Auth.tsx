@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BackgroundPaths } from "@/components/ui/background-paths";
 import { SignInCard } from "@/components/ui/sign-in-card-2";
+import { useTheme } from "next-themes";
 
 type SignInFormValues = {
   identifier: string;
@@ -14,6 +15,7 @@ type SignInFormValues = {
 const Auth = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { setTheme } = useTheme();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -26,6 +28,10 @@ const Auth = () => {
     };
     checkAuth();
   }, [navigate]);
+
+  useEffect(() => {
+    setTheme("dark");
+  }, [setTheme]);
 
   const handleSubmit = useCallback(
     async ({ identifier, password }: SignInFormValues) => {
