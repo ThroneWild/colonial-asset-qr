@@ -1,7 +1,9 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, type HTMLAttributes } from "react"
 import * as THREE from "three"
+
+import { cn } from "@/lib/utils"
 
 type ShaderUniforms = (Record<string, THREE.IUniform> & {
   time: THREE.IUniform & { value: number }
@@ -16,7 +18,9 @@ type SceneResources = {
   animationId: number
 }
 
-export function ShaderAnimation() {
+type ShaderAnimationProps = HTMLAttributes<HTMLDivElement>
+
+export function ShaderAnimation({ className, style, ...props }: ShaderAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<SceneResources | null>(null)
 
@@ -131,11 +135,13 @@ export function ShaderAnimation() {
   return (
     <div
       ref={containerRef}
-      className="h-full w-full"
+      className={cn("h-full w-full", className)}
       style={{
         background: "#000",
         overflow: "hidden",
+        ...style,
       }}
+      {...props}
     />
   )
 }
