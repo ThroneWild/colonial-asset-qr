@@ -1,11 +1,14 @@
-import { Component as SignInComponent } from "@/components/ui/sign-in-card-2";
+import { ShaderAnimation } from "@/components/ui/shader-animation"
 
-const DemoOne = () => {
+export default function DemoOne() {
   return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <SignInComponent />
+    <div className="relative flex h-[650px] w-full flex-col items-center justify-center overflow-hidden rounded-xl border bg-blue-700">
+      <div className="absolute inset-0">
+        <ShaderAnimation />
+      </div>
+      <span className="pointer-events-none absolute z-10 whitespace-pre-wrap text-center text-7xl font-semibold leading-none tracking-tighter text-white">
+        Shader Animation
+      </span>
     </div>
-  );
-};
-
-export { DemoOne };
+  )
+}
