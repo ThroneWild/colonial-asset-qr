@@ -31,7 +31,7 @@ export const TopAssetsTable = ({ assets }: TopAssetsTableProps) => {
             {topAssets.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center text-muted-foreground">
-                  Nenhum ativo com valor cadastrado
+                  Nenhum ativo com valor cadastrado para o período selecionado
                 </TableCell>
               </TableRow>
             ) : (

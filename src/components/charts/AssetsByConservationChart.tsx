@@ -19,6 +19,14 @@ export const AssetsByConservationChart = ({ data }: AssetsByConservationChartPro
     fill: CONSERVATION_COLORS[name] || 'hsl(var(--primary))',
   }));
 
+  if (chartData.length === 0) {
+    return (
+      <Card className="p-6 flex items-center justify-center text-sm text-muted-foreground">
+        Sem registros para o período selecionado.
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-6">
       <h3 className="text-lg font-semibold mb-4">Estado de Conservação</h3>
@@ -34,7 +42,10 @@ export const AssetsByConservationChart = ({ data }: AssetsByConservationChartPro
               borderRadius: '8px',
             }}
           />
-          <Legend />
+          <Legend
+            wrapperStyle={{ color: 'hsl(var(--foreground))' }}
+            formatter={(value) => <span className="text-sm text-foreground font-medium">{value}</span>}
+          />
           <Bar dataKey="quantidade" radius={[8, 8, 0, 0]}>
             {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.fill} />

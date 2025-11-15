@@ -31,7 +31,7 @@ export const ConservationHeatmapChart = ({ assets }: ConservationHeatmapChartPro
 
   const getColorClass = (state: string, intensity: number) => {
     if (intensity === 0) return 'bg-muted/20';
-    
+
     const alpha = Math.max(0.3, intensity);
     switch (state) {
       case 'Novo':
@@ -46,6 +46,14 @@ export const ConservationHeatmapChart = ({ assets }: ConservationHeatmapChartPro
         return `bg-muted/[${alpha}]`;
     }
   };
+
+  if (maxCount === 0) {
+    return (
+      <Card className="glass-light p-6 flex items-center justify-center text-sm text-muted-foreground">
+        Sem registros para o período selecionado.
+      </Card>
+    );
+  }
 
   return (
     <Card className="glass-light">

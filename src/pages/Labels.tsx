@@ -4,8 +4,8 @@ import { Card } from '@/components/ui/card';
 import { Asset } from '@/types/asset';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { ArrowLeft, Printer } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Printer, Loader2 } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,7 +14,10 @@ import logoPrize from '@/assets/logo-prize.png';
 const Labels = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedAssets, setSelectedAssets] = useState<string[]>([]);
+  const [isLoadingAssets, setIsLoadingAssets] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from;
   const { user, loading } = useAuth();
 
   useEffect(() => {
@@ -31,6 +34,7 @@ const Labels = () => {
 
   const fetchAssets = async () => {
     try {
+      setIsLoadingAssets(true);
       const { data, error } = await supabase
         .from('assets')
         .select('*')
@@ -43,6 +47,8 @@ const Labels = () => {
         console.error('Erro ao carregar ativos:', error);
       }
       toast.error('Erro ao carregar ativos');
+    } finally {
+      setIsLoadingAssets(false);
     }
   };
 
@@ -51,12 +57,14 @@ const Labels = () => {
   };
 
   const toggleAsset = (id: string) => {
+    if (isLoadingAssets) return;
     setSelectedAssets((prev) =>
       prev.includes(id) ? prev.filter((assetId) => assetId !== id) : [...prev, id]
     );
   };
 
   const toggleAll = () => {
+    if (isLoadingAssets) return;
     if (selectedAssets.length === assets.length) {
       setSelectedAssets([]);
     } else {
@@ -64,7 +72,29 @@ const Labels = () => {
     }
   };
 
+  useEffect(() => {
+    if (assets.length === 0) return;
+    const stored = sessionStorage.getItem('selectedAssetsForLabels');
+    if (stored) {
+      try {
+        const parsed: Asset[] = JSON.parse(stored);
+        const ids = parsed.map((asset) => asset.id);
+        setSelectedAssets(ids.filter((id) => assets.some((asset) => asset.id === id)));
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          console.error('Erro ao restaurar seleção de etiquetas:', error);
+        }
+      } finally {
+        sessionStorage.removeItem('selectedAssetsForLabels');
+      }
+    }
+  }, [assets]);
+
   const selectedAssetsList = assets.filter((asset) => selectedAssets.includes(asset.id));
+
+  const handleBack = () => {
+    navigate(from || '/assets');
+  };
 
   if (loading) {
     return (
@@ -86,7 +116,7 @@ const Labels = () => {
       <header className="bg-primary text-primary-foreground py-4 px-4 shadow-md print:hidden">
         <div className="container mx-auto">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-primary-foreground hover:bg-primary-foreground/10">
+            <Button variant="ghost" size="icon" onClick={handleBack} className="text-primary-foreground hover:bg-primary-foreground/10">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <img src={logoPrize} alt="Prize Patrimônios" className="h-10 w-auto" />
@@ -108,44 +138,58 @@ const Labels = () => {
                 checked={selectedAssets.length === assets.length && assets.length > 0}
                 onCheckedChange={toggleAll}
                 id="select-all"
+                disabled={isLoadingAssets || assets.length === 0}
               />
               <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
-                Selecionar todos ({selectedAssets.length} de {assets.length})
+                {isLoadingAssets
+                  ? 'Carregando ativos...'
+                  : `Selecionar todos (${selectedAssets.length} de ${assets.length})`}
               </label>
             </div>
-            <Button onClick={handlePrint} disabled={selectedAssets.length === 0}>
+            <Button onClick={handlePrint} disabled={selectedAssets.length === 0 || isLoadingAssets}>
               <Printer className="mr-2 h-4 w-4" />
               Imprimir Etiquetas
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto p-2">
-            {assets.map((asset) => (
-              <Card
-                key={asset.id}
-                className={`p-3 cursor-pointer transition-all ${
-                  selectedAssets.includes(asset.id)
-                    ? 'border-primary bg-secondary/50'
-                    : 'hover:border-muted-foreground'
-                }`}
-                onClick={() => toggleAsset(asset.id)}
-              >
-                <div className="flex items-start gap-3">
-                  <Checkbox
-                    checked={selectedAssets.includes(asset.id)}
-                    onCheckedChange={() => toggleAsset(asset.id)}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-primary">HCI-{String(asset.item_number).padStart(6, '0')}</p>
-                    <p className="text-sm text-foreground truncate">{asset.description}</p>
-                    {asset.brand_model && (
-                      <p className="text-xs text-muted-foreground truncate">{asset.brand_model}</p>
-                    )}
+          {isLoadingAssets ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-12 text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span>Carregando ativos para etiquetas...</span>
+            </div>
+          ) : assets.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-muted-foreground/40 bg-muted/10 p-6 text-center text-sm text-muted-foreground">
+              Nenhum ativo disponível para gerar etiquetas.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-2">
+              {assets.map((asset) => (
+                <Card
+                  key={asset.id}
+                  className={`p-3 cursor-pointer transition-all ${
+                    selectedAssets.includes(asset.id)
+                      ? 'border-primary bg-secondary/50'
+                      : 'hover:border-muted-foreground'
+                  }`}
+                  onClick={() => toggleAsset(asset.id)}
+                >
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      checked={selectedAssets.includes(asset.id)}
+                      onCheckedChange={() => toggleAsset(asset.id)}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-primary">HCI-{String(asset.item_number).padStart(6, '0')}</p>
+                      <p className="text-sm text-foreground truncate">{asset.description}</p>
+                      {asset.brand_model && (
+                        <p className="text-xs text-muted-foreground truncate">{asset.brand_model}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="hidden print:block">

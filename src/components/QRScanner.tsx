@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,18 +12,15 @@ interface QRScannerProps {
 
 export const QRScanner = ({ onScan, onClose }: QRScannerProps) => {
   const [isScanning, setIsScanning] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const qrCodeRegionId = 'qr-reader';
 
-  useEffect(() => {
-    startScanner();
-    return () => {
-      stopScanner();
-    };
-  }, []);
-
-  const startScanner = async () => {
+  const startScanner = useCallback(async () => {
     try {
+      setErrorMessage(null);
+      setIsInitializing(true);
       const html5QrCode = new Html5Qrcode(qrCodeRegionId);
       scannerRef.current = html5QrCode;
 
@@ -42,13 +39,23 @@ export const QRScanner = ({ onScan, onClose }: QRScannerProps) => {
         }
       );
       setIsScanning(true);
+      setIsInitializing(false);
     } catch (err) {
       console.error('Error starting scanner:', err);
+      setIsScanning(false);
+      setIsInitializing(false);
+      setErrorMessage('Não foi possível acessar a câmera. Verifique as permissões do navegador ou tente em outro dispositivo.');
+      try {
+        await scannerRef.current?.clear();
+      } catch (clearError) {
+        console.error('Error clearing scanner:', clearError);
+      }
+      scannerRef.current = null;
       toast.error('Erro ao iniciar câmera. Verifique as permissões.');
     }
-  };
+  }, [onScan]);
 
-  const stopScanner = async () => {
+  const stopScanner = useCallback(async () => {
     if (scannerRef.current) {
       try {
         await scannerRef.current.stop();
@@ -58,6 +65,18 @@ export const QRScanner = ({ onScan, onClose }: QRScannerProps) => {
       }
     }
     setIsScanning(false);
+  }, []);
+
+  useEffect(() => {
+    startScanner();
+    return () => {
+      stopScanner();
+    };
+  }, [startScanner, stopScanner]);
+
+  const handleRetry = async () => {
+    await stopScanner();
+    startScanner();
   };
 
   const handleClose = () => {
@@ -85,18 +104,33 @@ export const QRScanner = ({ onScan, onClose }: QRScannerProps) => {
           />
           
           <p className="text-sm text-muted-foreground text-center">
-            {isScanning 
-              ? 'Aponte a câmera para o QR Code da etiqueta'
-              : 'Iniciando câmera...'}
+            {errorMessage
+              ? errorMessage
+              : isScanning
+                ? 'Aponte a câmera para o QR Code da etiqueta'
+                : isInitializing
+                  ? 'Iniciando câmera...'
+                  : 'Preparando câmera...'}
           </p>
-          
-          <Button 
-            variant="outline" 
-            onClick={handleClose}
-            className="w-full"
-          >
-            Cancelar
-          </Button>
+
+          {errorMessage ? (
+            <div className="space-y-2">
+              <Button variant="default" onClick={handleRetry} className="w-full">
+                Tentar novamente
+              </Button>
+              <Button variant="outline" onClick={handleClose} className="w-full">
+                Fechar
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              className="w-full"
+            >
+              Cancelar
+            </Button>
+          )}
         </div>
       </Card>
     </div>

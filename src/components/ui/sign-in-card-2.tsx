@@ -43,7 +43,21 @@ interface SignInCardProps {
   }) => Promise<void> | void;
 }
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+function Input({ className, type, onInvalid, onInput, ...props }: React.ComponentProps<"input">) {
+  const handleInvalid = (event: React.FormEvent<HTMLInputElement>) => {
+    if (props.required) {
+      event.currentTarget.setCustomValidity(
+        props['data-required-message'] ?? 'Preencha este campo.',
+      );
+    }
+    onInvalid?.(event);
+  };
+
+  const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
+    event.currentTarget.setCustomValidity('');
+    onInput?.(event);
+  };
+
   return (
     <input
       type={type}
@@ -54,6 +68,8 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         className
       )}
+      onInvalid={handleInvalid}
+      onInput={handleInput}
       {...props}
     />
   );
@@ -370,6 +386,7 @@ export function SignInCard({
                       className="h-10 w-full bg-white/5 pl-10 pr-3 text-white placeholder:text-white/30 transition-all duration-300 focus:bg-white/10 focus:border-transparent"
                       autoComplete={identifierType === "email" ? "email" : "username"}
                       required
+                      data-required-message="Preencha este campo"
                     />
 
                     {focusedInput === "identifier" && (
@@ -402,7 +419,7 @@ export function SignInCard({
 
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Password"
+                      placeholder="Senha"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       onFocus={() => setFocusedInput("password")}
@@ -410,6 +427,7 @@ export function SignInCard({
                       className="h-10 w-full bg-white/5 pl-10 pr-10 text-white placeholder:text-white/30 transition-all duration-300 focus:bg-white/10 focus:border-transparent"
                       autoComplete="current-password"
                       required
+                      data-required-message="Preencha este campo"
                     />
 
                     <button

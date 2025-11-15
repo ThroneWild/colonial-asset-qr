@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Asset, AssetFilters } from '@/types/asset';
@@ -54,6 +54,7 @@ const AllAssets = () => {
   const { paginatedItems, currentPage, totalPages, goToPage, nextPage, prevPage, canGoNext, canGoPrev } = usePagination(filteredAssets, 50);
   
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading } = useAuth();
 
   // Search suggestions
@@ -340,15 +341,30 @@ const AllAssets = () => {
     handleExportPDF(assetsToExport);
   };
 
+  const handleExportExcel = (assetsToExport: Asset[] = filteredAssets) => {
+    if (assetsToExport.length === 0) {
+      toast.info('Não há ativos para exportar no momento.');
+      return;
+    }
+
+    toast.promise(
+      Promise.resolve().then(() => exportToExcel(assetsToExport)),
+      {
+        loading: 'Gerando arquivo Excel...',
+        success: 'Relatório Excel gerado com sucesso!',
+        error: 'Não foi possível gerar o Excel. Tente novamente mais tarde.',
+      }
+    );
+  };
+
   const handleBatchExportExcel = (assetsToExport: Asset[]) => {
-    exportToExcel(assetsToExport);
-    toast.success('Relatório Excel gerado com sucesso!');
+    handleExportExcel(assetsToExport);
   };
 
   const handleBatchGenerateLabels = (assetsForLabels: Asset[]) => {
     // Store selected assets in sessionStorage and navigate to labels page
     sessionStorage.setItem('selectedAssetsForLabels', JSON.stringify(assetsForLabels));
-    navigate('/labels');
+    navigate('/labels', { state: { from: location.pathname } });
   };
 
   if (loading) {
@@ -398,11 +414,11 @@ const AllAssets = () => {
                 <FileText className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Exportar PDF</span>
               </Button>
-              <Button onClick={() => exportToExcel(filteredAssets)} variant="outline" size="sm" className="sm:size-default">
+              <Button onClick={() => handleExportExcel()} variant="outline" size="sm" className="sm:size-default">
                 <FileText className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Exportar Excel</span>
               </Button>
-              <Button onClick={() => navigate('/labels')} size="sm" className="sm:size-default">
+              <Button onClick={() => navigate('/labels', { state: { from: location.pathname } })} size="sm" className="sm:size-default">
                 <Tags className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Gerar Etiquetas</span>
               </Button>

@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Asset, AssetStatistics } from '@/types/asset';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, TrendingUp, DollarSign, Package } from 'lucide-react';
+import { BarChart3, TrendingUp, DollarSign, Package, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { AssetsBySectorChart } from '@/components/charts/AssetsBySectorChart';
 import { AssetsByConservationChart } from '@/components/charts/AssetsByConservationChart';
@@ -31,32 +31,49 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from '@/lib/utils';
 
 const Dashboard = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [statistics, setStatistics] = useState<AssetStatistics | null>(null);
   const [loading, setLoading] = useState(true);
   const [periodFilter, setPeriodFilter] = useState<string>('all');
+  const [isApplyingFilter, setIsApplyingFilter] = useState(false);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
 
-  const filteredAssets = assets.filter(asset => {
-    const createdAt = new Date(asset.created_at);
+  const filteredAssets = useMemo(() => {
     const now = new Date();
-    
-    switch (periodFilter) {
-      case '7':
-        return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 7;
-      case '30':
-        return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 30;
-      case '90':
-        return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 90;
-      case '365':
-        return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 365;
-      default:
-        return true;
-    }
-  });
+
+    return assets.filter(asset => {
+      const createdAt = new Date(asset.created_at);
+
+      switch (periodFilter) {
+        case '7':
+          return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 7;
+        case '30':
+          return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 30;
+        case '90':
+          return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 90;
+        case '365':
+          return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 365;
+        default:
+          return true;
+      }
+    });
+  }, [assets, periodFilter]);
+
+  const handlePeriodChange = (value: string) => {
+    setIsApplyingFilter(true);
+    setPeriodFilter(value);
+  };
+
+  const renderFilterOverlay = () => (
+    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-3xl bg-background/80 backdrop-blur-sm">
+      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+      <span className="mt-2 text-sm text-muted-foreground">Atualizando dados...</span>
+    </div>
+  );
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -88,6 +105,7 @@ const Dashboard = () => {
       toast.error('Erro ao carregar dados do dashboard');
     } finally {
       setLoading(false);
+      setIsApplyingFilter(false);
     }
   };
 
@@ -125,10 +143,10 @@ const Dashboard = () => {
 
   // Recalculate stats when period filter changes
   useEffect(() => {
-    if (filteredAssets.length > 0) {
-      calculateStatistics(filteredAssets);
-    }
-  }, [periodFilter, assets]);
+    calculateStatistics(filteredAssets);
+    const timeout = window.setTimeout(() => setIsApplyingFilter(false), 300);
+    return () => window.clearTimeout(timeout);
+  }, [filteredAssets]);
 
   if (authLoading || loading) {
     return (
@@ -169,7 +187,7 @@ const Dashboard = () => {
           <h1 className="text-4xl font-display font-bold mb-2">Dashboard Patrimonial</h1>
           <p className="text-muted-foreground">Análise e Estatísticas Detalhadas</p>
         </div>
-        <Select value={periodFilter} onValueChange={setPeriodFilter}>
+        <Select value={periodFilter} onValueChange={handlePeriodChange}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Período" />
           </SelectTrigger>
@@ -183,82 +201,123 @@ const Dashboard = () => {
         </Select>
       </div>
 
+      {filteredAssets.length === 0 && !loading && (
+        <div className="mb-6 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/20 px-4 py-3 text-center text-sm text-muted-foreground">
+          Sem registros para o período selecionado.
+        </div>
+      )}
+
       {/* Cards de Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-fade-in">
-        <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-primary/10">
-              <Package className="h-6 w-6 text-primary" />
+      <div className="relative mb-8">
+        {isApplyingFilter && renderFilterOverlay()}
+        <div
+          className={cn(
+            "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in",
+            isApplyingFilter && "pointer-events-none opacity-50",
+          )}
+        >
+          <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-primary/10">
+                <Package className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Total de Ativos</p>
+                <p className="text-3xl font-bold text-foreground">{statistics.totalAssets}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Total de Ativos</p>
-              <p className="text-3xl font-bold text-foreground">{statistics.totalAssets}</p>
-            </div>
-          </div>
-        </Card>
+          </Card>
 
-        <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-prize-gold/10">
-              <DollarSign className="h-6 w-6 text-prize-gold" />
+          <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-prize-gold/10">
+                <DollarSign className="h-6 w-6 text-prize-gold" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Valor Total</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statistics.totalValue)}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Valor Total</p>
-              <p className="text-2xl font-bold text-foreground">
-                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statistics.totalValue)}
-              </p>
-            </div>
-          </div>
-        </Card>
+          </Card>
 
-        <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-primary/10">
-              <TrendingUp className="h-6 w-6 text-primary" />
+          <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-primary/10">
+                <TrendingUp className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Valor Médio</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statistics.averageValue)}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Valor Médio</p>
-              <p className="text-2xl font-bold text-foreground">
-                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(statistics.averageValue)}
-              </p>
-            </div>
-          </div>
-        </Card>
+          </Card>
 
-        <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-destructive/10">
-              <BarChart3 className="h-6 w-6 text-destructive" />
+          <Card className="p-6 border-0 shadow-card hover:shadow-hover transition-smooth">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-destructive/10">
+                <BarChart3 className="h-6 w-6 text-destructive" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Taxa Manutenção</p>
+                <p className="text-3xl font-bold text-foreground">{statistics.maintenanceRate.toFixed(1)}%</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Taxa Manutenção</p>
-              <p className="text-3xl font-bold text-foreground">{statistics.maintenanceRate.toFixed(1)}%</p>
-            </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
 
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-scale-in">
-        <AssetsBySectorChart data={statistics.assetsBySector} />
-        <AssetsByConservationChart data={statistics.assetsByConservation} />
+        <div className="relative">
+          {isApplyingFilter && renderFilterOverlay()}
+          <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
+            <AssetsBySectorChart data={statistics.assetsBySector} />
+          </div>
+        </div>
+        <div className="relative">
+          {isApplyingFilter && renderFilterOverlay()}
+          <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
+            <AssetsByConservationChart data={statistics.assetsByConservation} />
+          </div>
+        </div>
       </div>
 
-      <div className="mb-8 animate-fade-in">
-        <ValueDistributionChart assets={filteredAssets} />
+      <div className="relative mb-8 animate-fade-in">
+        {isApplyingFilter && renderFilterOverlay()}
+        <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
+          <ValueDistributionChart assets={filteredAssets} />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in">
-        <RegistrationTimelineChart assets={filteredAssets} days={30} />
-        <AssetsTimelineChart assets={filteredAssets} />
+      <div className="relative mb-8 animate-fade-in">
+        {isApplyingFilter && renderFilterOverlay()}
+        <div
+          className={cn(
+            "grid grid-cols-1 lg:grid-cols-2 gap-6",
+            isApplyingFilter && "pointer-events-none opacity-50",
+          )}
+        >
+          <RegistrationTimelineChart assets={filteredAssets} days={30} />
+          <AssetsTimelineChart assets={filteredAssets} />
+        </div>
       </div>
 
-      <div className="mb-8 animate-fade-in">
-        <ConservationHeatmapChart assets={filteredAssets} />
+      <div className="relative mb-8 animate-fade-in">
+        {isApplyingFilter && renderFilterOverlay()}
+        <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
+          <ConservationHeatmapChart assets={filteredAssets} />
+        </div>
       </div>
 
-      <div className="animate-fade-in">
-        <TopAssetsTable assets={filteredAssets} />
+      <div className="relative animate-fade-in">
+        {isApplyingFilter && renderFilterOverlay()}
+        <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
+          <TopAssetsTable assets={filteredAssets} />
+        </div>
       </div>
     </div>
   );
