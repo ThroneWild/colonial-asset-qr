@@ -123,6 +123,36 @@ export type Database = {
         }
         Relationships: []
       }
+      failed_login_attempts: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          id: string
+          last_attempt: string
+          locked_until: string | null
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          id?: string
+          last_attempt?: string
+          locked_until?: string | null
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          id?: string
+          last_attempt?: string
+          locked_until?: string | null
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
