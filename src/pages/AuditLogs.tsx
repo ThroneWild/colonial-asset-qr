@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,15 +45,19 @@ const fieldLabels: Record<string, string> = {
   evaluation_value: 'Valor de Avaliação',
 };
 
-const formatFieldValue = (field: string, value: any) => {
+const formatFieldValue = (field: string, value: unknown) => {
   if (value === null || value === undefined) return '-';
-  
+
   switch (field) {
     case 'evaluation_value':
-      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+      return typeof value === 'number'
+        ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+        : '-';
     case 'created_at':
     case 'updated_at':
-      return format(parseISO(value), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+      return typeof value === 'string'
+        ? format(parseISO(value), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
+        : '-';
     default:
       return String(value);
   }
@@ -133,6 +137,10 @@ interface Filters {
   searchTerm: string;
 }
 
+type SupabaseHistoryEntry = Omit<AssetHistoryEntry, 'user_profile'> & {
+  user_profile: { full_name: string; email: string } | null;
+};
+
 const AuditLogs = () => {
   const [history, setHistory] = useState<AssetHistoryEntry[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -156,26 +164,18 @@ const AuditLogs = () => {
     }
   }, [user, authLoading, navigate]);
 
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-  }, [user]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
 
-      // Fetch all assets
       const { data: assetsData, error: assetsError } = await supabase
         .from('assets')
         .select('*')
         .order('item_number', { ascending: false });
 
       if (assetsError) throw assetsError;
-      setAssets(assetsData || []);
+      setAssets(assetsData ?? []);
 
-      // Fetch all history with user profiles
       const { data: historyData, error: historyError } = await supabase
         .from('asset_history')
         .select(`
@@ -186,13 +186,13 @@ const AuditLogs = () => {
 
       if (historyError) throw historyError;
 
-      const transformedData = historyData?.map((entry: any) => ({
-        ...entry,
-        user_profile: entry.user_profile ? {
-          full_name: entry.user_profile.full_name,
-          email: entry.user_profile.email
-        } : undefined
-      })) || [];
+      const transformedData = (historyData ?? []).map((entry) => {
+        const typedEntry = entry as SupabaseHistoryEntry;
+        return {
+          ...typedEntry,
+          user_profile: typedEntry.user_profile ?? undefined,
+        } satisfies AssetHistoryEntry;
+      });
 
       setHistory(transformedData);
     } catch (error) {
@@ -201,7 +201,13 @@ const AuditLogs = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      void fetchData();
+    }
+  }, [user, fetchData]);
 
   // Get unique users and assets for filters
   const uniqueUsers = useMemo(() => {

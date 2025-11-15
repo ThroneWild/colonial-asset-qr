@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Asset, SECTORS } from '@/types/asset';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,13 +43,7 @@ const AssetView = () => {
   const [newSector, setNewSector] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    if (id) {
-      fetchAsset(id);
-    }
-  }, [id]);
-
-  const fetchAsset = async (assetId: string) => {
+  const fetchAsset = useCallback(async (assetId: string) => {
     try {
       const { data, error } = await supabase
         .from('assets_public')
@@ -76,7 +70,13 @@ const AssetView = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    if (id) {
+      void fetchAsset(id);
+    }
+  }, [id, fetchAsset]);
 
   const handleChangeSector = async () => {
     if (!newSector || !asset || !user) return;

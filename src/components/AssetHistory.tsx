@@ -34,6 +34,10 @@ interface HistoryFilters {
   dateTo: string;
 }
 
+type SupabaseHistoryEntry = Omit<AssetHistoryEntry, 'user_profile'> & {
+  user_profile: { full_name: string; email: string } | null;
+};
+
 const fieldLabels: Record<string, string> = {
   description: 'Descrição',
   sector: 'Setor',
@@ -44,15 +48,19 @@ const fieldLabels: Record<string, string> = {
   invoice_url: 'Nota Fiscal',
 };
 
-const formatFieldValue = (field: string, value: any) => {
+const formatFieldValue = (field: string, value: unknown) => {
   if (value === null || value === undefined) return '-';
-  
+
   switch (field) {
     case 'evaluation_value':
-      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+      return typeof value === 'number'
+        ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+        : '-';
     case 'created_at':
     case 'updated_at':
-      return format(parseISO(value), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+      return typeof value === 'string'
+        ? format(parseISO(value), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
+        : '-';
     case 'invoice_url':
       return value ? 'Anexada' : 'Não anexada';
     default:
@@ -136,14 +144,14 @@ export const AssetHistory = ({ history, loading, asset }: AssetHistoryProps) => 
 
   // Get unique users for filter
   const uniqueUsers = useMemo(() => {
-    const users = history
-      .filter(entry => entry.user_profile)
-      .map(entry => ({
-        id: entry.user_id,
-        name: entry.user_profile!.full_name,
-      }));
-    
-    const uniqueMap = new Map(users.map(u => [u.id, u]));
+    const users = history.reduce<Array<{ id: string; name: string }>>((acc, entry) => {
+      if (entry.user_profile) {
+        acc.push({ id: entry.user_id, name: entry.user_profile.full_name });
+      }
+      return acc;
+    }, []);
+
+    const uniqueMap = new Map(users.map(user => [user.id, user]));
     return Array.from(uniqueMap.values());
   }, [history]);
 

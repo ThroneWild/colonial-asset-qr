@@ -17,6 +17,18 @@ export const QRScanner = ({ onScan, onClose }: QRScannerProps) => {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const qrCodeRegionId = 'qr-reader';
 
+  const stopScanner = useCallback(async () => {
+    if (scannerRef.current) {
+      try {
+        await scannerRef.current.stop();
+        scannerRef.current.clear();
+      } catch (err) {
+        console.error('Error stopping scanner:', err);
+      }
+    }
+    setIsScanning(false);
+  }, []);
+
   const startScanner = useCallback(async () => {
     try {
       setErrorMessage(null);
@@ -34,7 +46,7 @@ export const QRScanner = ({ onScan, onClose }: QRScannerProps) => {
           onScan(decodedText);
           stopScanner();
         },
-        (errorMessage) => {
+        () => {
           // Scanner errors are expected during scanning
         }
       );
@@ -53,19 +65,7 @@ export const QRScanner = ({ onScan, onClose }: QRScannerProps) => {
       scannerRef.current = null;
       toast.error('Erro ao iniciar câmera. Verifique as permissões.');
     }
-  }, [onScan]);
-
-  const stopScanner = useCallback(async () => {
-    if (scannerRef.current) {
-      try {
-        await scannerRef.current.stop();
-        scannerRef.current.clear();
-      } catch (err) {
-        console.error('Error stopping scanner:', err);
-      }
-    }
-    setIsScanning(false);
-  }, []);
+  }, [onScan, stopScanner]);
 
   useEffect(() => {
     startScanner();

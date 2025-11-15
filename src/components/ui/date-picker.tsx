@@ -1,5 +1,6 @@
 import * as React from "react";
 import { format } from "date-fns";
+import type { Locale } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 
@@ -51,7 +52,7 @@ export const DatePicker = ({
             setOpen(false);
           }}
           initialFocus
-          locale={ptBR as any}
+          locale={ptBR as Locale}
         />
       </PopoverContent>
     </Popover>

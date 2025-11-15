@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { AssetHistoryEntry } from '@/types/asset';
 import { toast } from 'sonner';
@@ -7,17 +7,11 @@ export const useAssetHistory = (assetId: string | undefined) => {
   const [history, setHistory] = useState<AssetHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchHistory = useCallback(async () => {
     if (!assetId) {
       setLoading(false);
       return;
     }
-
-    fetchHistory();
-  }, [assetId]);
-
-  const fetchHistory = async () => {
-    if (!assetId) return;
 
     try {
       setLoading(true);
@@ -32,14 +26,17 @@ export const useAssetHistory = (assetId: string | undefined) => {
 
       if (error) throw error;
 
-      // Transform the data to match our interface
-      const transformedData = data?.map((entry: any) => ({
-        ...entry,
-        user_profile: entry.user_profile ? {
-          full_name: entry.user_profile.full_name,
-          email: entry.user_profile.email
-        } : undefined
-      })) || [];
+      type SupabaseHistoryEntry = Omit<AssetHistoryEntry, 'user_profile'> & {
+        user_profile: { full_name: string; email: string } | null;
+      };
+
+      const transformedData = (data ?? []).map((entry) => {
+        const typedEntry = entry as SupabaseHistoryEntry;
+        return {
+          ...typedEntry,
+          user_profile: typedEntry.user_profile ?? undefined,
+        } satisfies AssetHistoryEntry;
+      });
 
       setHistory(transformedData);
     } catch (error) {
@@ -48,7 +45,11 @@ export const useAssetHistory = (assetId: string | undefined) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [assetId]);
+
+  useEffect(() => {
+    void fetchHistory();
+  }, [assetId, fetchHistory]);
 
   return { history, loading, refetch: fetchHistory };
 };
