@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { SkeletonStatsGrid } from '@/components/ui/skeleton-stats';
+import { SkeletonActionCards } from '@/components/ui/skeleton-action-cards';
 
 
 const Index = () => {
@@ -20,6 +21,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [newAssetLabel, setNewAssetLabel] = useState<Asset | null>(null);
+  const [initialLoad, setInitialLoad] = useState(true);
   const navigate = useNavigate();
   const { user, loading, profile, isAdmin } = useAuth();
 
@@ -52,6 +54,7 @@ const Index = () => {
       toast.error('Erro ao carregar ativos');
     } finally {
       setIsLoadingAssets(false);
+      setTimeout(() => setInitialLoad(false), 300);
     }
   };
 
@@ -172,68 +175,74 @@ const Index = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 animate-scale-in">
-        <Card 
-          className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-          onClick={() => navigate('/dashboard')}
-        >
-          <div className="flex flex-col items-center gap-3 sm:gap-4">
-            <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-              <BarChart3 className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Dashboard</h3>
-              <p className="text-xs text-muted-foreground">Visualize estatísticas e gráficos</p>
-            </div>
-          </div>
-        </Card>
+        {initialLoad ? (
+          <SkeletonActionCards count={4} />
+        ) : (
+          <>
+            <Card 
+              className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+              onClick={() => navigate('/dashboard')}
+            >
+              <div className="flex flex-col items-center gap-3 sm:gap-4">
+                <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                  <BarChart3 className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Dashboard</h3>
+                  <p className="text-xs text-muted-foreground">Visualize estatísticas e gráficos</p>
+                </div>
+              </div>
+            </Card>
 
-        <Card 
-          className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-          onClick={() => setIsFormOpen(true)}
-        >
-          <div className="flex flex-col items-center gap-3 sm:gap-4">
-            <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-              <Plus className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Cadastrar Item</h3>
-              <p className="text-xs text-muted-foreground">Adicione um novo item ao patrimônio</p>
-            </div>
-          </div>
-        </Card>
+            <Card 
+              className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+              onClick={() => setIsFormOpen(true)}
+            >
+              <div className="flex flex-col items-center gap-3 sm:gap-4">
+                <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                  <Plus className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Cadastrar Item</h3>
+                  <p className="text-xs text-muted-foreground">Adicione um novo item ao patrimônio</p>
+                </div>
+              </div>
+            </Card>
 
-        <Card 
-          className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-          onClick={() => setShowScanner(true)}
-        >
-          <div className="flex flex-col items-center gap-3 sm:gap-4">
-            <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-              <QrCode className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Ler QR Code</h3>
-              <p className="text-xs text-muted-foreground">Escaneie o código para ver detalhes</p>
-            </div>
-          </div>
-        </Card>
+            <Card 
+              className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+              onClick={() => setShowScanner(true)}
+            >
+              <div className="flex flex-col items-center gap-3 sm:gap-4">
+                <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                  <QrCode className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Ler QR Code</h3>
+                  <p className="text-xs text-muted-foreground">Escaneie o código para ver detalhes</p>
+                </div>
+              </div>
+            </Card>
 
-        <Card 
-          className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
-          onClick={() => navigate('/assets')}
-        >
-          <div className="flex flex-col items-center gap-3 sm:gap-4">
-            <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
-              <List className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Ver Todos os Itens</h3>
-              <p className="text-xs text-muted-foreground">Liste e gerencie o patrimônio</p>
-            </div>
-          </div>
-        </Card>
+            <Card 
+              className="p-6 sm:p-8 text-center shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+              onClick={() => navigate('/assets')}
+            >
+              <div className="flex flex-col items-center gap-3 sm:gap-4">
+                <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                  <List className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 sm:mb-2">Ver Todos os Itens</h3>
+                  <p className="text-xs text-muted-foreground">Liste e gerencie o patrimônio</p>
+                </div>
+              </div>
+            </Card>
+          </>
+        )}
       </div>
 
-      {isAdmin && (
+      {isAdmin && !initialLoad && (
         <div className="flex justify-center mb-8 animate-fade-in">
           <Card 
             className="inline-flex items-center gap-3 px-6 py-4 shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
@@ -245,6 +254,20 @@ const Index = () => {
             <div className="text-left">
               <h3 className="text-base font-bold text-foreground">Gerenciar Usuários</h3>
               <p className="text-xs text-muted-foreground">Administre contas e permissões</p>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {isAdmin && initialLoad && (
+        <div className="flex justify-center mb-8 animate-pulse">
+          <Card className="inline-flex items-center gap-3 px-6 py-4 shadow-card border-0">
+            <div className="p-3 rounded-xl bg-muted">
+              <div className="h-6 w-6 bg-muted-foreground/20 rounded" />
+            </div>
+            <div className="text-left space-y-2">
+              <div className="h-4 w-32 bg-muted rounded" />
+              <div className="h-3 w-40 bg-muted rounded" />
             </div>
           </Card>
         </div>
