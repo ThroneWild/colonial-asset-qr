@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { motion, useSpring, AnimatePresence } from 'framer-motion'
 import { useNavigate, useLocation } from 'react-router-dom'
 
@@ -21,26 +21,40 @@ export const AdaptiveNavigationBar: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   
-  const navItems: NavItem[] = [
-    { label: 'Início', id: 'home', path: '/' },
-    { label: 'Dashboard', id: 'dashboard', path: '/dashboard' },
-    { label: 'Ativos', id: 'assets', path: '/assets' },
-    { label: 'Auditoria', id: 'audit', path: '/auditoria' },
-    { label: 'Etiquetas', id: 'labels', path: '/labels' },
-  ]
+  const navItems = useMemo<NavItem[]>(
+    () => [
+      { label: 'Início', id: 'home', path: '/' },
+      { label: 'Dashboard', id: 'dashboard', path: '/dashboard' },
+      { label: 'Ativos', id: 'assets', path: '/assets' },
+      { label: 'Manutenções', id: 'maintenance', path: '/maintenance' },
+      { label: 'Auditoria', id: 'audit', path: '/auditoria' },
+      { label: 'Etiquetas', id: 'labels', path: '/labels' },
+    ],
+    []
+  )
 
-  // Determine active section based on current route
-  const getActiveSectionFromPath = (pathname: string) => {
-    const item = navItems.find(item => item.path === pathname)
-    return item ? item.id : 'home'
-  }
+  const resolveActiveSection = useCallback(
+    (pathname: string) => {
+      if (pathname === '/') {
+        return 'home'
+      }
 
-  const [activeSection, setActiveSection] = useState(() => getActiveSectionFromPath(location.pathname))
+      const item = navItems.find(
+        item =>
+          item.path !== '/' && (pathname === item.path || pathname.startsWith(`${item.path}/`))
+      )
+
+      return item ? item.id : 'home'
+    },
+    [navItems]
+  )
+
+  const [activeSection, setActiveSection] = useState(() => resolveActiveSection(location.pathname))
 
   // Update active section when route changes
   useEffect(() => {
-    setActiveSection(getActiveSectionFromPath(location.pathname))
-  }, [location.pathname])
+    setActiveSection(resolveActiveSection(location.pathname))
+  }, [location.pathname, resolveActiveSection])
 
   // Spring animations for smooth motion
   const pillWidth = useSpring(140, { stiffness: 220, damping: 25, mass: 1 })
