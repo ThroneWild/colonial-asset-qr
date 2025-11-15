@@ -63,35 +63,33 @@ const Index = () => {
 
     setIsLoading(true);
     try {
-      const dataWithUser = {
-        ...formData,
-        user_id: user.id,
-        modified_by: user.id,
-      };
-
       const { data, error } = await supabase
         .from('assets')
-        .insert([dataWithUser])
+        .insert([{
+          ...formData,
+          user_id: user.id,
+          modified_by: user.id,
+        }])
         .select()
         .single();
 
       if (error) throw error;
 
-      // Gerar URL do QR Code
       const qrCodeUrl = `${window.location.origin}/asset/${data.id}`;
       
-      const { data: updatedAsset } = await supabase
+      const { data: updatedAsset, error: updateError } = await supabase
         .from('assets')
         .update({ qr_code_url: qrCodeUrl })
         .eq('id', data.id)
         .select()
         .single();
 
+      if (updateError) throw updateError;
+
       toast.success('Ativo cadastrado com sucesso!');
       setIsFormOpen(false);
-      fetchAssets();
+      await fetchAssets();
       
-      // Mostrar etiqueta para impressão
       if (updatedAsset) {
         setNewAssetLabel(updatedAsset);
       }
@@ -107,7 +105,6 @@ const Index = () => {
 
   const handleScanQR = (data: string) => {
     setShowScanner(false);
-    // Se for uma URL do nosso sistema, navegar para ela
     if (data.includes('/asset/')) {
       const assetId = data.split('/asset/')[1];
       navigate(`/asset/${assetId}`);
@@ -236,21 +233,22 @@ const Index = () => {
         </Card>
       </div>
 
-      <div className="relative z-10 flex justify-center mb-8 animate-fade-in">
-        <Button 
-          onClick={() => navigate('/users')}
-          className="w-48 h-12 text-base relative group overflow-hidden cursor-pointer"
-        >
-          <span className="inline-block translate-x-1 transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">
-            Usuários
-          </span>
-          <div className="absolute top-0 z-10 flex h-full w-full translate-x-12 items-center justify-center gap-2 opacity-0 transition-all duration-300 group-hover:-translate-x-1 group-hover:opacity-100">
-            <span>Usuários</span>
-            <UserCog className="h-4 w-4" />
-          </div>
-          <div className="absolute left-[20%] top-[40%] h-2 w-2 scale-[1] rounded-lg bg-primary transition-all duration-300 group-hover:left-[0%] group-hover:top-[0%] group-hover:h-full group-hover:w-full group-hover:scale-[1.8]"></div>
-        </Button>
-      </div>
+      {isAdmin && (
+        <div className="flex justify-center mb-8 animate-fade-in">
+          <Card 
+            className="inline-flex items-center gap-3 px-6 py-4 shadow-card hover:shadow-hover transition-smooth cursor-pointer group border-0"
+            onClick={() => navigate('/users')}
+          >
+            <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+              <UserCog className="h-6 w-6 text-primary" />
+            </div>
+            <div className="text-left">
+              <h3 className="text-base font-bold text-foreground">Gerenciar Usuários</h3>
+              <p className="text-xs text-muted-foreground">Administre contas e permissões</p>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {isFormOpen && (
         <Card className="p-5 sm:p-6 mb-6 shadow-card animate-scale-in border-0">

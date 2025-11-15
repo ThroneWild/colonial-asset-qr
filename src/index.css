@@ -147,4 +147,20 @@ All colors MUST be HSL.
   .border-gold {
     border-color: hsl(var(--prize-gold));
   }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .shadow-card {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+  
+  .shadow-hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  
+  .bg-gradient-subtle {
+    background: linear-gradient(to bottom, hsl(var(--background)), hsl(var(--muted) / 0.3));
+  }
 }
