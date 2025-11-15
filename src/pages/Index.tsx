@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Plus, QrCode, List, BarChart3 } from 'lucide-react';
-import { AssetForm } from '@/components/AssetForm';
-import { QRScanner } from '@/components/QRScanner';
-import { SingleLabel } from '@/components/SingleLabel';
-import { Asset, AssetFormData } from '@/types/asset';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { SkeletonStatsGrid } from '@/components/ui/skeleton-stats';
-import { SkeletonActionCards } from '@/components/ui/skeleton-action-cards';
-import { HeroSection } from '@/components/ui/hero-section-dark';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Plus, QrCode, List, BarChart3 } from "lucide-react";
+import { AssetForm } from "@/components/AssetForm";
+import { QRScanner } from "@/components/QRScanner";
+import { SingleLabel } from "@/components/SingleLabel";
+import { Asset, AssetFormData } from "@/types/asset";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { SkeletonStatsGrid } from "@/components/ui/skeleton-stats";
+import { SkeletonActionCards } from "@/components/ui/skeleton-action-cards";
+import { HeroSection } from "@/components/ui/hero-section-dark";
 const Index = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [isLoadingAssets, setIsLoadingAssets] = useState(true);
@@ -22,15 +22,10 @@ const Index = () => {
   const [newAssetLabel, setNewAssetLabel] = useState<Asset | null>(null);
   const [initialLoad, setInitialLoad] = useState(true);
   const navigate = useNavigate();
-  const {
-    user,
-    loading,
-    profile,
-    isAdmin
-  } = useAuth();
+  const { user, loading, profile, isAdmin } = useAuth();
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth');
+      navigate("/auth");
     }
   }, [user, loading, navigate]);
   useEffect(() => {
@@ -41,19 +36,16 @@ const Index = () => {
   const fetchAssets = async () => {
     try {
       setIsLoadingAssets(true);
-      const {
-        data,
-        error
-      } = await supabase.from('assets').select('*').order('item_number', {
-        ascending: false
+      const { data, error } = await supabase.from("assets").select("*").order("item_number", {
+        ascending: false,
       });
       if (error) throw error;
       setAssets(data || []);
     } catch (error) {
       if (import.meta.env.DEV) {
-        console.error('Erro ao carregar ativos:', error);
+        console.error("Erro ao carregar ativos:", error);
       }
-      toast.error('Erro ao carregar ativos');
+      toast.error("Erro ao carregar ativos");
     } finally {
       setIsLoadingAssets(false);
       setTimeout(() => setInitialLoad(false), 300);
@@ -61,29 +53,34 @@ const Index = () => {
   };
   const handleSubmit = async (formData: AssetFormData) => {
     if (!user) {
-      toast.error('Você precisa estar autenticado');
+      toast.error("Você precisa estar autenticado");
       return;
     }
     setIsLoading(true);
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('assets').insert([{
-        ...formData,
-        user_id: user.id,
-        modified_by: user.id
-      }]).select().single();
+      const { data, error } = await supabase
+        .from("assets")
+        .insert([
+          {
+            ...formData,
+            user_id: user.id,
+            modified_by: user.id,
+          },
+        ])
+        .select()
+        .single();
       if (error) throw error;
       const qrCodeUrl = `${window.location.origin}/asset/${data.id}`;
-      const {
-        data: updatedAsset,
-        error: updateError
-      } = await supabase.from('assets').update({
-        qr_code_url: qrCodeUrl
-      }).eq('id', data.id).select().single();
+      const { data: updatedAsset, error: updateError } = await supabase
+        .from("assets")
+        .update({
+          qr_code_url: qrCodeUrl,
+        })
+        .eq("id", data.id)
+        .select()
+        .single();
       if (updateError) throw updateError;
-      toast.success('Ativo cadastrado com sucesso!');
+      toast.success("Ativo cadastrado com sucesso!");
       setIsFormOpen(false);
       await fetchAssets();
       if (updatedAsset) {
@@ -91,23 +88,23 @@ const Index = () => {
       }
     } catch (error) {
       if (import.meta.env.DEV) {
-        console.error('Erro ao cadastrar ativo:', error);
+        console.error("Erro ao cadastrar ativo:", error);
       }
-      toast.error('Erro ao cadastrar ativo');
+      toast.error("Erro ao cadastrar ativo");
     } finally {
       setIsLoading(false);
     }
   };
   const handleScanQR = (data: string) => {
     setShowScanner(false);
-    if (data.includes('/asset/')) {
-      const assetId = data.split('/asset/')[1];
+    if (data.includes("/asset/")) {
+      const assetId = data.split("/asset/")[1];
       navigate(`/asset/${assetId}`);
     } else {
-      toast.error('QR Code inválido');
+      toast.error("QR Code inválido");
     }
   };
-  const firstName = profile?.full_name ? profile.full_name.split(' ')[0] : '';
+  const firstName = profile?.full_name ? profile.full_name.split(" ")[0] : "";
 
   if (loading) {
     return (
@@ -122,17 +119,16 @@ const Index = () => {
   if (!user) {
     return null;
   }
-  const maintenanceCount = assets.filter(a => a.conservation_state === 'Precisa de Manutenção').length;
+  const maintenanceCount = assets.filter((a) => a.conservation_state === "Precisa de Manutenção").length;
   return (
     <div className="space-y-12">
       <HeroSection
         title="Prize Patrimônios"
         subtitle={{
-          regular: `${firstName ? `Bem-vindo, ${firstName}. ` : ""}Inventário hoteleiro com `,
+          regular: `${firstName ? `Bem-vindo, ${firstName}. ` : ""}`,
           gradient: "controle em tempo real.",
         }}
-        description="Monitore cada suíte, enxoval e equipamento com dashboards operacionais, auditorias via QR Code e alertas de manutenção preventiva."
-        ctaText="Cadastrar patrimônio agora"
+        description="Monitore cada suíte, enxoval e equipamento"
         ctaHref="#novo-patrimonio"
       />
 
@@ -150,7 +146,7 @@ const Index = () => {
             <Card className="glass rounded-3xl border border-white/10 p-6 text-center text-slate-200 shadow-hover">
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Disponíveis</h3>
               <p className="mb-1 text-4xl font-bold text-primary sm:text-5xl">
-                {assets.filter(a => a.conservation_state !== 'Precisa de Manutenção').length}
+                {assets.filter((a) => a.conservation_state !== "Precisa de Manutenção").length}
               </p>
               <p className="text-xs text-slate-400">Em uso pelos setores</p>
             </Card>
@@ -163,7 +159,9 @@ const Index = () => {
 
             <Card className="glass rounded-3xl border border-white/10 p-6 text-center text-slate-200 shadow-hover">
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Setores</h3>
-              <p className="mb-1 text-4xl font-bold text-primary sm:text-5xl">{new Set(assets.map(a => a.sector)).size}</p>
+              <p className="mb-1 text-4xl font-bold text-primary sm:text-5xl">
+                {new Set(assets.map((a) => a.sector)).size}
+              </p>
               <p className="text-xs text-slate-400">Áreas acompanhadas</p>
             </Card>
           </>
@@ -177,7 +175,7 @@ const Index = () => {
           <>
             <Card
               className="glass group cursor-pointer rounded-3xl border border-white/10 p-8 text-center text-slate-200 transition-smooth hover:border-primary/50 hover:text-white"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate("/dashboard")}
             >
               <div className="flex flex-col items-center gap-4">
                 <div className="rounded-2xl border border-white/10 bg-primary/10 p-5 transition-smooth group-hover:bg-primary/20">
@@ -222,7 +220,7 @@ const Index = () => {
 
             <Card
               className="glass group cursor-pointer rounded-3xl border border-white/10 p-8 text-center text-slate-200 transition-smooth hover:border-primary/50 hover:text-white"
-              onClick={() => navigate('/assets')}
+              onClick={() => navigate("/assets")}
             >
               <div className="flex flex-col items-center gap-4">
                 <div className="rounded-2xl border border-white/10 bg-primary/10 p-5 transition-smooth group-hover:bg-primary/20">
