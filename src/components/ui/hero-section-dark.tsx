@@ -79,32 +79,32 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
   ) => {
     return (
       <div className={cn("relative", className)} ref={ref} {...props}>
-        <div className="absolute top-0 z-0 h-screen w-screen bg-[radial-gradient(ellipse_60%_70%_at_50%_-20%,rgba(30,64,175,0.35),rgba(2,6,23,0))] dark:bg-[radial-gradient(ellipse_60%_70%_at_50%_-20%,rgba(37,99,235,0.45),rgba(2,6,23,0))]" />
+        <div className="absolute top-0 z-0 h-screen w-screen bg-[radial-gradient(ellipse_60%_70%_at_50%_-20%,rgba(148,163,184,0.25),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_60%_70%_at_50%_-20%,rgba(37,99,235,0.45),rgba(2,6,23,0))]" />
         <section className="relative z-10 mx-auto max-w-full">
           <RetroGrid {...gridOptions} />
-          <div className="mx-auto max-w-screen-xl gap-12 px-4 py-28 md:px-8">
+          <div className="mx-auto max-w-screen-xl gap-12 px-4 py-24 md:px-8 lg:py-28">
             <div className="mx-auto max-w-3xl space-y-5 text-center">
-              <h1 className="group mx-auto inline-flex items-center justify-center gap-2 rounded-3xl border border-white/10 bg-gradient-to-r from-white/10 via-white/5 to-transparent px-5 py-2 text-sm font-medium text-slate-200 shadow-sm backdrop-blur-2xl">
-                <span className="flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-slate-300/70">
+              <h1 className="group mx-auto inline-flex items-center justify-center gap-2 rounded-3xl border border-slate-300/60 bg-white/80 px-5 py-2 text-sm font-medium text-slate-600 shadow-sm backdrop-blur-2xl transition-colors dark:border-white/10 dark:bg-white/10 dark:text-slate-200">
+                <span className="flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-slate-500/80 dark:text-slate-300/70">
                   {title}
                 </span>
                 <ChevronRight className="h-4 w-4 text-gold transition-transform duration-300 group-hover:translate-x-1" />
               </h1>
               <h2 className="text-4xl font-display tracking-tight text-transparent md:text-6xl">
-                <span className="bg-[linear-gradient(180deg,_rgba(148,163,184,0.9)_0%,_rgba(226,232,240,0.2)_100%)] bg-clip-text text-transparent">
+                <span className="bg-[linear-gradient(180deg,_rgba(30,41,59,0.85)_0%,_rgba(100,116,139,0.35)_100%)] bg-clip-text text-transparent dark:bg-[linear-gradient(180deg,_rgba(148,163,184,0.9)_0%,_rgba(226,232,240,0.2)_100%)]">
                   {subtitle.regular}
                 </span>
                 <span className="heading-shine bg-clip-text text-transparent">
                   {subtitle.gradient}
                 </span>
               </h2>
-              <p className="mx-auto max-w-2xl text-base text-slate-300">
+              <p className="mx-auto max-w-2xl text-base text-muted-foreground">
                 {description}
               </p>
               <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <span className="relative inline-flex overflow-hidden rounded-full border border-white/10 bg-white/10 px-[1.5px] py-[1.5px] backdrop-blur-xl">
-                  <span className="absolute inset-0 animate-[spin_8s_linear_infinite] bg-[conic-gradient(from_120deg_at_50%_50%,rgba(251,191,36,0.45)_0%,rgba(30,64,175,0.6)_40%,rgba(251,191,36,0.45)_100%)] opacity-60" />
-                  <div className="relative inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-background/80 px-10 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-foreground transition-all hover:bg-background/70">
+                <span className="relative inline-flex overflow-hidden rounded-full border border-slate-300/70 bg-white/80 px-[1.5px] py-[1.5px] backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-white/10">
+                  <span className="absolute inset-0 animate-[spin_8s_linear_infinite] bg-[conic-gradient(from_120deg_at_50%_50%,rgba(251,191,36,0.35)_0%,rgba(59,130,246,0.45)_40%,rgba(251,191,36,0.35)_100%)] opacity-60" />
+                  <div className="relative inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-background/85 px-10 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-foreground transition-all hover:bg-background/70">
                     <a
                       href={ctaHref}
                       className="inline-flex w-full items-center justify-center gap-2 text-sm font-medium text-foreground sm:w-auto"
