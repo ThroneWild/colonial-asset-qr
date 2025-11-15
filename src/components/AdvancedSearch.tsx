@@ -84,7 +84,7 @@ export const AdvancedSearch = ({
 
       {/* Search History */}
       {showHistoryPanel && (
-        <div className="absolute top-full mt-2 w-full glass-light border border-border rounded-lg p-3 z-50 animate-fade-in">
+        <div className="mt-2 w-full glass-light border border-border rounded-lg p-3 shadow-lg animate-fade-in">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <History className="h-4 w-4" />
@@ -110,7 +110,7 @@ export const AdvancedSearch = ({
 
       {/* Suggestions */}
       {showSuggestionsPanel && (
-        <div className="absolute top-full mt-2 w-full glass-light border border-border rounded-lg p-3 z-50 animate-fade-in">
+        <div className="mt-2 w-full glass-light border border-border rounded-lg p-3 shadow-lg animate-fade-in">
           <div className="text-sm text-muted-foreground mb-2">Sugestões</div>
           <div className="space-y-1">
             {filteredSuggestions.map((suggestion, index) => (

@@ -562,6 +562,7 @@ const AuditLogs = () => {
                   type="date"
                   value={filters.dateFrom}
                   onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+                  placeholder="dd/mm/aaaa"
                 />
               </div>
 
@@ -571,6 +572,7 @@ const AuditLogs = () => {
                   type="date"
                   value={filters.dateTo}
                   onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
+                  placeholder="dd/mm/aaaa"
                 />
               </div>
             </div>

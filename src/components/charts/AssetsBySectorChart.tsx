@@ -22,6 +22,14 @@ export const AssetsBySectorChart = ({ data }: AssetsBySectorChartProps) => {
     value,
   }));
 
+  if (chartData.length === 0) {
+    return (
+      <Card className="p-6 flex items-center justify-center text-sm text-muted-foreground">
+        Sem registros para o período selecionado.
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-6">
       <h3 className="text-lg font-semibold mb-4">Ativos por Setor</h3>
@@ -42,7 +50,10 @@ export const AssetsBySectorChart = ({ data }: AssetsBySectorChartProps) => {
             ))}
           </Pie>
           <Tooltip />
-          <Legend />
+          <Legend
+            wrapperStyle={{ color: 'hsl(var(--foreground))' }}
+            formatter={(value) => <span className="text-sm text-foreground font-medium">{value}</span>}
+          />
         </PieChart>
       </ResponsiveContainer>
     </Card>

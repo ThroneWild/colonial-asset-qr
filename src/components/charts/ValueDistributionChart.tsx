@@ -30,6 +30,14 @@ export const ValueDistributionChart = ({ assets }: ValueDistributionChartProps) 
     },
   };
 
+  if (sortedData.length === 0) {
+    return (
+      <Card className="glass-light p-6 flex items-center justify-center text-sm text-muted-foreground">
+        Sem registros para o período selecionado.
+      </Card>
+    );
+  }
+
   return (
     <Card className="glass-light">
       <CardHeader>

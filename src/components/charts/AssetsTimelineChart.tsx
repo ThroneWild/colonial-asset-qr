@@ -31,6 +31,14 @@ export const AssetsTimelineChart = ({ assets }: AssetsTimelineChartProps) => {
     };
   });
 
+  if (chartData.length === 0) {
+    return (
+      <Card className="p-6 flex items-center justify-center text-sm text-muted-foreground">
+        Sem registros para o período selecionado.
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-6">
       <h3 className="text-lg font-semibold mb-4">Evolução de Cadastros</h3>
