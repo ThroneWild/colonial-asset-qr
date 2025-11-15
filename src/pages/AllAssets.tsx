@@ -185,21 +185,28 @@ const AllAssets = () => {
     });
     
     // Rodapé
-    const pageCount = (doc as any).internal.getNumberOfPages();
+    const pageCount = doc.getNumberOfPages();
+    const pageSize = doc.internal.pageSize as unknown as {
+      height: number;
+      getHeight?: () => number;
+    };
+    const getPageHeight = () => (pageSize.getHeight ? pageSize.getHeight() : pageSize.height);
+
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(128);
+      const pageHeight = getPageHeight();
       doc.text(
         `Página ${i} de ${pageCount}`,
         148,
-        doc.internal.pageSize.height - 10,
+        pageHeight - 10,
         { align: 'center' }
       );
       doc.text(
         'Prize Patrimônios - Sistema de Gestão Patrimonial | By prize hoteis',
         148,
-        doc.internal.pageSize.height - 6,
+        pageHeight - 6,
         { align: 'center' }
       );
     }
@@ -251,8 +258,8 @@ const AllAssets = () => {
           asset_id: assetToDelete.id,
           user_id: user.id,
           action: 'deleted',
-          old_values: assetToDelete as any,
-          new_values: {} as any,
+          old_values: assetToDelete,
+          new_values: {} as Partial<Asset>,
           changed_fields: [],
           deletion_reason: reason,
         }]);

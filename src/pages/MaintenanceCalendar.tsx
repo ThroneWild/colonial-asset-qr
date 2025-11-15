@@ -214,7 +214,7 @@ const MaintenanceCalendar = () => {
         setSelectedTask(updated);
       }
     }
-  }, [tasks]);
+  }, [tasks, selectedTask]);
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {

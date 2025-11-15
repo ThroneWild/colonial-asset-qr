@@ -186,7 +186,9 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
         <Label htmlFor="conservation_state">Estado de Conservação *</Label>
         <Select
           value={formData.conservation_state}
-          onValueChange={(value: any) => setFormData({ ...formData, conservation_state: value })}
+          onValueChange={(value: AssetFormData['conservation_state']) =>
+            setFormData({ ...formData, conservation_state: value })
+          }
           required
         >
           <SelectTrigger id="conservation_state">

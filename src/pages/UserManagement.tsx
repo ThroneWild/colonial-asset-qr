@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -49,32 +49,21 @@ const UserManagement = () => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-      return;
-    }
-    if (user && !loading) {
-      fetchUsers();
-    }
-  }, [user, loading, navigate]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('Fetching users...');
-      const { data, error } = await supabase.rpc('list_all_users');
-      
+      const { data, error } = await supabase.rpc<User>('list_all_users');
+
       if (error) {
         console.error('RPC Error:', error);
         throw error;
       }
-      
-      console.log('Users fetched:', data);
-      setUsers(data || []);
-    } catch (error: any) {
+
+      setUsers(data ?? []);
+    } catch (error: unknown) {
       console.error('Erro ao carregar usuários:', error);
-      if (error.message?.includes('administradores')) {
+      const message = error instanceof Error ? error.message : '';
+      if (message.includes('administradores')) {
         toast.error('Você não tem permissão para acessar esta página');
         navigate('/');
       } else {
@@ -83,7 +72,17 @@ const UserManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+      return;
+    }
+    if (user && !loading) {
+      void fetchUsers();
+    }
+  }, [user, loading, navigate, fetchUsers]);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,17 +111,22 @@ const UserManagement = () => {
         }),
       });
 
-      const result = await response.json();
+      const result: unknown = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Erro ao criar usuário');
+        const errorMessage =
+          typeof result === 'object' && result !== null && 'error' in result && typeof (result as { error: unknown }).error === 'string'
+            ? (result as { error: string }).error
+            : 'Erro ao criar usuário';
+        throw new Error(errorMessage);
       }
 
       toast.success('Usuário criado com sucesso!');
       setIsDialogOpen(false);
       fetchUsers();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao criar usuário');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao criar usuário';
+      toast.error(message);
     } finally {
       setCreatingUser(false);
     }
@@ -150,17 +154,22 @@ const UserManagement = () => {
         }),
       });
 
-      const result = await response.json();
+      const result: unknown = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Erro ao excluir usuário');
+        const errorMessage =
+          typeof result === 'object' && result !== null && 'error' in result && typeof (result as { error: unknown }).error === 'string'
+            ? (result as { error: string }).error
+            : 'Erro ao excluir usuário';
+        throw new Error(errorMessage);
       }
 
       toast.success('Usuário excluído com sucesso!');
       setUserToDelete(null);
       fetchUsers();
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao excluir usuário');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao excluir usuário';
+      toast.error(message);
     }
   };
 

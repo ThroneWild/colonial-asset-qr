@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -81,13 +81,7 @@ const Dashboard = () => {
     }
   }, [user, authLoading, navigate]);
 
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-  }, [user]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -107,7 +101,13 @@ const Dashboard = () => {
       setLoading(false);
       setIsApplyingFilter(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      void fetchData();
+    }
+  }, [user, fetchData]);
 
   const calculateStatistics = (assetsData: Asset[]) => {
     const assetsBySector: Record<string, number> = {};

@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { MaintenanceStatusBadge } from '@/components/maintenance/MaintenanceStatusBadge';
 import { MaintenanceHistoryList } from '@/components/maintenance/MaintenanceHistoryList';
-import { MAINTENANCE_STATUSES } from '@/types/maintenance';
+import { MAINTENANCE_STATUSES, type MaintenanceStatus } from '@/types/maintenance';
 
 interface AssetDetailsProps {
   asset: Asset;
@@ -24,6 +24,9 @@ interface AssetDetailsProps {
 export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
   const { history, loading: historyLoading } = useAssetHistory(asset?.id);
   const assetUrl = `${window.location.origin}/asset/${asset.id}`;
+
+  const isValidMaintenanceStatus = (status: string): status is MaintenanceStatus =>
+    MAINTENANCE_STATUSES.includes(status as MaintenanceStatus);
 
   const handleViewInvoice = async () => {
     if (!asset.invoice_url) return;
@@ -197,8 +200,8 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
                     Acompanhe o status preventivo deste ativo.
                   </p>
                 </div>
-                {asset.maintenance_status && MAINTENANCE_STATUSES.includes(asset.maintenance_status as any) && (
-                  <MaintenanceStatusBadge status={asset.maintenance_status as any} />
+                {asset.maintenance_status && isValidMaintenanceStatus(asset.maintenance_status) && (
+                  <MaintenanceStatusBadge status={asset.maintenance_status} />
                 )}
               </div>
 

@@ -70,7 +70,12 @@ export const AdvancedFilters = ({ filters, onFiltersChange }: AdvancedFiltersPro
           {/* Ordenação */}
           <div className="space-y-2">
             <Label>Ordenar por</Label>
-            <Select value={filters.sortBy || 'date_desc'} onValueChange={(value: any) => onFiltersChange({ ...filters, sortBy: value })}>
+            <Select
+              value={filters.sortBy || 'date_desc'}
+              onValueChange={(value: NonNullable<AssetFilters['sortBy']>) =>
+                onFiltersChange({ ...filters, sortBy: value })
+              }
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
