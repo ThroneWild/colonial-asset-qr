@@ -1,18 +1,14 @@
-import { ReactNode, useMemo } from "react";
+import { PropsWithChildren } from "react";
 import { AdaptiveNavigationBar } from "@/components/ui/3d-adaptive-navigation-bar";
 import { ShaderAnimation } from "@/components/ui/shader-animation";
 import ThemeSwitch from "@/components/ui/theme-switch";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-interface AppLayoutProps {
-  children: ReactNode;
-}
-
-const AppLayout = ({ children }: AppLayoutProps) => {
+const AppLayout = ({ children }: PropsWithChildren) => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -45,9 +41,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           <LogOut className="h-4 w-4" />
         </Button>
       </div>
-      
+
       <main className="relative z-10 flex-1 overflow-auto pt-24">
-        {children}
+        {children ?? <Outlet />}
       </main>
     </div>
   );

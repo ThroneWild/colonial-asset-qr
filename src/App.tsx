@@ -28,16 +28,18 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
-            <Route path="/" element={<AppLayout><Index /></AppLayout>} />
-            <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />
-            <Route path="/maintenance" element={<AppLayout><MaintenanceDashboard /></AppLayout>} />
-            <Route path="/maintenance/calendar" element={<AppLayout><MaintenanceCalendar /></AppLayout>} />
-            <Route path="/assets" element={<AppLayout><AllAssets /></AppLayout>} />
-            <Route path="/auditoria" element={<AppLayout><AuditLogs /></AppLayout>} />
-            <Route path="/labels" element={<AppLayout><Labels /></AppLayout>} />
-            <Route path="/users" element={<AppLayout><UserManagement /></AppLayout>} />
-            <Route path="/asset/:id" element={<AssetView />} />
-            <Route path="*" element={<NotFound />} />
+            <Route element={<AppLayout />}>
+              <Route index element={<Index />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="maintenance" element={<MaintenanceDashboard />} />
+              <Route path="maintenance/calendar" element={<MaintenanceCalendar />} />
+              <Route path="assets" element={<AllAssets />} />
+              <Route path="auditoria" element={<AuditLogs />} />
+              <Route path="labels" element={<Labels />} />
+              <Route path="users" element={<UserManagement />} />
+              <Route path="asset/:id" element={<AssetView />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
