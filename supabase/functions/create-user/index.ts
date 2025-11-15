@@ -107,9 +107,9 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    console.log('User creation error', { timestamp: Date.now() })
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'Erro ao criar usuário' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }

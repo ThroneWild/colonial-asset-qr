@@ -29,6 +29,28 @@ Deno.serve(async (req) => {
       )
     }
 
+    // Validate input format and length
+    if (username.length < 3 || username.length > 50) {
+      return new Response(
+        JSON.stringify({ error: 'Nome de usuário inválido' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    if (password.length < 6 || password.length > 128) {
+      return new Response(
+        JSON.stringify({ error: 'Senha inválida' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      return new Response(
+        JSON.stringify({ error: 'Nome de usuário contém caracteres inválidos' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Check rate limiting
     const { data: attemptData } = await supabaseClient
       .from('failed_login_attempts')
@@ -77,7 +99,7 @@ Deno.serve(async (req) => {
       .rpc('get_email_by_username', { user_username: username })
 
     if (emailError || !email) {
-      console.error('Failed to lookup username')
+      console.log('Login attempt failed', { timestamp: Date.now() })
       return new Response(
         JSON.stringify({ error: 'Usuário ou senha incorretos' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -91,7 +113,7 @@ Deno.serve(async (req) => {
     })
 
     if (authError) {
-      console.error('Authentication failed')
+      console.log('Login attempt failed', { timestamp: Date.now() })
       
       // Record failed attempt
       if (attemptData) {
@@ -146,7 +168,7 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Login error occurred')
+    console.log('Login error occurred', { timestamp: Date.now() })
     return new Response(
       JSON.stringify({ error: 'Erro ao processar login' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
