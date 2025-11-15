@@ -3,22 +3,26 @@
 import { useEffect, useRef } from "react"
 import * as THREE from "three"
 
-type ShaderUniforms = (Record<string, THREE.IUniform> & {
-  time: THREE.IUniform & { value: number }
-  resolution: THREE.IUniform & { value: THREE.Vector2 }
-})
+import { cn } from "@/lib/utils"
 
-type SceneResources = {
+interface ShaderAnimationState {
   camera: THREE.Camera
   scene: THREE.Scene
   renderer: THREE.WebGLRenderer
-  uniforms: ShaderUniforms
+  uniforms: {
+    time: { value: number }
+    resolution: { value: THREE.Vector2 }
+  }
   animationId: number
 }
 
-export function ShaderAnimation() {
+interface ShaderAnimationProps {
+  className?: string
+}
+
+export function ShaderAnimation({ className }: ShaderAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const sceneRef = useRef<SceneResources | null>(null)
+  const sceneRef = useRef<ShaderAnimationState | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -61,15 +65,15 @@ export function ShaderAnimation() {
     const scene = new THREE.Scene()
     const geometry = new THREE.PlaneGeometry(2, 2)
 
-    const uniforms: ShaderUniforms = {
+    const uniforms = {
       time: { value: 1.0 },
       resolution: { value: new THREE.Vector2() },
     }
 
     const material = new THREE.ShaderMaterial({
       uniforms,
-      vertexShader: vertexShader,
-      fragmentShader: fragmentShader,
+      vertexShader,
+      fragmentShader,
     })
 
     const mesh = new THREE.Mesh(geometry, material)
@@ -77,7 +81,6 @@ export function ShaderAnimation() {
 
     const renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
-
     container.appendChild(renderer.domElement)
 
     const onWindowResize = () => {
@@ -131,9 +134,12 @@ export function ShaderAnimation() {
   return (
     <div
       ref={containerRef}
-      className="h-full w-full"
+      className={cn(
+        "pointer-events-none fixed inset-0 -z-10 h-screen w-full",
+        className,
+      )}
       style={{
-        background: "#000",
+        background: "#020617",
         overflow: "hidden",
       }}
     />
