@@ -164,7 +164,7 @@ const MaintenanceCalendar = () => {
 
       if (error) throw error;
 
-      const assetData = data || [];
+      const assetData = (data || []) as Asset[];
       setAssets(assetData);
 
       const mappedTasks: CalendarTask[] = assetData

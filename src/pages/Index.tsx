@@ -40,7 +40,7 @@ const Index = () => {
         ascending: false,
       });
       if (error) throw error;
-      setAssets(data || []);
+      setAssets((data || []) as Asset[]);
     } catch (error) {
       if (import.meta.env.DEV) {
         console.error("Erro ao carregar ativos:", error);
@@ -84,7 +84,7 @@ const Index = () => {
       setIsFormOpen(false);
       await fetchAssets();
       if (updatedAsset) {
-        setNewAssetLabel(updatedAsset);
+        setNewAssetLabel(updatedAsset as Asset);
       }
     } catch (error) {
       if (import.meta.env.DEV) {

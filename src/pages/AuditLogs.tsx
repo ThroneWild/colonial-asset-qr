@@ -174,7 +174,7 @@ const AuditLogs = () => {
         .order('item_number', { ascending: false });
 
       if (assetsError) throw assetsError;
-      setAssets(assetsData ?? []);
+      setAssets((assetsData ?? []) as Asset[]);
 
       const { data: historyData, error: historyError } = await supabase
         .from('asset_history')

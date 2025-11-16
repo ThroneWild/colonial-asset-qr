@@ -83,7 +83,18 @@ export type Database = {
           id: string
           invoice_url: string | null
           item_number: number
+          last_maintenance_date: string | null
+          maintenance_cost: number | null
+          maintenance_criticality: string | null
+          maintenance_custom_interval: number | null
+          maintenance_frequency: string | null
+          maintenance_notes: string | null
+          maintenance_priority: string | null
+          maintenance_responsible: string | null
+          maintenance_status: string | null
+          maintenance_type: string | null
           modified_by: string | null
+          next_maintenance_date: string | null
           qr_code_url: string | null
           sector: string
           updated_at: string
@@ -99,7 +110,18 @@ export type Database = {
           id?: string
           invoice_url?: string | null
           item_number?: number
+          last_maintenance_date?: string | null
+          maintenance_cost?: number | null
+          maintenance_criticality?: string | null
+          maintenance_custom_interval?: number | null
+          maintenance_frequency?: string | null
+          maintenance_notes?: string | null
+          maintenance_priority?: string | null
+          maintenance_responsible?: string | null
+          maintenance_status?: string | null
+          maintenance_type?: string | null
           modified_by?: string | null
+          next_maintenance_date?: string | null
           qr_code_url?: string | null
           sector: string
           updated_at?: string
@@ -115,7 +137,18 @@ export type Database = {
           id?: string
           invoice_url?: string | null
           item_number?: number
+          last_maintenance_date?: string | null
+          maintenance_cost?: number | null
+          maintenance_criticality?: string | null
+          maintenance_custom_interval?: number | null
+          maintenance_frequency?: string | null
+          maintenance_notes?: string | null
+          maintenance_priority?: string | null
+          maintenance_responsible?: string | null
+          maintenance_status?: string | null
+          maintenance_type?: string | null
           modified_by?: string | null
+          next_maintenance_date?: string | null
           qr_code_url?: string | null
           sector?: string
           updated_at?: string

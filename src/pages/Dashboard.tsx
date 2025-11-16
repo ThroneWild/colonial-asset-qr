@@ -91,7 +91,7 @@ const Dashboard = () => {
 
       if (error) throw error;
       
-      const assetsData = data || [];
+      const assetsData = (data || []) as Asset[];
       setAssets(assetsData);
       calculateStatistics(assetsData);
     } catch (error) {

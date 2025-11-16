@@ -87,7 +87,7 @@ const AllAssets = () => {
         .order('item_number', { ascending: false });
 
       if (error) throw error;
-      setAssets(data || []);
+      setAssets((data || []) as Asset[]);
     } catch (error) {
       if (import.meta.env.DEV) {
         console.error('Erro ao carregar ativos:', error);
