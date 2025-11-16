@@ -43,7 +43,7 @@ export const SingleLabel = ({ asset, onClose }: SingleLabelProps) => {
 
         <div className="flex justify-center">
           <div
-            className="border-2 border-black"
+            className="print-label border-2 border-black bg-white"
             style={{ width: '195px', height: '155px', padding: '6px' }}
           >
             <div className="flex flex-col h-full">
@@ -83,20 +83,37 @@ export const SingleLabel = ({ asset, onClose }: SingleLabelProps) => {
 
       <style>{`
         @media print {
+          @page {
+            size: auto;
+            margin: 0;
+          }
+          
+          body {
+            margin: 0;
+            padding: 0;
+            background: white !important;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+          }
+          
           body * {
-            visibility: hidden;
+            visibility: hidden !important;
           }
-          .border-2.border-black,
-          .border-2.border-black * {
-            visibility: visible;
+          
+          .print-label,
+          .print-label * {
+            visibility: visible !important;
           }
-          .border-2.border-black {
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
+          
+          .print-label {
+            position: absolute !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            background: white !important;
           }
         }
+        
         .line-clamp-4 {
           display: -webkit-box;
           -webkit-line-clamp: 4;

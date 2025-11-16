@@ -192,12 +192,12 @@ const Labels = () => {
           )}
         </div>
 
-        <div className="hidden print:block">
-          <div className="grid grid-cols-4 gap-2">
+        <div className="hidden print:block print-labels-grid">
+          <div className="grid grid-cols-4 gap-2 bg-white">
             {selectedAssetsList.map((asset) => (
               <div
                 key={asset.id}
-                className="border-2 border-black page-break-inside-avoid"
+                className="border-2 border-black page-break-inside-avoid bg-white"
                 style={{ width: '195px', height: '155px', padding: '6px' }}
               >
                 <div className="flex flex-col h-full">
@@ -237,16 +237,38 @@ const Labels = () => {
         @media print {
           @page {
             size: A4;
-            margin: 0.4cm;
+            margin: 0.5cm;
           }
+          
           body {
+            margin: 0;
+            padding: 0;
+            background: white !important;
             print-color-adjust: exact;
             -webkit-print-color-adjust: exact;
           }
+          
+          body * {
+            visibility: hidden !important;
+          }
+          
+          .print-labels-grid,
+          .print-labels-grid * {
+            visibility: visible !important;
+          }
+          
+          .print-labels-grid {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            background: white !important;
+          }
+          
           .page-break-inside-avoid {
             page-break-inside: avoid;
             break-inside: avoid;
           }
+          
           .line-clamp-4 {
             display: -webkit-box;
             -webkit-line-clamp: 4;
