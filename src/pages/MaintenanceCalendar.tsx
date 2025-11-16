@@ -168,7 +168,7 @@ const MaintenanceCalendar = () => {
       setAssets(assetData);
 
       const mappedTasks: CalendarTask[] = assetData
-        .filter((asset) => asset.next_maintenance_date)
+        .filter((asset) => (asset as any).next_maintenance_date)
         .map((asset) => ({
           id: `asset-${asset.id}`,
           assetId: asset.id,
@@ -179,21 +179,21 @@ const MaintenanceCalendar = () => {
             asset_group: asset.asset_group,
           },
           title: asset.description,
-          type: (asset.maintenance_type as MaintenanceType) || 'Preventiva',
-          status: (asset.maintenance_status as MaintenanceStatus) || 'Pendente',
-          frequency: (asset.maintenance_frequency as MaintenanceFrequencyValue) || MAINTENANCE_FREQUENCIES[1].value,
-          customInterval: asset.maintenance_custom_interval || undefined,
-          lastMaintenance: asset.last_maintenance_date,
-          nextMaintenance: asset.next_maintenance_date!,
-          responsible: asset.maintenance_responsible || MAINTENANCE_RESPONSIBLES[0],
-          criticality: (asset.maintenance_criticality as MaintenanceCriticality) || 'Média',
+          type: ((asset as any).maintenance_type as MaintenanceType) || 'Preventiva',
+          status: ((asset as any).maintenance_status as MaintenanceStatus) || 'Pendente',
+          frequency: ((asset as any).maintenance_frequency as MaintenanceFrequencyValue) || MAINTENANCE_FREQUENCIES[1].value,
+          customInterval: (asset as any).maintenance_custom_interval || undefined,
+          lastMaintenance: (asset as any).last_maintenance_date,
+          nextMaintenance: (asset as any).next_maintenance_date!,
+          responsible: (asset as any).maintenance_responsible || MAINTENANCE_RESPONSIBLES[0],
+          criticality: ((asset as any).maintenance_criticality as MaintenanceCriticality) || 'Média',
           workOrder: undefined,
           checklist: [],
           sector: asset.sector,
           itemGroup: asset.asset_group,
-          priority: (asset.maintenance_priority as MaintenancePriority) || 'Média',
-          estimatedCost: asset.maintenance_cost || undefined,
-          notes: asset.maintenance_notes,
+          priority: ((asset as any).maintenance_priority as MaintenancePriority) || 'Média',
+          estimatedCost: (asset as any).maintenance_cost || undefined,
+          notes: (asset as any).maintenance_notes,
         }));
 
       setAssetTasks(mappedTasks);

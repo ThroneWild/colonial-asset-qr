@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-interface User {
+interface AppUser {
   id: string;
   email: string;
   full_name: string;
@@ -36,7 +36,7 @@ interface User {
 }
 
 const UserManagement = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<AppUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState('');
@@ -45,21 +45,21 @@ const UserManagement = () => {
   const [newUserUsername, setNewUserUsername] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [creatingUser, setCreatingUser] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<AppUser | null>(null);
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
 
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.rpc<User>('list_all_users');
+      const { data, error } = await supabase.rpc('list_all_users');
 
       if (error) {
         console.error('RPC Error:', error);
         throw error;
       }
 
-      setUsers(data ?? []);
+      setUsers((data as AppUser[]) ?? []);
     } catch (error: unknown) {
       console.error('Erro ao carregar usuários:', error);
       const message = error instanceof Error ? error.message : '';
