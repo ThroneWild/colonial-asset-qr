@@ -57,7 +57,7 @@ const MaintenanceDashboard = () => {
 
       if (error) throw error;
 
-      setAssets(data || []);
+      setAssets((data || []) as Asset[]);
     } catch (error) {
       console.error('Erro ao carregar dados de manutenção:', error);
     } finally {

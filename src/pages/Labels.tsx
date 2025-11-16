@@ -41,7 +41,7 @@ const Labels = () => {
         .order('item_number', { ascending: true });
 
       if (error) throw error;
-      setAssets(data || []);
+      setAssets((data || []) as Asset[]);
     } catch (error) {
       if (import.meta.env.DEV) {
         console.error('Erro ao carregar ativos:', error);
