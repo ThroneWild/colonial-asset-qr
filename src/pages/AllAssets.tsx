@@ -258,8 +258,8 @@ const AllAssets = () => {
           asset_id: assetToDelete.id,
           user_id: user.id,
           action: 'deleted',
-          old_values: assetToDelete,
-          new_values: {} as Partial<Asset>,
+          old_values: JSON.parse(JSON.stringify(assetToDelete)) as any,
+          new_values: {} as any,
           changed_fields: [],
           deletion_reason: reason,
         }]);

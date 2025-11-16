@@ -110,23 +110,23 @@ const DotMatrix: React.FC<DotMatrixProps> = ({
           color[1] / 255,
           color[2] / 255,
         ]),
-        type: "uniform3fv",
+        type: "uniform3fv" as const,
       },
       u_opacities: {
         value: opacities,
-        type: "uniform1fv",
+        type: "uniform1fv" as const,
       },
       u_total_size: {
         value: totalSize,
-        type: "uniform1f",
+        type: "uniform1f" as const,
       },
       u_dot_size: {
         value: dotSize,
-        type: "uniform1f",
+        type: "uniform1f" as const,
       },
       u_reverse: {
         value: shader.includes("u_reverse_active") ? 1 : 0,
-        type: "uniform1i",
+        type: "uniform1i" as const,
       },
     };
   }, [colors, opacities, totalSize, dotSize, shader]);
@@ -206,7 +206,6 @@ const DotMatrix: React.FC<DotMatrixProps> = ({
             fragColor.rgb *= fragColor.a;
         }`}
       uniforms={uniforms}
-      maxFps={60}
     />
   );
 };
@@ -308,10 +307,10 @@ const ShaderMaterial = ({ source, uniforms }: { source: string; uniforms: Unifor
   );
 };
 
-const Shader: React.FC<ShaderProps> = ({ source, uniforms, maxFps = 60 }) => {
+const Shader: React.FC<ShaderProps> = ({ source, uniforms }) => {
   return (
     <Canvas className="absolute inset-0 h-full w-full">
-      <ShaderMaterial source={source} uniforms={uniforms} maxFps={maxFps} />
+      <ShaderMaterial source={source} uniforms={uniforms} />
     </Canvas>
   );
 };

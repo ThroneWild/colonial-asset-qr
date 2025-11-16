@@ -247,7 +247,7 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
             onValueChange={(value) =>
               setFormData({
                 ...formData,
-                maintenance_frequency: value,
+                maintenance_frequency: value as any,
                 maintenance_custom_interval: value === 'custom' ? formData.maintenance_custom_interval : null,
               })
             }
@@ -317,7 +317,7 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
           <Label>Tipo de manutenção</Label>
           <Select
             value={formData.maintenance_type ?? ''}
-            onValueChange={(value) => setFormData({ ...formData, maintenance_type: value })}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_type: value as any })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione o tipo" />
@@ -356,7 +356,7 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
           <Label>Status da manutenção</Label>
           <Select
             value={formData.maintenance_status ?? ''}
-            onValueChange={(value) => setFormData({ ...formData, maintenance_status: value })}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_status: value as any })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione o status" />
@@ -374,7 +374,7 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
           <Label>Prioridade</Label>
           <Select
             value={formData.maintenance_priority ?? ''}
-            onValueChange={(value) => setFormData({ ...formData, maintenance_priority: value })}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_priority: value as any })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione" />
@@ -392,7 +392,7 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
           <Label>Criticidade</Label>
           <Select
             value={formData.maintenance_criticality ?? ''}
-            onValueChange={(value) => setFormData({ ...formData, maintenance_criticality: value })}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_criticality: value as any })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione" />

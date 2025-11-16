@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { DatePicker } from '@/components/ui/date-picker';
-import { Asset, SECTORS, ASSET_GROUPS, CONSERVATION_STATES } from '@/types/asset';
+import { Asset, AssetFormData, SECTORS, ASSET_GROUPS, CONSERVATION_STATES } from '@/types/asset';
 import { Loader2, Upload, X, FileText, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -310,7 +310,7 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, onDelete, isLoading }
             onValueChange={(value) =>
               setFormData({
                 ...formData,
-                maintenance_frequency: value,
+                maintenance_frequency: value as any,
                 maintenance_custom_interval: value === 'custom' ? formData.maintenance_custom_interval : null,
               })
             }
@@ -379,7 +379,7 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, onDelete, isLoading }
           <Label>Tipo de manutenção</Label>
           <Select
             value={formData.maintenance_type ?? ''}
-            onValueChange={(value) => setFormData({ ...formData, maintenance_type: value })}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_type: value as any })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione o tipo" />
@@ -418,7 +418,7 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, onDelete, isLoading }
           <Label>Status</Label>
           <Select
             value={formData.maintenance_status ?? ''}
-            onValueChange={(value) => setFormData({ ...formData, maintenance_status: value })}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_status: value as any })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione" />
@@ -436,7 +436,7 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, onDelete, isLoading }
           <Label>Prioridade</Label>
           <Select
             value={formData.maintenance_priority ?? ''}
-            onValueChange={(value) => setFormData({ ...formData, maintenance_priority: value })}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_priority: value as any })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione" />
@@ -454,7 +454,7 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, onDelete, isLoading }
           <Label>Criticidade</Label>
           <Select
             value={formData.maintenance_criticality ?? ''}
-            onValueChange={(value) => setFormData({ ...formData, maintenance_criticality: value })}
+            onValueChange={(value) => setFormData({ ...formData, maintenance_criticality: value as any })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione" />
