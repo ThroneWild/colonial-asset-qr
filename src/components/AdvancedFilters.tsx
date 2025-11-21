@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Badge } from '@/components/ui/badge';
 import { AssetFilters, SECTORS, ASSET_GROUPS, CONSERVATION_STATES } from '@/types/asset';
 import { Filter, X } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AdvancedFiltersProps {
   filters: AssetFilters;
@@ -16,11 +17,29 @@ interface AdvancedFiltersProps {
 
 export const AdvancedFilters = ({ filters, onFiltersChange }: AdvancedFiltersProps) => {
   const [open, setOpen] = useState(false);
+  const [apartmentNumbers, setApartmentNumbers] = useState<string[]>([]);
+
+  useEffect(() => {
+    const loadApartments = async () => {
+      const { data } = await supabase
+        .from('assets')
+        .select('apartment_number')
+        .not('apartment_number', 'is', null)
+        .order('apartment_number');
+      
+      if (data) {
+        const unique = [...new Set(data.map(d => d.apartment_number).filter(Boolean))] as string[];
+        setApartmentNumbers(unique);
+      }
+    };
+    loadApartments();
+  }, []);
 
   const activeFiltersCount = [
     filters.sectors && filters.sectors.length > 0,
     filters.groups && filters.groups.length > 0,
     filters.conservationStates && filters.conservationStates.length > 0,
+    filters.apartmentNumbers && filters.apartmentNumbers.length > 0,
     filters.valueMin !== undefined,
     filters.valueMax !== undefined,
     filters.sortBy && filters.sortBy !== 'date_desc',
@@ -32,6 +51,7 @@ export const AdvancedFilters = ({ filters, onFiltersChange }: AdvancedFiltersPro
       sectors: [],
       groups: [],
       conservationStates: [],
+      apartmentNumbers: [],
       valueMin: undefined,
       valueMax: undefined,
       dateFrom: undefined,
@@ -40,7 +60,7 @@ export const AdvancedFilters = ({ filters, onFiltersChange }: AdvancedFiltersPro
     });
   };
 
-  const toggleArrayFilter = (key: 'sectors' | 'groups' | 'conservationStates', value: string) => {
+  const toggleArrayFilter = (key: 'sectors' | 'groups' | 'conservationStates' | 'apartmentNumbers', value: string) => {
     const current = filters[key] || [];
     const updated = current.includes(value)
       ? current.filter(v => v !== value)
@@ -122,6 +142,27 @@ export const AdvancedFilters = ({ filters, onFiltersChange }: AdvancedFiltersPro
               </div>
             ))}
           </div>
+
+          {/* Apartamentos */}
+          {apartmentNumbers.length > 0 && (
+            <div className="space-y-3">
+              <Label>Apartamentos</Label>
+              <div className="max-h-40 overflow-y-auto space-y-2">
+                {apartmentNumbers.map(apt => (
+                  <div key={apt} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`apt-${apt}`}
+                      checked={filters.apartmentNumbers?.includes(apt)}
+                      onCheckedChange={() => toggleArrayFilter('apartmentNumbers', apt)}
+                    />
+                    <label htmlFor={`apt-${apt}`} className="text-sm cursor-pointer">
+                      {apt}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Estado de Conservação */}
           <div className="space-y-3">

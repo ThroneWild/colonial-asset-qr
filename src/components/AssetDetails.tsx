@@ -162,6 +162,16 @@ export const AssetDetails = ({ asset, onClose, onEdit }: AssetDetailsProps) => {
                   <dt className="text-sm font-medium text-muted-foreground mb-1">Grupo</dt>
                   <dd className="text-foreground">{asset.asset_group}</dd>
                 </div>
+                {asset.location_type === 'apartamento' && asset.apartment_number && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground mb-1">Apartamento</dt>
+                    <dd>
+                      <Badge variant="glass-gold" className="text-sm font-semibold">
+                        {asset.apartment_number}
+                      </Badge>
+                    </dd>
+                  </div>
+                )}
                 {asset.brand_model && (
                   <div>
                     <dt className="text-sm font-medium text-muted-foreground mb-1">Marca/Modelo</dt>

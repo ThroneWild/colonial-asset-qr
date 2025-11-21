@@ -32,6 +32,13 @@ export const useAssetFilters = (assets: Asset[], filters: AssetFilters) => {
       filtered = filtered.filter(asset => filters.conservationStates?.includes(asset.conservation_state));
     }
 
+    // Apartment numbers
+    if (filters.apartmentNumbers && filters.apartmentNumbers.length > 0) {
+      filtered = filtered.filter(asset => 
+        asset.apartment_number && filters.apartmentNumbers?.includes(asset.apartment_number)
+      );
+    }
+
     // Value range
     if (filters.valueMin !== undefined) {
       filtered = filtered.filter(asset => (asset.evaluation_value || 0) >= filters.valueMin!);

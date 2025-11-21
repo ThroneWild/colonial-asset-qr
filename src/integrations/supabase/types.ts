@@ -74,6 +74,7 @@ export type Database = {
       }
       assets: {
         Row: {
+          apartment_number: string | null
           asset_group: string
           brand_model: string | null
           conservation_state: string
@@ -84,6 +85,7 @@ export type Database = {
           invoice_url: string | null
           item_number: number
           last_maintenance_date: string | null
+          location_type: string | null
           maintenance_cost: number | null
           maintenance_criticality: string | null
           maintenance_custom_interval: number | null
@@ -101,6 +103,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          apartment_number?: string | null
           asset_group: string
           brand_model?: string | null
           conservation_state: string
@@ -111,6 +114,7 @@ export type Database = {
           invoice_url?: string | null
           item_number?: number
           last_maintenance_date?: string | null
+          location_type?: string | null
           maintenance_cost?: number | null
           maintenance_criticality?: string | null
           maintenance_custom_interval?: number | null
@@ -128,6 +132,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          apartment_number?: string | null
           asset_group?: string
           brand_model?: string | null
           conservation_state?: string
@@ -138,6 +143,7 @@ export type Database = {
           invoice_url?: string | null
           item_number?: number
           last_maintenance_date?: string | null
+          location_type?: string | null
           maintenance_cost?: number | null
           maintenance_criticality?: string | null
           maintenance_custom_interval?: number | null

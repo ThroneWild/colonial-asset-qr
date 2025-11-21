@@ -24,6 +24,7 @@ import { Loader2 } from 'lucide-react';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { addDays, parseISO } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 
 const assetSchema = z.object({
   description: z.string().trim().min(3, 'Descrição deve ter no mínimo 3 caracteres').max(500, 'Descrição deve ter no máximo 500 caracteres'),
@@ -55,6 +56,8 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
   const [formData, setFormData] = useState<AssetFormData>({
     description: '',
     sector: '',
+    location_type: 'departamento',
+    apartment_number: '',
     asset_group: '',
     conservation_state: 'Bom',
     brand_model: '',
@@ -71,7 +74,24 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
     maintenance_criticality: 'Média',
     maintenance_cost: null,
   });
+  const [apartmentOptions, setApartmentOptions] = useState<string[]>([]);
   const [lastMaintenanceDate, setLastMaintenanceDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const loadApartments = async () => {
+      const { data } = await supabase
+        .from('assets')
+        .select('apartment_number')
+        .not('apartment_number', 'is', null)
+        .order('apartment_number');
+      
+      if (data) {
+        const unique = [...new Set(data.map(d => d.apartment_number).filter(Boolean))] as string[];
+        setApartmentOptions(unique);
+      }
+    };
+    loadApartments();
+  }, []);
 
   useEffect(() => {
     if (!formData.last_maintenance_date || !formData.maintenance_frequency) {
@@ -180,6 +200,46 @@ export const AssetForm = ({ onSubmit, onCancel, isLoading }: AssetFormProps) => 
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="location_type">Tipo de Localização *</Label>
+          <Select
+            value={formData.location_type}
+            onValueChange={(value: 'departamento' | 'apartamento') => 
+              setFormData({ ...formData, location_type: value, apartment_number: value === 'departamento' ? '' : formData.apartment_number })
+            }
+            required
+          >
+            <SelectTrigger id="location_type">
+              <SelectValue placeholder="Selecione o tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="departamento">Departamento</SelectItem>
+              <SelectItem value="apartamento">Apartamento/UH</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {formData.location_type === 'apartamento' && (
+          <div className="space-y-2">
+            <Label htmlFor="apartment_number">Número do Apartamento *</Label>
+            <Input
+              id="apartment_number"
+              placeholder="Ex: 601"
+              value={formData.apartment_number}
+              onChange={(e) => setFormData({ ...formData, apartment_number: e.target.value })}
+              required
+              list="apartment-options"
+            />
+            <datalist id="apartment-options">
+              {apartmentOptions.map((apt) => (
+                <option key={apt} value={apt} />
+              ))}
+            </datalist>
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
