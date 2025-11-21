@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { AdaptiveNavigationBar } from "@/components/ui/3d-adaptive-navigation-bar";
 import { Spotlight } from "@/components/ui/spotlight";
 import ThemeSwitch from "@/components/ui/theme-switch";
-import { LogOut } from "lucide-react";
+import { Download, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,20 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <div className="fixed left-1/2 top-6 z-50 -translate-x-1/2">
         <AdaptiveNavigationBar />
       </div>
+
+      {!isElectron() && (
+        <div className="fixed left-6 top-6 z-50">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate("/download")}
+            className="h-8 w-8 rounded-full border-white/10 bg-background/30 text-foreground transition-smooth hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+            title="Download desktop"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
 
       <div className="fixed right-6 top-6 z-50 flex items-center gap-3 rounded-full border border-white/10 bg-background/70 px-4 py-2 backdrop-blur-xl">
         <ThemeSwitch className="h-8 w-16" />
