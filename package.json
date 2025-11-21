@@ -17,6 +17,9 @@
     "build:electron:win": "cross-env VITE_ELECTRON=true vite build && electron-builder --win",
     "build:electron:mac": "cross-env VITE_ELECTRON=true vite build && electron-builder --mac",
     "build:electron:linux": "cross-env VITE_ELECTRON=true vite build && electron-builder --linux",
+    "release:patch": "bash ./scripts/create-release.sh patch",
+    "release:minor": "bash ./scripts/create-release.sh minor",
+    "release:major": "bash ./scripts/create-release.sh major",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -57,6 +60,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
+    "electron-log": "^5.1.7",
     "electron-updater": "^6.1.8",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.24",
