@@ -9,6 +9,26 @@ const isDev = process.env.NODE_ENV === 'development';
 autoUpdater.autoDownload = false; // Não baixar automaticamente
 autoUpdater.autoInstallOnAppQuit = true; // Instalar quando fechar o app
 
+// Configurar o repositório do GitHub para releases
+// O electron-builder usa automaticamente o provider do package.json
+// mas podemos forçar em desenvolvimento para testes
+if (isDev) {
+  // Em desenvolvimento, podemos testar apontando para staging ou usar mock
+  // autoUpdater.setFeedURL({
+  //   provider: 'github',
+  //   owner: 'ThroneWild',
+  //   repo: 'colonial-asset-qr'
+  // });
+}
+
+// Log detalhado em desenvolvimento
+autoUpdater.logger = require('electron-log');
+autoUpdater.logger.transports.file.level = 'info';
+
+console.log('Auto-updater configurado');
+console.log('Versão atual:', app.getVersion());
+console.log('Modo desenvolvimento:', isDev);
+
 let mainWindow;
 
 function createWindow() {
