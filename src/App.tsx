@@ -18,6 +18,8 @@ import UserManagement from "./pages/UserManagement";
 import NotFound from "./pages/NotFound";
 import MaintenanceCalendar from "./pages/MaintenanceCalendar";
 import ApartmentReport from "./pages/ApartmentReport";
+import Download from "./pages/Download";
+import DownloadThanks from "./pages/DownloadThanks";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,8 @@ const App = () => (
             <Route path="/users" element={<AppLayout><UserManagement /></AppLayout>} />
             <Route path="/apartamentos" element={<AppLayout><ApartmentReport /></AppLayout>} />
             <Route path="/asset/:id" element={<AssetView />} />
+            <Route path="/download" element={<Download />} />
+            <Route path="/download/thanks" element={<DownloadThanks />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
