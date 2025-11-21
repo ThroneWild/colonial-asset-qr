@@ -113,20 +113,24 @@ export const AdvancedSearch = ({
         <div className="mt-2 w-full glass-light border border-border rounded-lg p-3 shadow-lg animate-fade-in">
           <div className="text-sm text-muted-foreground mb-2">Sugestões</div>
           <div className="space-y-1">
-            {filteredSuggestions.map((suggestion, index) => (
-              <button
-                key={index}
-                onClick={() => handleSearch(suggestion)}
-                className="w-full text-left px-3 py-2 text-sm rounded hover:bg-muted transition-colors"
-              >
-                <span dangerouslySetInnerHTML={{ 
-                  __html: suggestion.replace(
-                    new RegExp(`(${value})`, 'gi'),
-                    '<mark class="bg-primary/20 text-primary font-medium">$1</mark>'
-                  )
-                }} />
-              </button>
-            ))}
+            {filteredSuggestions.map((suggestion, index) => {
+              const parts = suggestion.split(new RegExp(`(${value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleSearch(suggestion)}
+                  className="w-full text-left px-3 py-2 text-sm rounded hover:bg-muted transition-colors"
+                >
+                  {parts.map((part, i) => 
+                    part.toLowerCase() === value.toLowerCase() ? (
+                      <mark key={i} className="bg-primary/20 text-primary font-medium">{part}</mark>
+                    ) : (
+                      part
+                    )
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
