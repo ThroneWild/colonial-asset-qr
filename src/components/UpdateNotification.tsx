@@ -105,7 +105,7 @@ export function UpdateNotification() {
           <AlertDialogHeader>
             <AlertDialogTitle>Manter o app atualizado?</AlertDialogTitle>
             <AlertDialogDescription>
-              Deseja permitir que o Colonial Asset QR verifique automaticamente por atualizações?
+              Deseja permitir que o PrizePatrimonios verifique automaticamente por atualizações?
               <br />
               <br />
               Isso garante que você sempre tenha acesso aos recursos mais recentes e correções de
@@ -133,7 +133,7 @@ export function UpdateNotification() {
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <p>
-                A versão <strong>{updateStatus?.version}</strong> do Colonial Asset QR está
+                A versão <strong>{updateStatus?.version}</strong> do PrizePatrimonios está
                 disponível.
               </p>
               {updateStatus?.releaseNotes && (

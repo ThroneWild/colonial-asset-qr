@@ -1,8 +1,8 @@
 {
   "name": "colonial-asset-qr",
-  "productName": "Colonial Asset QR",
-  "description": "Sistema de gestão de ativos com QR Code",
-  "author": "Colonial Asset",
+  "productName": "PrizePatrimonios",
+  "description": "Sistema de gestão de patrimônios com QR Code",
+  "author": "PrizePatrimonios",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -114,9 +114,9 @@
     "vite-plugin-electron-renderer": "^0.14.6"
   },
   "build": {
-    "appId": "com.colonial.assetqr",
-    "productName": "Colonial Asset QR",
-    "copyright": "Copyright © 2025 Colonial Asset",
+    "appId": "com.prizepatrimonios.app",
+    "productName": "PrizePatrimonios",
+    "copyright": "Copyright © 2025 PrizePatrimonios",
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -152,7 +152,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Colonial Asset QR"
+      "shortcutName": "PrizePatrimonios"
     },
     "mac": {
       "target": [

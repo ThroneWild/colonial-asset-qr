@@ -72,7 +72,7 @@ export default function DownloadThanks() {
                 Obrigado por baixar!
               </CardTitle>
               <CardDescription className="text-lg">
-                O download do Colonial Asset QR foi iniciado
+                O download do PrizePatrimonios foi iniciado
               </CardDescription>
             </motion.div>
           </CardHeader>

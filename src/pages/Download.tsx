@@ -150,7 +150,7 @@ export default function Download() {
               <DownloadIcon className="w-10 h-10 text-primary" />
             </motion.div>
             <CardTitle className="text-3xl font-bold">
-              Baixar Colonial Asset QR
+              Baixar PrizePatrimonios
             </CardTitle>
             <CardDescription className="text-lg">
               Escolha a versão para o seu sistema operacional
