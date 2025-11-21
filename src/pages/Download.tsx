@@ -67,19 +67,23 @@ export default function Download() {
       }
 
       if (!downloadUrl) {
-        // Fallback: construir URL baseado no padrão
-        const version = latestRelease?.tag_name || '1.0.0';
-        const baseUrl = `https://github.com/ThroneWild/colonial-asset-qr/releases/download/${version}`;
+        // Fallback: construir URL baseado no padrão de nomes do electron-builder
+        // Os artefatos publicados incluem espaços (ex: "Colonial Asset QR-1.0.0-Setup.exe"),
+        // portanto precisamos refletir exatamente esse formato para evitar 404.
+        const version = (latestRelease?.tag_name || '1.0.0').replace(/^v/, '');
+        const productName = 'Colonial Asset QR';
+        const encodedProductName = encodeURIComponent(productName);
+        const baseUrl = `https://github.com/ThroneWild/colonial-asset-qr/releases/download/v${version}`;
 
         if (platform === 'windows') {
-          fileName = `Colonial-Asset-QR-${version}-Setup.exe`;
-          downloadUrl = `${baseUrl}/${fileName}`;
+          fileName = `${productName}-${version}-Setup.exe`;
+          downloadUrl = `${baseUrl}/${encodedProductName}-${version}-Setup.exe`;
         } else if (platform === 'mac') {
-          fileName = `Colonial-Asset-QR-${version}-arm64.dmg`;
-          downloadUrl = `${baseUrl}/${fileName}`;
+          fileName = `${productName}-${version}-arm64.dmg`;
+          downloadUrl = `${baseUrl}/${encodedProductName}-${version}-arm64.dmg`;
         } else if (platform === 'linux') {
-          fileName = `Colonial-Asset-QR-${version}-x64.AppImage`;
-          downloadUrl = `${baseUrl}/${fileName}`;
+          fileName = `${productName}-${version}-x64.AppImage`;
+          downloadUrl = `${baseUrl}/${encodedProductName}-${version}-x64.AppImage`;
         }
       }
 
