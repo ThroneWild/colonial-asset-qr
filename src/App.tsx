@@ -16,6 +16,7 @@ import AuditLogs from "./pages/AuditLogs";
 import UserManagement from "./pages/UserManagement";
 import NotFound from "./pages/NotFound";
 import MaintenanceCalendar from "./pages/MaintenanceCalendar";
+import ApartmentReport from "./pages/ApartmentReport";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/auditoria" element={<AppLayout><AuditLogs /></AppLayout>} />
             <Route path="/labels" element={<AppLayout><Labels /></AppLayout>} />
             <Route path="/users" element={<AppLayout><UserManagement /></AppLayout>} />
+            <Route path="/apartamentos" element={<AppLayout><ApartmentReport /></AppLayout>} />
             <Route path="/asset/:id" element={<AssetView />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

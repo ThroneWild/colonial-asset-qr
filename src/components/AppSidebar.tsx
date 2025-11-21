@@ -1,4 +1,4 @@
-import { Home, BarChart3, Package, ScrollText, Tag, LogOut, Wrench } from "lucide-react";
+import { Home, BarChart3, Package, ScrollText, Tag, LogOut, Wrench, Building2 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ export function AppSidebar() {
     { label: "Dashboard", href: "/dashboard", icon: <BarChart3 className="h-5 w-5" /> },
     { label: "Todos os Ativos", href: "/assets", icon: <Package className="h-5 w-5" /> },
     { label: "Manutenções", href: "/maintenance", icon: <Wrench className="h-5 w-5" /> },
+    { label: "Relatório por Apartamento", href: "/apartamentos", icon: <Building2 className="h-5 w-5" /> },
     { label: "Registros de Auditoria", href: "/auditoria", icon: <ScrollText className="h-5 w-5" /> },
     { label: "Etiquetas", href: "/labels", icon: <Tag className="h-5 w-5" /> },
   ];
