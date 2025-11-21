@@ -11,6 +11,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Solicitar acesso à câmera
   requestCameraAccess: () => ipcRenderer.invoke('request-camera-access'),
 
+  // Auto-update
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),
+  installUpdate: () => ipcRenderer.invoke('install-update'),
+
+  // Listener para status de atualizações
+  onUpdateStatus: (callback) => {
+    ipcRenderer.on('update-status', (_, data) => callback(data));
+    return () => ipcRenderer.removeAllListeners('update-status');
+  },
+
   // Informações do sistema
   platform: process.platform,
 

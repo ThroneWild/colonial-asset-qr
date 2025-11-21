@@ -1,10 +1,11 @@
-import { Home, BarChart3, Package, ScrollText, Tag, LogOut, Wrench, Building2 } from "lucide-react";
+import { Home, BarChart3, Package, ScrollText, Tag, LogOut, Wrench, Building2, Download } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logoImage from "@/assets/logo-prize.png";
 import { SidebarBody, SidebarLink, useSidebar } from "@/components/ui/animated-sidebar";
 import { motion } from "framer-motion";
+import { isElectron } from "@/utils/electron";
 
 export function AppSidebar() {
   const location = useLocation();
@@ -61,7 +62,18 @@ export function AppSidebar() {
         </div>
       </div>
 
-      <div className="border-t border-sidebar-border pt-4">
+      <div className="border-t border-sidebar-border pt-4 space-y-2">
+        {!isElectron() && (
+          <SidebarLink
+            link={{
+              label: "Baixar Desktop",
+              href: "/download",
+              icon: <Download className="h-5 w-5" />,
+            }}
+            onClick={() => navigate('/download')}
+            className="hover:bg-primary/10 text-muted-foreground"
+          />
+        )}
         <SidebarLink
           link={{
             label: "Sair",
