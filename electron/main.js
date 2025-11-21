@@ -1,8 +1,13 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 
 // Configuração para ambiente de desenvolvimento ou produção
 const isDev = process.env.NODE_ENV === 'development';
+
+// Configuração do auto-updater
+autoUpdater.autoDownload = false; // Não baixar automaticamente
+autoUpdater.autoInstallOnAppQuit = true; // Instalar quando fechar o app
 
 let mainWindow;
 
@@ -64,9 +69,87 @@ function createWindow() {
   });
 }
 
+// Configurar eventos do auto-updater
+function setupAutoUpdater() {
+  // Verificar por atualizações quando o app iniciar (somente em produção)
+  if (!isDev) {
+    // Aguardar 5 segundos após o app iniciar
+    setTimeout(() => {
+      autoUpdater.checkForUpdates();
+    }, 5000);
+
+    // Verificar por atualizações a cada 30 minutos
+    setInterval(() => {
+      autoUpdater.checkForUpdates();
+    }, 30 * 60 * 1000);
+  }
+
+  // Eventos do auto-updater
+  autoUpdater.on('checking-for-update', () => {
+    console.log('Verificando atualizações...');
+    if (mainWindow) {
+      mainWindow.webContents.send('update-status', { status: 'checking' });
+    }
+  });
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('Atualização disponível:', info.version);
+    if (mainWindow) {
+      mainWindow.webContents.send('update-status', {
+        status: 'available',
+        version: info.version,
+        releaseNotes: info.releaseNotes,
+        releaseDate: info.releaseDate,
+      });
+    }
+  });
+
+  autoUpdater.on('update-not-available', (info) => {
+    console.log('Nenhuma atualização disponível');
+    if (mainWindow) {
+      mainWindow.webContents.send('update-status', { status: 'not-available' });
+    }
+  });
+
+  autoUpdater.on('error', (err) => {
+    console.error('Erro ao verificar atualizações:', err);
+    if (mainWindow) {
+      mainWindow.webContents.send('update-status', {
+        status: 'error',
+        error: err.message,
+      });
+    }
+  });
+
+  autoUpdater.on('download-progress', (progressObj) => {
+    console.log(
+      `Baixando: ${progressObj.percent.toFixed(2)}% - ${progressObj.transferred}/${progressObj.total}`
+    );
+    if (mainWindow) {
+      mainWindow.webContents.send('update-status', {
+        status: 'downloading',
+        progress: progressObj.percent,
+        transferred: progressObj.transferred,
+        total: progressObj.total,
+      });
+    }
+  });
+
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('Atualização baixada:', info.version);
+    if (mainWindow) {
+      mainWindow.webContents.send('update-status', {
+        status: 'downloaded',
+        version: info.version,
+      });
+    }
+  });
+}
+
 // Criar janela quando o app estiver pronto
 app.whenReady().then(() => {
   createWindow();
+  setupAutoUpdater();
 
   // No macOS, recriar janela quando clicar no dock
   app.on('activate', () => {
@@ -107,6 +190,40 @@ ipcMain.handle('request-camera-access', async () => {
   } catch (error) {
     return { success: false, error: error.message };
   }
+});
+
+// Handlers para auto-update
+ipcMain.handle('check-for-updates', async () => {
+  if (isDev) {
+    return { error: 'Auto-update não disponível em modo desenvolvimento' };
+  }
+  try {
+    const result = await autoUpdater.checkForUpdates();
+    return { success: true, updateInfo: result.updateInfo };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('download-update', async () => {
+  if (isDev) {
+    return { error: 'Auto-update não disponível em modo desenvolvimento' };
+  }
+  try {
+    await autoUpdater.downloadUpdate();
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('install-update', () => {
+  if (isDev) {
+    return { error: 'Auto-update não disponível em modo desenvolvimento' };
+  }
+  // Instalar e reiniciar
+  autoUpdater.quitAndInstall(false, true);
+  return { success: true };
 });
 
 // Prevenir múltiplas instâncias

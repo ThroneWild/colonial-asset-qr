@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AppLayout } from "@/components/AppLayout";
+import { UpdateNotification } from "@/components/UpdateNotification";
 import Index from "./pages/Index";
 import Labels from "./pages/Labels";
 import AssetView from "./pages/AssetView";
@@ -26,6 +27,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <UpdateNotification />
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
