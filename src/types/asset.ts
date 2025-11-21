@@ -12,6 +12,8 @@ export interface Asset {
   item_number: number;
   description: string;
   sector: string;
+  location_type?: 'departamento' | 'apartamento' | null;
+  apartment_number?: string | null;
   asset_group: string;
   conservation_state: string;
   brand_model: string | null;
@@ -39,6 +41,8 @@ export interface Asset {
 export interface AssetFormData {
   description: string;
   sector: string;
+  location_type?: 'departamento' | 'apartamento';
+  apartment_number?: string;
   asset_group: string;
   conservation_state: "Novo" | "Bom" | "Regular" | "Ruim";
   brand_model?: string;
@@ -119,6 +123,7 @@ export interface AssetFilters {
   sectors?: string[];
   groups?: string[];
   conservationStates?: string[];
+  apartmentNumbers?: string[];
   valueMin?: number;
   valueMax?: number;
   dateFrom?: Date;

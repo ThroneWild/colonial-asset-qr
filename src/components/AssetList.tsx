@@ -68,6 +68,11 @@ export const AssetList = ({ assets, selectedAssets = [], onViewAsset, onEditAsse
                 <Badge variant="glass-primary" className="text-xs font-medium">
                   {asset.asset_group}
                 </Badge>
+                {asset.location_type === 'apartamento' && asset.apartment_number && (
+                  <Badge variant="glass-gold" className="text-xs font-medium">
+                    Apto {asset.apartment_number}
+                  </Badge>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant={getConservationBadge(asset.conservation_state)} className="text-xs font-semibold">

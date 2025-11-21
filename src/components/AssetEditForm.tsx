@@ -59,6 +59,8 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, onDelete, isLoading }
   const [formData, setFormData] = useState({
     description: asset.description,
     sector: asset.sector,
+    location_type: asset.location_type || 'departamento',
+    apartment_number: asset.apartment_number || '',
     asset_group: asset.asset_group,
     conservation_state: asset.conservation_state,
     brand_model: asset.brand_model || '',
@@ -78,9 +80,26 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, onDelete, isLoading }
   });
   const [uploading, setUploading] = useState(false);
   const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
+  const [apartmentOptions, setApartmentOptions] = useState<string[]>([]);
   const [lastMaintenanceDate, setLastMaintenanceDate] = useState<Date | null>(
     asset.last_maintenance_date ? new Date(asset.last_maintenance_date) : null,
   );
+
+  useEffect(() => {
+    const loadApartments = async () => {
+      const { data } = await supabase
+        .from('assets')
+        .select('apartment_number')
+        .not('apartment_number', 'is', null)
+        .order('apartment_number');
+      
+      if (data) {
+        const unique = [...new Set(data.map(d => d.apartment_number).filter(Boolean))] as string[];
+        setApartmentOptions(unique);
+      }
+    };
+    loadApartments();
+  }, []);
 
   useEffect(() => {
     if (!formData.last_maintenance_date || !formData.maintenance_frequency) {
@@ -243,6 +262,46 @@ export const AssetEditForm = ({ asset, onSubmit, onCancel, onDelete, isLoading }
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="location_type">Tipo de Localização *</Label>
+          <Select
+            value={formData.location_type}
+            onValueChange={(value: 'departamento' | 'apartamento') => 
+              setFormData({ ...formData, location_type: value, apartment_number: value === 'departamento' ? '' : formData.apartment_number })
+            }
+            required
+          >
+            <SelectTrigger id="location_type">
+              <SelectValue placeholder="Selecione o tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="departamento">Departamento</SelectItem>
+              <SelectItem value="apartamento">Apartamento/UH</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {formData.location_type === 'apartamento' && (
+          <div className="space-y-2">
+            <Label htmlFor="apartment_number">Número do Apartamento *</Label>
+            <Input
+              id="apartment_number"
+              placeholder="Ex: 601"
+              value={formData.apartment_number}
+              onChange={(e) => setFormData({ ...formData, apartment_number: e.target.value })}
+              required
+              list="apartment-options-edit"
+            />
+            <datalist id="apartment-options-edit">
+              {apartmentOptions.map((apt) => (
+                <option key={apt} value={apt} />
+              ))}
+            </datalist>
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
