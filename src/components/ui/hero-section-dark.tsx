@@ -82,15 +82,15 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
         <div className="absolute top-0 z-0 h-screen w-screen bg-[radial-gradient(ellipse_60%_70%_at_50%_-20%,rgba(30,64,175,0.35),rgba(2,6,23,0))] dark:bg-[radial-gradient(ellipse_60%_70%_at_50%_-20%,rgba(37,99,235,0.45),rgba(2,6,23,0))]" />
         <section className="relative z-10 mx-auto max-w-full">
           <RetroGrid {...gridOptions} />
-          <div className="mx-auto max-w-screen-xl gap-12 px-4 py-28 md:px-8">
-            <div className="mx-auto max-w-3xl space-y-5 text-center">
-              <h1 className="group mx-auto inline-flex items-center justify-center gap-2 rounded-3xl border border-white/10 bg-gradient-to-r from-white/10 via-white/5 to-transparent px-5 py-2 text-sm font-medium text-slate-200 shadow-sm backdrop-blur-2xl">
-                <span className="flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-slate-300/70">
+          <div className="mx-auto max-w-screen-xl gap-12 px-4 py-16 md:py-28 md:px-8">
+            <div className="mx-auto max-w-3xl space-y-4 md:space-y-5 text-center">
+              <h1 className="group mx-auto inline-flex items-center justify-center gap-2 rounded-3xl border border-white/10 bg-gradient-to-r from-white/10 via-white/5 to-transparent px-4 md:px-5 py-1.5 md:py-2 text-xs md:text-sm font-medium text-slate-200 shadow-sm backdrop-blur-2xl">
+                <span className="flex items-center gap-2 text-[10px] md:text-xs uppercase tracking-[0.25em] md:tracking-[0.35em] text-slate-300/70">
                   {title}
                 </span>
-                <ChevronRight className="h-4 w-4 text-gold transition-transform duration-300 group-hover:translate-x-1" />
+                <ChevronRight className="h-3 w-3 md:h-4 md:w-4 text-gold transition-transform duration-300 group-hover:translate-x-1" />
               </h1>
-              <h2 className="text-4xl font-display tracking-tight text-transparent md:text-6xl">
+              <h2 className="text-3xl md:text-4xl lg:text-6xl font-display tracking-tight text-transparent">
                 <span className="bg-[linear-gradient(180deg,_rgba(148,163,184,0.9)_0%,_rgba(226,232,240,0.2)_100%)] bg-clip-text text-transparent">
                   {subtitle.regular}
                 </span>
@@ -98,16 +98,16 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
                   {subtitle.gradient}
                 </span>
               </h2>
-              <p className="mx-auto max-w-2xl text-base text-slate-300">
+              <p className="mx-auto max-w-2xl text-sm md:text-base text-slate-300 px-4">
                 {description}
               </p>
-              <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <div className="flex flex-col items-center justify-center gap-3 sm:flex-row pt-2">
                 <span className="relative inline-flex overflow-hidden rounded-full border border-white/10 bg-white/10 px-[1.5px] py-[1.5px] backdrop-blur-xl">
                   <span className="absolute inset-0 animate-[spin_8s_linear_infinite] bg-[conic-gradient(from_120deg_at_50%_50%,rgba(251,191,36,0.45)_0%,rgba(30,64,175,0.6)_40%,rgba(251,191,36,0.45)_100%)] opacity-60" />
-                  <div className="relative inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-background/80 px-10 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-foreground transition-all hover:bg-background/70">
+                  <div className="relative inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-background/80 px-6 py-3 md:px-10 md:py-4 text-xs font-semibold uppercase tracking-[0.15em] md:tracking-[0.2em] text-foreground transition-all hover:bg-background/70 touch-target">
                     <a
                       href={ctaHref}
-                      className="inline-flex w-full items-center justify-center gap-2 text-sm font-medium text-foreground sm:w-auto"
+                      className="inline-flex w-full items-center justify-center gap-2 text-xs md:text-sm font-medium text-foreground sm:w-auto"
                     >
                       {ctaText}
                     </a>
