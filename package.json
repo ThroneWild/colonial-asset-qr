@@ -1,12 +1,22 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "colonial-asset-qr",
+  "productName": "Colonial Asset QR",
+  "description": "Sistema de gestão de ativos com QR Code",
+  "author": "Colonial Asset",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
+    "dev:electron": "cross-env VITE_ELECTRON=true vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "build:electron": "cross-env VITE_ELECTRON=true vite build && electron-builder",
+    "build:electron:dir": "cross-env VITE_ELECTRON=true vite build && electron-builder --dir",
+    "build:electron:win": "cross-env VITE_ELECTRON=true vite build && electron-builder --win",
+    "build:electron:mac": "cross-env VITE_ELECTRON=true vite build && electron-builder --mac",
+    "build:electron:linux": "cross-env VITE_ELECTRON=true vite build && electron-builder --linux",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -79,6 +89,10 @@
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react-swc": "^3.11.0",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.3",
+    "electron-builder": "^26.0.12",
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
@@ -88,6 +102,83 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
-    "vite": "^5.4.19"
+    "vite": "^5.4.19",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-electron-renderer": "^0.14.6"
+  },
+  "build": {
+    "appId": "com.colonial.assetqr",
+    "productName": "Colonial Asset QR",
+    "copyright": "Copyright © 2025 Colonial Asset",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "public",
+        "to": "public",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/favicon.ico",
+      "artifactName": "${productName}-${version}-Setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Colonial Asset QR"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "public/favicon.ico",
+      "category": "public.app-category.productivity",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/favicon.ico",
+      "category": "Utility",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    }
   }
 }
