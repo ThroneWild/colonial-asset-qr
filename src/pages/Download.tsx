@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Download as DownloadIcon, Monitor, Apple, Loader2, CheckCircle } from 'lucide-react';
+import { Download as DownloadIcon, Monitor, Apple, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from 'sonner';
 
 interface Release {
@@ -20,6 +21,8 @@ export default function Download() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [latestRelease, setLatestRelease] = useState<Release | null>(null);
+  const [noReleasesAvailable, setNoReleasesAvailable] = useState(false);
+  const [isCheckingRelease, setIsCheckingRelease] = useState(true);
 
   useEffect(() => {
     // Buscar a versão mais recente do GitHub
@@ -28,19 +31,36 @@ export default function Download() {
 
   const fetchLatestRelease = async () => {
     try {
+      setIsCheckingRelease(true);
       const response = await fetch(
         'https://api.github.com/repos/ThroneWild/colonial-asset-qr/releases/latest'
       );
       if (response.ok) {
         const data = await response.json();
         setLatestRelease(data);
+        setNoReleasesAvailable(false);
+      } else if (response.status === 404) {
+        // Nenhuma release encontrada
+        setNoReleasesAvailable(true);
+        setLatestRelease(null);
       }
     } catch (error) {
       console.error('Erro ao buscar release:', error);
+      setNoReleasesAvailable(true);
+    } finally {
+      setIsCheckingRelease(false);
     }
   };
 
   const handleDownload = async (platform: 'windows' | 'mac' | 'linux') => {
+    // Verificar se há releases disponíveis
+    if (noReleasesAvailable || !latestRelease) {
+      toast.error('Nenhuma versão disponível', {
+        description: 'Ainda não há releases publicadas. Por favor, tente novamente mais tarde.',
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -63,24 +83,22 @@ export default function Download() {
         if (asset) {
           downloadUrl = asset.browser_download_url;
           fileName = asset.name;
+        } else {
+          // Asset específico não encontrado
+          toast.error('Arquivo não encontrado', {
+            description: `Não foi possível encontrar a versão para ${platform}. Tente outra plataforma.`,
+          });
+          setIsLoading(false);
+          return;
         }
       }
 
       if (!downloadUrl) {
-        // Fallback: construir URL baseado no padrão
-        const version = latestRelease?.tag_name || '1.0.0';
-        const baseUrl = `https://github.com/ThroneWild/colonial-asset-qr/releases/download/${version}`;
-
-        if (platform === 'windows') {
-          fileName = `Colonial-Asset-QR-${version}-Setup.exe`;
-          downloadUrl = `${baseUrl}/${fileName}`;
-        } else if (platform === 'mac') {
-          fileName = `Colonial-Asset-QR-${version}-arm64.dmg`;
-          downloadUrl = `${baseUrl}/${fileName}`;
-        } else if (platform === 'linux') {
-          fileName = `Colonial-Asset-QR-${version}-x64.AppImage`;
-          downloadUrl = `${baseUrl}/${fileName}`;
-        }
+        toast.error('Erro ao obter link de download', {
+          description: 'Não foi possível gerar o link de download. Por favor, tente novamente.',
+        });
+        setIsLoading(false);
+        return;
       }
 
       // Criar link temporário e iniciar download
@@ -145,6 +163,31 @@ export default function Download() {
           </CardHeader>
 
           <CardContent className="space-y-6">
+            {/* Alerta quando não há releases disponíveis */}
+            {noReleasesAvailable && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Nenhuma versão disponível</AlertTitle>
+                  <AlertDescription>
+                    Ainda não há versões do app desktop publicadas. Por favor, aguarde enquanto preparamos a primeira release ou entre em contato com o suporte para mais informações.
+                  </AlertDescription>
+                </Alert>
+              </motion.div>
+            )}
+
+            {/* Indicador de carregamento */}
+            {isCheckingRelease && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-3 text-muted-foreground">Verificando versões disponíveis...</span>
+              </div>
+            )}
+
             <div className="grid gap-4 md:grid-cols-2">
               {/* Windows */}
               <motion.div
@@ -173,7 +216,7 @@ export default function Download() {
                     <Button
                       className="w-full"
                       onClick={() => handleDownload('windows')}
-                      disabled={isLoading}
+                      disabled={isLoading || noReleasesAvailable || isCheckingRelease}
                     >
                       {isLoading ? (
                         <>
@@ -218,7 +261,7 @@ export default function Download() {
                     <Button
                       className="w-full"
                       onClick={() => handleDownload('mac')}
-                      disabled={isLoading}
+                      disabled={isLoading || noReleasesAvailable || isCheckingRelease}
                     >
                       {isLoading ? (
                         <>
