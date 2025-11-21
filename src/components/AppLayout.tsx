@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { DownloadFloatingBadge } from "@/components/DownloadBadge";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -57,6 +58,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <main className="relative z-10 flex-1 overflow-auto px-4 pb-16 pt-28 sm:px-6 lg:px-12">
         <div className="mx-auto w-full max-w-7xl space-y-10">{children}</div>
       </main>
+
+      {/* Badge flutuante discreto para download */}
+      <DownloadFloatingBadge />
     </div>
   );
 };

@@ -189,6 +189,102 @@ GH_TOKEN=seu_github_token  # Para publicar releases privados
 
 ---
 
+## 3. Sistema de Download do App Desktop
+
+Implementado um fluxo elegante e discreto para download da versão desktop.
+
+### Páginas Criadas
+
+- `src/pages/Download.tsx` - Página de seleção de plataforma
+- `src/pages/DownloadThanks.tsx` - Página de agradecimento
+- `src/components/DownloadBadge.tsx` - Componentes de badges discretos
+- `src/components/DownloadAppButton.tsx` - Botões reutilizáveis
+
+### Funcionalidades
+
+#### Fluxo de Download
+
+1. **Página de Seleção** (`/download`)
+   - Cards elegantes para Windows e macOS
+   - Busca automática do GitHub Releases
+   - Mostra versão e tamanho dos arquivos
+   - Animações suaves com Framer Motion
+   - Download automático ao clicar
+
+2. **Página de Agradecimento** (`/download/thanks`)
+   - Animação de confetti celebratório
+   - Instruções passo a passo
+   - Links para guia e suporte
+   - Botão para voltar ao início
+
+#### Componentes de Badge Discretos
+
+Múltiplas opções de badges para promover o download:
+
+1. **`<DownloadFloatingBadge />`** (Recomendado)
+   - Badge flutuante no canto inferior direito
+   - Aparece após 3 segundos
+   - Pode ser dispensado (lembra por 7 dias via cookie)
+   - Animação suave de entrada/saída
+   - Tooltip com dica
+
+2. **`<DownloadFooterLink />`**
+   - Link discreto para rodapé
+   - Texto pequeno com ícone
+   - Ideal para footers
+
+3. **`<DownloadInlineBadge />`**
+   - Badge inline com fundo colorido
+   - Pode ser inserido em qualquer texto
+
+4. **`<DownloadTopBanner />`**
+   - Banner no topo da página
+   - Pode ser fechado
+   - Mensagem promocional
+
+5. **`<DownloadTextLink />`**
+   - Link de texto simples
+   - Mais discreto possível
+
+#### Integração
+
+**No Sidebar:**
+```tsx
+// Botão "Baixar Desktop" no rodapé do sidebar
+// Só aparece no modo Web
+```
+
+**No AppLayout:**
+```tsx
+// Badge flutuante em todas as páginas
+<DownloadFloatingBadge />
+```
+
+### Exemplo de Uso
+
+```tsx
+import { DownloadFloatingBadge, DownloadTextLink } from '@/components/DownloadBadge';
+
+// Em qualquer componente
+<DownloadTextLink className="ml-2" />
+
+// No layout principal (já integrado)
+<DownloadFloatingBadge />
+```
+
+### Detecção Inteligente
+
+Todos os componentes:
+- ✅ Detectam automaticamente se está no Electron
+- ✅ Não aparecem na versão desktop (evita confusão)
+- ✅ Só aparecem no modo Web
+
+### Cookies Utilizados
+
+- `download_badge_dismissed` - Lembra se o usuário dispensou o badge (7 dias)
+
+---
+
 ## Próximos Passos
 
 1. **CI/CD**: Configurar GitHub Actions para build e publicação automática
