@@ -127,7 +127,9 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground antialiased font-sans;
+    @apply bg-background text-foreground antialiased font-sans overflow-x-hidden;
+    /* Improve scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -136,6 +138,18 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  /* Z-index hierarchy for consistent layering */
+  .z-background { z-index: -30; }
+  .z-grid { z-index: -20; }
+  .z-spotlight { z-index: -10; }
+  .z-content { z-index: 10; }
+  .z-navigation { z-index: 50; }
+  .z-dropdown { z-index: 60; }
+  .z-modal { z-index: 70; }
+  .z-popover { z-index: 80; }
+  .z-toast { z-index: 90; }
+  .z-tooltip { z-index: 100; }
+
   .text-gold {
     color: hsl(var(--prize-gold));
   }
@@ -150,6 +164,19 @@ All colors MUST be HSL.
 
   .transition-smooth {
     transition: var(--transition-smooth);
+  }
+
+  /* Prevent horizontal overflow */
+  .overflow-x-safe {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Touch-friendly targets (minimum 44x44px for iOS) */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    @apply flex items-center justify-center;
   }
 
   .shadow-card {
@@ -169,6 +196,8 @@ All colors MUST be HSL.
 
   .animate-spotlight {
     animation: spotlight 18s ease-in-out infinite;
+    /* Optimize for mobile - use will-change sparingly */
+    will-change: opacity;
   }
 
   @keyframes spotlight {
@@ -193,6 +222,18 @@ All colors MUST be HSL.
     100% {
       opacity: 0;
       transform: translate3d(12%, 12%, 0) scale(0.92);
+    }
+  }
+
+  /* Reduced motion for accessibility and performance */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-spotlight,
+    .heading-shine {
+      animation: none;
+    }
+
+    .hover-lift {
+      transition: none;
     }
   }
 

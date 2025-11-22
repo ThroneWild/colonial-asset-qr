@@ -15,6 +15,7 @@ interface AssetListProps {
 
 export const AssetList = ({ assets, selectedAssets = [], onViewAsset, onEditAsset, onToggleSelection }: AssetListProps) => {
   const isSelected = (asset: Asset) => selectedAssets.some(a => a.id === asset.id);
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const getConservationBadge = (state: string) => {
     switch (state) {
       case 'Novo':
@@ -32,14 +33,17 @@ export const AssetList = ({ assets, selectedAssets = [], onViewAsset, onEditAsse
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {assets.map((asset, index) => (
-          <Card 
-            key={asset.id} 
-            className={`p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card group animate-scale-in ${
-              isSelected(asset) ? 'ring-2 ring-primary' : ''
-            }`}
-            style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
+          <Card
+            key={asset.id}
+            className={`p-4 md:p-6 shadow-card hover:shadow-hover transition-smooth border-0 bg-card group ${
+              prefersReducedMotion ? '' : 'animate-scale-in'
+            } ${isSelected(asset) ? 'ring-2 ring-primary' : ''}`}
+            style={prefersReducedMotion ? {} : {
+              animationDelay: `${Math.min(index * 30, 300)}ms`,
+              animationFillMode: 'backwards'
+            }}
           >
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1 flex gap-3">
@@ -90,13 +94,13 @@ export const AssetList = ({ assets, selectedAssets = [], onViewAsset, onEditAsse
                 </div>
               )}
             </div>
-            <div className="flex gap-2 mt-4">
-              <Button onClick={() => onViewAsset(asset)} size="sm" className="flex-1">
+            <div className="flex flex-col sm:flex-row gap-2 mt-4">
+              <Button onClick={() => onViewAsset(asset)} size="sm" className="flex-1 touch-target">
                 <Eye className="h-4 w-4 mr-2" />
-                Visualizar
+                <span className="text-xs sm:text-sm">Visualizar</span>
               </Button>
               {onEditAsset && (
-                <Button onClick={() => onEditAsset(asset)} size="sm" variant="outline" className="flex-1">
+                <Button onClick={() => onEditAsset(asset)} size="sm" variant="outline" className="flex-1 touch-target">
                   <Edit className="h-4 w-4 mr-2" />
                   Editar
                 </Button>
