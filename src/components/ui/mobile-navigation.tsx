@@ -10,7 +10,9 @@ import {
   Wrench,
   FileText,
   Tags,
-  Building2
+  Building2,
+  Calendar,
+  Users
 } from 'lucide-react';
 
 interface NavItem {
@@ -25,8 +27,10 @@ const navItems: NavItem[] = [
   { label: 'Dashboard', id: 'dashboard', path: '/dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
   { label: 'Ativos', id: 'assets', path: '/assets', icon: <Package className="h-5 w-5" /> },
   { label: 'Manutenções', id: 'maintenance', path: '/maintenance', icon: <Wrench className="h-5 w-5" /> },
+  { label: 'Calendário', id: 'calendar', path: '/maintenance/calendar', icon: <Calendar className="h-5 w-5" /> },
   { label: 'Apartamentos', id: 'apartments', path: '/apartamentos', icon: <Building2 className="h-5 w-5" /> },
   { label: 'Auditoria', id: 'audit', path: '/auditoria', icon: <FileText className="h-5 w-5" /> },
+  { label: 'Usuários', id: 'users', path: '/users', icon: <Users className="h-5 w-5" /> },
   { label: 'Etiquetas', id: 'labels', path: '/labels', icon: <Tags className="h-5 w-5" /> },
 ];
 
