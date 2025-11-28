@@ -53,9 +53,9 @@ jobs:
         with:
           name: macos-installers
           path: |
-            dist/*.dmg
-            dist/*.zip
-            dist/latest-mac.yml
+            release/*.dmg
+            release/*.zip
+            release/latest-mac.yml
 
       - name: Upload artifacts (Windows)
         if: matrix.os == 'windows-latest'
@@ -63,8 +63,8 @@ jobs:
         with:
           name: windows-installers
           path: |
-            dist/*.exe
-            dist/latest.yml
+            release/*.exe
+            release/latest.yml
 
       - name: Upload artifacts (Linux)
         if: matrix.os == 'ubuntu-latest'
@@ -72,10 +72,10 @@ jobs:
         with:
           name: linux-installers
           path: |
-            dist/*.AppImage
-            dist/*.deb
-            dist/*.snap
-            dist/latest-linux.yml
+            release/*.AppImage
+            release/*.deb
+            release/*.snap
+            release/latest-linux.yml
 
   publish:
     needs: release
