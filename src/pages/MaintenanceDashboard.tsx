@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Asset } from '@/types/asset';
+import { toast } from 'sonner';
 import {
   MaintenanceDashboardMetrics,
   MAINTENANCE_STATUSES,

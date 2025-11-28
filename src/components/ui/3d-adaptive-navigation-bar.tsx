@@ -27,6 +27,7 @@ export const AdaptiveNavigationBar: React.FC = () => {
       { label: 'Dashboard', id: 'dashboard', path: '/dashboard' },
       { label: 'Ativos', id: 'assets', path: '/assets' },
       { label: 'Manutenções', id: 'maintenance', path: '/maintenance' },
+      { label: 'Apartamentos', id: 'apartments', path: '/apartamentos' },
       { label: 'Auditoria', id: 'audit', path: '/auditoria' },
       { label: 'Etiquetas', id: 'labels', path: '/labels' },
     ],
