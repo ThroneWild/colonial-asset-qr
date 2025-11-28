@@ -146,12 +146,10 @@
     ],
     "win": {
       "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
+        "nsis"
+      ],
+      "arch": [
+        "x64"
       ],
       "icon": "build/icon.png",
       "artifactName": "${productName}-${version}-Setup.${ext}"
@@ -165,13 +163,11 @@
     },
     "mac": {
       "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
+        "dmg"
+      ],
+      "arch": [
+        "x64",
+        "arm64"
       ],
       "icon": "build/icon.png",
       "category": "public.app-category.productivity",
@@ -179,18 +175,10 @@
     },
     "linux": {
       "target": [
-        {
-          "target": "AppImage",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "deb",
-          "arch": [
-            "x64"
-          ]
-        }
+        "AppImage"
+      ],
+      "arch": [
+        "x64"
       ],
       "icon": "build/icon.png",
       "category": "Utility",

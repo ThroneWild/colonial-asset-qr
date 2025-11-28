@@ -54,7 +54,6 @@ jobs:
           name: macos-installers
           path: |
             release/*.dmg
-            release/*.zip
             release/latest-mac.yml
 
       - name: Upload artifacts (Windows)
@@ -73,8 +72,6 @@ jobs:
           name: linux-installers
           path: |
             release/*.AppImage
-            release/*.deb
-            release/*.snap
             release/latest-linux.yml
 
   publish:
