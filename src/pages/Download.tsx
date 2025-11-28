@@ -45,7 +45,6 @@ export default function Download() {
         setLatestRelease(null);
       }
     } catch (error) {
-      console.error('Erro ao buscar release:', error);
       setNoReleasesAvailable(true);
     } finally {
       setIsCheckingRelease(false);
@@ -118,7 +117,6 @@ export default function Download() {
         navigate('/download/thanks');
       }, 1500);
     } catch (error) {
-      console.error('Erro ao baixar:', error);
       toast.error('Erro ao iniciar download', {
         description: 'Por favor, tente novamente.',
       });

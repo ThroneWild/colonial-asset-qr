@@ -89,9 +89,6 @@ const AllAssets = () => {
       if (error) throw error;
       setAssets((data || []) as Asset[]);
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error('Erro ao carregar ativos:', error);
-      }
       toast.error('Erro ao carregar ativos');
     } finally {
       setIsLoadingAssets(false);
@@ -230,16 +227,12 @@ const AllAssets = () => {
       toast.success('Ativo atualizado com sucesso!');
       setEditingAsset(null);
       await fetchAssets();
-      
-      // Update selected asset if it's the one being edited
+
       if (selectedAsset?.id === id) {
         const updated = assets.find(a => a.id === id);
         if (updated) setSelectedAsset({ ...updated, ...data } as Asset);
       }
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error('Erro ao atualizar ativo:', error);
-      }
       toast.error('Erro ao atualizar ativo');
     } finally {
       setIsEditLoading(false);
@@ -251,7 +244,6 @@ const AllAssets = () => {
     
     setIsEditLoading(true);
     try {
-      // Create deletion history entry BEFORE deleting the asset
       const { error: historyError } = await supabase
         .from('asset_history')
         .insert([{
@@ -265,10 +257,8 @@ const AllAssets = () => {
         }]);
 
       if (historyError) {
-        console.error('Erro ao registrar histórico:', historyError);
+        toast.error('Erro ao registrar histórico');
       }
-
-      // Delete invoice file if exists
       if (assetToDelete.invoice_url) {
         await supabase.storage.from('invoices').remove([assetToDelete.invoice_url]);
       }
@@ -287,9 +277,6 @@ const AllAssets = () => {
       setEditingAsset(null);
       await fetchAssets();
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error('Erro ao excluir ativo:', error);
-      }
       toast.error('Erro ao excluir ativo. Verifique suas permissões.');
     } finally {
       setIsEditLoading(false);
@@ -322,7 +309,6 @@ const AllAssets = () => {
       setSelectedAssets([]);
       await fetchAssets();
     } catch (error) {
-      console.error('Erro ao excluir ativos:', error);
       toast.error('Erro ao excluir alguns ativos');
     }
   };

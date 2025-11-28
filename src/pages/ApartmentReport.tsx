@@ -129,7 +129,6 @@ export default function ApartmentReport() {
       setApartments(apartmentsData);
       setFilteredApartments(apartmentsData);
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
       toast.error('Erro ao carregar relatório de apartamentos');
     } finally {
       setLoading(false);

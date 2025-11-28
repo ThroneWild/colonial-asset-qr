@@ -198,7 +198,6 @@ const MaintenanceCalendar = () => {
 
       setAssetTasks(mappedTasks);
     } catch (error) {
-      console.error('Erro ao carregar manutenções:', error);
       toast.error('Erro ao carregar informações de manutenção');
     } finally {
       setIsLoading(false);

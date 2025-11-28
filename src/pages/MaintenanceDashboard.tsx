@@ -59,7 +59,7 @@ const MaintenanceDashboard = () => {
 
       setAssets((data || []) as Asset[]);
     } catch (error) {
-      console.error('Erro ao carregar dados de manutenção:', error);
+      toast.error('Erro ao carregar dados de manutenção');
     } finally {
       setIsLoading(false);
     }

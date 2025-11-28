@@ -59,12 +59,8 @@ const AssetView = () => {
         return;
       }
       
-      // Cast to Asset type (public view excludes user_id and modified_by which aren't displayed)
       setAsset(data as Asset);
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error('Erro ao carregar ativo:', error);
-      }
       toast.error('Erro ao carregar ativo');
       navigate('/');
     } finally {
@@ -95,9 +91,6 @@ const AssetView = () => {
       setIsDialogOpen(false);
       setNewSector('');
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error('Erro ao alterar setor:', error);
-      }
       toast.error('Erro ao alterar local. Faça login para continuar.');
     } finally {
       setIsSaving(false);
