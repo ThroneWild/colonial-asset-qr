@@ -29,50 +29,45 @@ export const useAuth = () => {
 
       if (error) throw error;
       setProfile(data);
-      
-      // Verificar se é admin
+
       const { data: roleData } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
         .eq('role', 'admin')
         .single();
-      
+
       setIsAdmin(!!roleData);
     } catch (error) {
-      console.error('Erro ao carregar perfil:', error);
+      setProfile(null);
+      setIsAdmin(false);
     }
   };
 
   useEffect(() => {
-    // Configurar listener de mudanças de autenticação PRIMEIRO
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
-          // Buscar perfil quando usuário faz login
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-          }, 0);
+          void fetchProfile(session.user.id);
         } else {
           setProfile(null);
         }
-        
+
         setLoading(false);
       }
     );
 
-    // DEPOIS verificar sessão existente
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
-        fetchProfile(session.user.id);
+        void fetchProfile(session.user.id);
       }
-      
+
       setLoading(false);
     });
 

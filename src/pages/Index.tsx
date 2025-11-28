@@ -42,9 +42,6 @@ const Index = () => {
       if (error) throw error;
       setAssets((data || []) as Asset[]);
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error("Erro ao carregar ativos:", error);
-      }
       toast.error("Erro ao carregar ativos");
     } finally {
       setIsLoadingAssets(false);
@@ -87,9 +84,6 @@ const Index = () => {
         setNewAssetLabel(updatedAsset as Asset);
       }
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error("Erro ao cadastrar ativo:", error);
-      }
       toast.error("Erro ao cadastrar ativo");
     } finally {
       setIsLoading(false);

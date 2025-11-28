@@ -54,14 +54,10 @@ const UserManagement = () => {
       setLoading(true);
       const { data, error } = await supabase.rpc('list_all_users');
 
-      if (error) {
-        console.error('RPC Error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       setUsers((data as AppUser[]) ?? []);
     } catch (error: unknown) {
-      console.error('Erro ao carregar usuários:', error);
       const message = error instanceof Error ? error.message : '';
       if (message.includes('administradores')) {
         toast.error('Você não tem permissão para acessar esta página');

@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from '@/lib/utils';
 import { PageHeading } from '@/components/ui/page-heading';
+import { DAYS_IN_PERIOD, getDaysFromNow } from '@/utils/dateConstants';
 
 const Dashboard = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -43,20 +44,19 @@ const Dashboard = () => {
   const { user, loading: authLoading } = useAuth();
 
   const filteredAssets = useMemo(() => {
-    const now = new Date();
-
     return assets.filter(asset => {
       const createdAt = new Date(asset.created_at);
+      const daysFromNow = getDaysFromNow(createdAt);
 
       switch (periodFilter) {
         case '7':
-          return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 7;
+          return daysFromNow <= DAYS_IN_PERIOD.WEEK;
         case '30':
-          return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 30;
+          return daysFromNow <= DAYS_IN_PERIOD.MONTH;
         case '90':
-          return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 90;
+          return daysFromNow <= DAYS_IN_PERIOD.QUARTER;
         case '365':
-          return (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24) <= 365;
+          return daysFromNow <= DAYS_IN_PERIOD.YEAR;
         default:
           return true;
       }
@@ -68,7 +68,7 @@ const Dashboard = () => {
     setPeriodFilter(value);
   };
 
-  const renderFilterOverlay = () => (
+  const FilterOverlay = () => (
     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-3xl bg-background/80 backdrop-blur-sm">
       <Loader2 className="h-5 w-5 animate-spin text-primary" />
       <span className="mt-2 text-sm text-muted-foreground">Atualizando dados...</span>
@@ -90,12 +90,11 @@ const Dashboard = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
+
       const assetsData = (data || []) as Asset[];
       setAssets(assetsData);
       calculateStatistics(assetsData);
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
       toast.error('Erro ao carregar dados do dashboard');
     } finally {
       setLoading(false);
@@ -208,9 +207,8 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Cards de Estatísticas */}
       <div className="relative mb-8">
-        {isApplyingFilter && renderFilterOverlay()}
+        {isApplyingFilter && <FilterOverlay />}
         <div
           className={cn(
             "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in",
@@ -271,16 +269,15 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-scale-in">
         <div className="relative">
-          {isApplyingFilter && renderFilterOverlay()}
+          {isApplyingFilter && <FilterOverlay />}
           <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
             <AssetsBySectorChart data={statistics.assetsBySector} />
           </div>
         </div>
         <div className="relative">
-          {isApplyingFilter && renderFilterOverlay()}
+          {isApplyingFilter && <FilterOverlay />}
           <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
             <AssetsByConservationChart data={statistics.assetsByConservation} />
           </div>
@@ -288,14 +285,14 @@ const Dashboard = () => {
       </div>
 
       <div className="relative mb-8 animate-fade-in">
-        {isApplyingFilter && renderFilterOverlay()}
+        {isApplyingFilter && <FilterOverlay />}
         <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
           <ValueDistributionChart assets={filteredAssets} />
         </div>
       </div>
 
       <div className="relative mb-8 animate-fade-in">
-        {isApplyingFilter && renderFilterOverlay()}
+        {isApplyingFilter && <FilterOverlay />}
         <div
           className={cn(
             "grid grid-cols-1 lg:grid-cols-2 gap-6",
@@ -308,15 +305,15 @@ const Dashboard = () => {
       </div>
 
       <div className="relative mb-8 animate-fade-in">
-        {isApplyingFilter && renderFilterOverlay()}
-        <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}> 
+        {isApplyingFilter && <FilterOverlay />}
+        <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
           <ConservationHeatmapChart assets={filteredAssets} />
         </div>
       </div>
 
       <div className="relative animate-fade-in">
-        {isApplyingFilter && renderFilterOverlay()}
-        <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}> 
+        {isApplyingFilter && <FilterOverlay />}
+        <div className={cn(isApplyingFilter && "pointer-events-none opacity-50")}>
           <TopAssetsTable assets={filteredAssets} />
         </div>
       </div>

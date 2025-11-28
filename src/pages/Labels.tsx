@@ -43,9 +43,6 @@ const Labels = () => {
       if (error) throw error;
       setAssets((data || []) as Asset[]);
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error('Erro ao carregar ativos:', error);
-      }
       toast.error('Erro ao carregar ativos');
     } finally {
       setIsLoadingAssets(false);
@@ -81,9 +78,6 @@ const Labels = () => {
         const ids = parsed.map((asset) => asset.id);
         setSelectedAssets(ids.filter((id) => assets.some((asset) => asset.id === id)));
       } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error('Erro ao restaurar seleção de etiquetas:', error);
-        }
       } finally {
         sessionStorage.removeItem('selectedAssetsForLabels');
       }
