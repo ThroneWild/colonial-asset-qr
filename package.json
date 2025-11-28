@@ -3,7 +3,7 @@
   "productName": "PrizePatrimonios",
   "description": "Sistema de gestão de patrimônios com QR Code",
   "author": "PrizePatrimonios",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "main": "dist-electron/main.js",
